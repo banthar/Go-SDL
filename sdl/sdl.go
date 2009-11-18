@@ -2,6 +2,7 @@ package sdl
 
 // struct private_hwdata{};
 // struct SDL_BlitMap{};
+// struct TTF_Font{};
 // #define map _map
 // #include <SDL/SDL.h>
 // #include <SDL/SDL_image.h>
@@ -12,6 +13,7 @@ import "unsafe"
 import "image"
 
 //type Surface C.SDL_Surface;
+//type TTF_Font C.TTF_Font;
 
 type cast unsafe.Pointer
 
@@ -168,6 +170,13 @@ func Delay(ms uint32)	{ C.SDL_Delay(C.Uint32(ms)) }
 
 func TTF_Init() int {
     return int(C.TTF_Init());
+}
+
+func TTF_OpenFont(file string, ptsize int) *TTF_Font {
+    cfile := C.CString(file);
+    cfont := C.TTF_OpenFont(cfile, ptsize);
+    C.free(unsafe.Pointer(cfile));
+    return cfont;
 }
 
 
