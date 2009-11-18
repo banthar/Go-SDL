@@ -4,20 +4,15 @@
 
 include $(GOROOT)/src/Make.$(GOARCH)
 
-all: test-sdl test-gl
+all: test-sdl
 
 libs:
 	make -C sdl install
-	make -C gl install
 
 
 test-sdl: test-sdl.go libs
 	$(GC) test-sdl.go
 	$(LD) -o $@ test-sdl.$(O)
-
-test-gl: test-gl.go libs
-	$(GC) test-gl.go
-	$(LD) -o $@ test-gl.$(O)
 
 clean:
 	rm -f -r *.8 *.6 *.o */*.8 */*.6 */*.o */_obj test-sdl test-gl shoot.png

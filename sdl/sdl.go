@@ -5,6 +5,7 @@ package sdl
 // #define map _map
 // #include <SDL/SDL.h>
 // #include <SDL/SDL_image.h>
+// #include <SDL/SDL_ttf.h>
 import "C"
 import "unsafe"
 
@@ -162,5 +163,11 @@ func (event *Event) MouseMotion() *MouseMotionEvent
 //SDL time
 
 func Delay(ms uint32)	{ C.SDL_Delay(C.Uint32(ms)) }
+
+//SDL ttf
+
+func TTF_Init() int {
+    return int(C.TTF_Init());
+}
 
 
