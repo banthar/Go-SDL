@@ -2,7 +2,6 @@ package sdl
 
 // struct private_hwdata{};
 // struct SDL_BlitMap{};
-// struct TTF_Font{};
 // #define map _map
 // #include <SDL/SDL.h>
 // #include <SDL/SDL_image.h>
