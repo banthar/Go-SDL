@@ -9,6 +9,6 @@ main
 **.cgo*.8
 **.cgo*.6
 **/_obj
-test-gl
 test-sdl
+shoot.png
 
