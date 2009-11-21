@@ -1,15 +1,17 @@
 package main
 
-import "sdl"
-//import "math"
+import (
+    "sdl";
+    "sdl/ttf";
+    "fmt";
+    "image/png";
+    "os";
+)
 
-import "fmt"
-import "image/png"
-import "os"
 
 func main() {
 	sdl.Init(sdl.INIT_VIDEO);
-	sdl.TTF_Init();
+	ttf.Init();
 
 	var screen = sdl.SetVideoMode(640, 480, 32, 0);
 	sdl.WM_SetCaption("Go-SDL SDL Test", "");
@@ -17,9 +19,9 @@ func main() {
 	image := sdl.Load("test.png");
 	running := true;
 	var x, y int16;
-	font := sdl.TTF_OpenFont("CloisterBlack.ttf", 72);
+	font := ttf.OpenFont("CloisterBlack.ttf", 72);
 	white := sdl.Color{255,255,255,0};
-	text := sdl.TTF_RenderText_Blended(font, "Test", white);
+	text := ttf.RenderText_Blended(font, "Test", white);
 
 	for running {
 
@@ -57,9 +59,9 @@ func main() {
 
 	image.Free();
 	screen.Free();
-	sdl.TTF_CloseFont(font);
+	ttf.CloseFont(font);
 
-    sdl.TTF_Quit();
+    ttf.Quit();
 	sdl.Quit();
 
 }

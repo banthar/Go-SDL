@@ -4,19 +4,11 @@
 
 include $(GOROOT)/src/Make.$(GOARCH)
 
-TARG=sdl
+TARG=sdl/ttf
 
-GOFILES:=sdl_defs.go
+CGOFILES:=ttf.go
+CGO_LDFLAGS:=-lSDL_ttf
 
-CGOFILES:=sdl.go
-
-CGO_LDFLAGS:=`pkg-config --libs sdl` -lSDL_image
-
-CGO_CFLAGS:=`pkg-config --cflags sdl`
-
-CLEANFILES+=sdl
+CLEANFILES+=ttf
 
 include $(GOROOT)/src/Make.pkg
-
-sdl_defs.go: sdl.c
-	godefs -g sdl sdl.c > sdl_defs.go

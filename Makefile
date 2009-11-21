@@ -8,6 +8,7 @@ all: test-sdl
 
 libs:
 	make -C sdl install
+	make -C ttf install
 
 
 test-sdl: test-sdl.go libs

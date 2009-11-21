@@ -5,7 +5,6 @@ package sdl
 // #define map _map
 // #include <SDL/SDL.h>
 // #include <SDL/SDL_image.h>
-// #include <SDL/SDL_ttf.h>
 import "C"
 import "unsafe"
 
@@ -159,34 +158,5 @@ func (event *Event) MouseMotion() *MouseMotionEvent
 
 func Delay(ms uint32)	{ C.SDL_Delay(C.Uint32(ms)) }
 
-//SDL ttf
-
-
-func TTF_Init() int {
-    return int(C.TTF_Init());
-}
-
-func TTF_Quit() {
-    C.TTF_Quit();
-}
-
-func TTF_OpenFont(file string, ptsize int) *C.TTF_Font {
-    cfile := C.CString(file);
-    cfont := C.TTF_OpenFont(cfile, C.int(ptsize));
-    C.free(unsafe.Pointer(cfile));
-    return cfont;
-}
-
-func TTF_CloseFont(font *C.TTF_Font) {
-    C.TTF_CloseFont(font);
-}
-
-func TTF_RenderText_Blended(cfont *C.TTF_Font, text string, color Color) *Surface {
-    ctext := C.CString(text);
-    ccol := C.SDL_Color{C.Uint8(color.R),C.Uint8(color.G),C.Uint8(color.B), C.Uint8(color.Unused)};
-    surface := C.TTF_RenderText_Blended(cfont, ctext, ccol);
-    C.free(unsafe.Pointer(ctext));
-    return (*Surface)(cast(surface));
-}
 
 
