@@ -36,12 +36,6 @@ func WM_SetCaption(title string, icon string) {
     C.free(unsafe.Pointer(cicon));
 }
 
-func GL_SwapBuffers()
-{
-    C.SDL_GL_SwapBuffers();
-}
-
-
 func (screen *Surface) Flip() int	{ return int(C.SDL_Flip((*C.SDL_Surface)(cast(screen)))) }
 
 func (screen *Surface) Free()	{ C.SDL_FreeSurface((*C.SDL_Surface)(cast(screen))) }
