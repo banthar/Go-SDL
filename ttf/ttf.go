@@ -15,6 +15,13 @@ func Init() int {
     return int(C.TTF_Init());
 }
 
+func WasInit() int {
+    if C.TTF_WasInit() == 1 {
+        return 1
+    }
+    return 0;
+}
+
 func Quit() {
     C.TTF_Quit();
 }
