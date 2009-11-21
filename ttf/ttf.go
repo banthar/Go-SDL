@@ -28,8 +28,8 @@ func OpenFont(file string, ptsize int) *Font {
     return font;
 }
 
-func CloseFont(font *Font) {
-    C.TTF_CloseFont(font.cfont);
+func (f *Font) Close() {
+    C.TTF_CloseFont(f.cfont);
 }
 
 func RenderText_Blended(font *Font, text string, color sdl.Color) *sdl.Surface {

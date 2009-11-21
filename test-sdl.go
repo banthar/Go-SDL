@@ -19,7 +19,7 @@ func main() {
 	image := sdl.Load("test.png");
 	running := true;
 	var x, y int16;
-	font := ttf.OpenFont("CloisterBlack.ttf", 72);
+	font := ttf.OpenFont("Fontin Sans.otf", 72);
 	white := sdl.Color{255,255,255,0};
 	text := ttf.RenderText_Blended(font, "Test", white);
 
@@ -59,7 +59,7 @@ func main() {
 
 	image.Free();
 	screen.Free();
-	ttf.CloseFont(font);
+	font.Close();
 
     ttf.Quit();
 	sdl.Quit();
