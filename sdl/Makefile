@@ -10,7 +10,7 @@ GOFILES:=sdl_defs.go
 
 CGOFILES:=sdl.go
 
-CGO_LDFLAGS:=`pkg-config --libs sdl` -lSDL_image
+CGO_LDFLAGS:=`pkg-config --libs sdl` -lSDL_image -lSDL_ttf
 
 CGO_CFLAGS:=`pkg-config --cflags sdl`
 

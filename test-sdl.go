@@ -9,16 +9,17 @@ import "os"
 
 func main() {
 	sdl.Init(sdl.INIT_VIDEO);
+	sdl.TTF_Init();
 
 	var screen = sdl.SetVideoMode(640, 480, 32, 0);
-	
 	sdl.WM_SetCaption("Go-SDL SDL Test", "");
 
-	var image = sdl.Load("test.png");
-
-	var running = true;
-
+	image := sdl.Load("test.png");
+	running := true;
 	var x, y int16;
+	font := sdl.TTF_OpenFont("CloisterBlack.ttf", 72);
+	white := sdl.Color{255,255,255,0};
+	text := sdl.TTF_RenderText_Blended(font, "Test", white);
 
 	for running {
 
@@ -49,13 +50,16 @@ func main() {
 
 		screen.FillRect(nil, 0x302019);
 		screen.Blit(&sdl.Rect{x, y, 0, 0}, image, nil);
+		screen.Blit(&sdl.Rect{0,0,0,0}, text, nil);
 		screen.Flip();
 		sdl.Delay(25);
 	}
 
 	image.Free();
 	screen.Free();
+	sdl.TTF_CloseFont(font);
 
+    sdl.TTF_Quit();
 	sdl.Quit();
 
 }
