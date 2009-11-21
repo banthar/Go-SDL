@@ -16,4 +16,4 @@ test-sdl: test-sdl.go libs
 	$(LD) -o $@ test-sdl.$(O)
 
 clean:
-	rm -f -r *.8 *.6 *.o */*.8 */*.6 */*.o */_obj test-sdl test-gl shoot.png
+	rm -f -r *.8 *.6 *.o */*.8 */*.6 */*.o */_obj test-sdl shoot.png
