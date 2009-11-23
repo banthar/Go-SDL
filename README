@@ -1,2 +1,1 @@
-Make sure you have SDL, SDL_image, SDL_ttf, OpenGL and GLEW (all in -dev version).
-GL and GLEW headers should be in /usr/include/GL/
+Make sure you have SDL, SDL_image, and SDL_ttf (all in -dev version).
