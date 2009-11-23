@@ -10,7 +10,6 @@ libs:
 	make -C sdl install
 	make -C ttf install
 
-
 test-sdl: test-sdl.go libs
 	$(GC) test-sdl.go
 	$(LD) -o $@ test-sdl.$(O)
