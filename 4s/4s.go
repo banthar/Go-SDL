@@ -3,6 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // this is SDL version of src/pkg/exp/4s/4s.go
+// if you want to run int enable exp/draw support in sdl/Makefile
 
 package main
 

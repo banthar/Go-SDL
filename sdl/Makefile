@@ -6,7 +6,11 @@ include $(GOROOT)/src/Make.$(GOARCH)
 
 TARG=sdl
 
-GOFILES:=sdl_defs.go sdldraw.go
+
+GOFILES:=sdl_defs.go
+
+# uncomment this line to enable exp/draw support
+# GOFILES:=$(GOFILES) sdldraw.go
 
 CGOFILES:=sdl.go
 
