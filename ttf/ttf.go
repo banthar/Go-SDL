@@ -35,6 +35,15 @@ func OpenFont(file string, ptsize int) *Font {
     return font;
 }
 
+func OpenFontIndex(file string, ptsize int, index int) *Font {
+    cfile := C.CString(file);
+    cfont := C.TTF_OpenFontIndex(cfile, C.int(ptsize), C.long(index));
+    C.free(unsafe.Pointer(cfile));
+    font := new(Font);
+    font.cfont = cfont;
+    return font;
+}
+
 func (f *Font) Close() {
     C.TTF_CloseFont(f.cfont);
 }
@@ -63,3 +72,5 @@ func RenderText_Blended(font *Font, text string, color sdl.Color) *sdl.Surface {
     C.free(unsafe.Pointer(ctext));
     return (*sdl.Surface)(unsafe.Pointer(surface));
 }
+
+
