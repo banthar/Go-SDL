@@ -1,7 +1,4 @@
 Make sure you have SDL, SDL_image, and SDL_ttf (all in -dev version).
-<<<<<<< HEAD:README
 
 This is a sandbox fork of Banthar's SDL bindings.  Please see
 his version if you want the GL bindings as well. =)
-=======
->>>>>>> 966c1ab204a35f6810dd89766dfd6f438248d6ea:README
