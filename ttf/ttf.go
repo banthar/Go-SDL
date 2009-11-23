@@ -80,5 +80,3 @@ func RenderText_Blended(font *Font, text string, color sdl.Color) *sdl.Surface {
 func (f *Font) SetFontStyle(style int) {
     C.TTF_SetFontStyle(f.cfont, C.int(style));
 }
-
-
