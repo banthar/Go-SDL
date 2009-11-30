@@ -1,3 +1,10 @@
+/*
+A binding of SDL and SDL_image.
+
+The binding is works in pretty much the same way as it does in C, although
+some of the functions have been altered to give them an object-oriented
+flavor (eg. Rather than sdl.Flip(surface) it's surface.Flip() )
+*/
 package sdl
 
 // struct private_hwdata{};
@@ -6,7 +13,6 @@ package sdl
 // #include <SDL/SDL.h>
 // #include <SDL/SDL_image.h>
 import "C"
-import "image"
 import "unsafe"
 
 type cast unsafe.Pointer
@@ -15,26 +21,36 @@ type cast unsafe.Pointer
 
 func GetError() string	{ return C.GoString(C.SDL_GetError()) }
 
+// Initializes SDL.
 func Init(flags uint32) int	{ return int(C.SDL_Init(C.Uint32(flags))) }
 func Quit()			{ C.SDL_Quit() }
 
 //SDL_video
 
+// Sets up a video mode with the specified width, height, bits-per-pixel and
+// returns a corresponding surface.  You don't need to call the Free method
+// of the returned surface, as it will be done automatically by sdl.Quit.
 func SetVideoMode(w int, h int, bpp int, flags uint32) *Surface {
 	var screen = C.SDL_SetVideoMode(C.int(w), C.int(h), C.int(bpp), C.Uint32(flags));
 	return (*Surface)(cast(screen));
 }
 
+// Returns a pointer to the current display surface.
 func GetVideoSurface() *Surface	{ return (*Surface)(cast(C.SDL_GetVideoSurface())) }
 
+// Checks to see if a particular video mode is supported.  Returns 0 if not
+// supported, or the bits-per-pixel of the closest available mode.
 func VideoModeOK(width int, height int, bpp int, flags uint32) int {
 	return int(C.SDL_VideoModeOK(C.int(width), C.int(height), C.int(bpp), C.Uint32(flags)))
 }
 
-func SDL_UpdateRect(screen *Surface, x int32, y int32, w uint32, h uint32) {
+// Makes sure the given area is updated on the given screen.  If x, y, w, and
+// h are all 0, the whole screen will be updated.
+func (screen *Surface) UpdateRect(x int32, y int32, w uint32, h uint32) {
 	C.SDL_UpdateRect((*C.SDL_Surface)(cast(screen)), C.Sint32(x), C.Sint32(y), C.Uint32(w), C.Uint32(h))
 }
 
+// Sets the window title and icon name.
 func WM_SetCaption(title string, icon string) {
 	ctitle := C.CString(title);
 	cicon := C.CString(icon);
@@ -76,59 +92,6 @@ func (dst *Surface) FillRect(dstrect *Rect, color uint32) int {
 
 func GetRGBA(color uint32, format *PixelFormat, r *uint8, g *uint8, b *uint8, a *uint8) {
 	C.SDL_GetRGBA(C.Uint32(color), (*C.SDL_PixelFormat)(cast(format)), (*C.Uint8)(r), (*C.Uint8)(g), (*C.Uint8)(b), (*C.Uint8)(a))
-}
-
-// surface --> Image
-
-func (surface *Surface) ColorModel() image.ColorModel {
-	//TODO
-	return nil
-}
-
-func (surface *Surface) Width() int	{ return int(surface.W) }
-
-func (surface *Surface) Height() int	{ return int(surface.H) }
-
-func (surface *Surface) Set(x, y int, c image.Color) {
-	//TODO endianess, bpp, alpha, etc
-
-	var bpp = int(surface.Format.BytesPerPixel);
-
-	var pixel = uintptr(unsafe.Pointer(surface.Pixels));
-
-	pixel += uintptr(y*int(surface.Pitch) + x*bpp);
-
-	var p = (*image.RGBAColor)(unsafe.Pointer(pixel));
-
-	var r, g, b, a = c.RGBA();
-
-	p.R = uint8(r);
-	p.G = uint8(g);
-	p.R = uint8(b);
-	p.A = uint8(255 - a);
-
-}
-
-
-func (surface *Surface) At(x, y int) image.Color {
-
-	var bpp = int(surface.Format.BytesPerPixel);
-
-	var pixel = uintptr(unsafe.Pointer(surface.Pixels));
-
-	pixel += uintptr(y*int(surface.Pitch) + x*bpp);
-
-	var color = *((*uint32)(unsafe.Pointer(pixel)));
-
-	var r uint8;
-	var g uint8;
-	var b uint8;
-	var a uint8;
-
-	GetRGBA(color, surface.Format, &r, &g, &b, &a);
-
-	return image.RGBAColor{uint8(r), uint8(g), uint8(b), uint8(a)};
-
 }
 
 //SDL image

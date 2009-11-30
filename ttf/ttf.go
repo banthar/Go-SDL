@@ -1,5 +1,5 @@
 /*
-A binding of SDL_ttf
+A binding of SDL_ttf.
 
 You use this binding pretty much the same way you use SDL_ttf, although commands
 that work with loaded fonts are changed to have a more object-oriented feel.

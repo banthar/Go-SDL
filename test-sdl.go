@@ -51,7 +51,6 @@ func main() {
 	}
 
 	image.Free();
-	screen.Free();
 	font.Close();
 
 	ttf.Quit();
