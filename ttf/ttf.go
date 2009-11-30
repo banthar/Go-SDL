@@ -1,3 +1,10 @@
+/*
+A binding of SDL_ttf
+
+You use this binding pretty much the same way you use SDL_ttf, although commands
+that work with loaded fonts are changed to have a more object-oriented feel.
+(eg. Rather than ttf.GetFontStyle(f) it's f.GetFontStyle() )
+*/
 package ttf
 
 // #include <SDL/SDL_ttf.h>
@@ -5,13 +12,15 @@ import "C"
 import "sdl"
 import "unsafe"
 
-
+// A ttf or otf font.
 type Font struct {
 	cfont *C.TTF_Font;
 }
 
+// Initializes SDL_ttf.
 func Init() int	{ return int(C.TTF_Init()) }
 
+// Checks to see if SDL_ttf is initialized.  Returns 1 if true, 0 if false.
 func WasInit() int {
 	if C.TTF_WasInit() == 1 {
 		return 1
@@ -19,8 +28,10 @@ func WasInit() int {
 	return 0;
 }
 
+// Shuts down SDL_ttf.
 func Quit()	{ C.TTF_Quit() }
 
+// Loads a font from a file at the specified point size.
 func OpenFont(file string, ptsize int) *Font {
 	cfile := C.CString(file);
 	cfont := C.TTF_OpenFont(cfile, C.int(ptsize));
@@ -29,6 +40,8 @@ func OpenFont(file string, ptsize int) *Font {
 	return font;
 }
 
+// Loads a font from a file containing multiple font faces at the specified
+// point size.
 func OpenFontIndex(file string, ptsize int, index int) *Font {
 	cfile := C.CString(file);
 	cfont := C.TTF_OpenFontIndex(cfile, C.int(ptsize), C.long(index));
@@ -37,8 +50,11 @@ func OpenFontIndex(file string, ptsize int, index int) *Font {
 	return font;
 }
 
+// Frees the pointer to the font.
 func (f *Font) Close()	{ C.TTF_CloseFont(f.cfont) }
 
+// Renders text in the specified color and returns an SDL surface.  Solid
+// rendering is quick, although not as smooth as the other rendering types.
 func RenderText_Solid(font *Font, text string, color sdl.Color) *sdl.Surface {
 	ctext := C.CString(text);
 	ccol := C.SDL_Color{C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.Unused)};
@@ -47,6 +63,9 @@ func RenderText_Solid(font *Font, text string, color sdl.Color) *sdl.Surface {
 	return (*sdl.Surface)(unsafe.Pointer(surface));
 }
 
+// Renders text in the specified color (and with the specified background color)
+// and returns an SDL surface.  Shaded rendering is slower than solid
+// rendering and the text is in a solid box, but it's better looking.  
 func RenderText_Shaded(font *Font, text string, color sdl.Color, bgcolor sdl.Color) *sdl.Surface {
 	ctext := C.CString(text);
 	ccol := C.SDL_Color{C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.Unused)};
@@ -56,6 +75,9 @@ func RenderText_Shaded(font *Font, text string, color sdl.Color, bgcolor sdl.Col
 	return (*sdl.Surface)(unsafe.Pointer(surface));
 }
 
+// Renders text in the specified color and returns an SDL surface.  Blended
+// rendering is the slowest of the three methods, although it produces the best
+// results, especially when blitted over another image.
 func RenderText_Blended(font *Font, text string, color sdl.Color) *sdl.Surface {
 	ctext := C.CString(text);
 	ccol := C.SDL_Color{C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.Unused)};
@@ -64,14 +86,22 @@ func RenderText_Blended(font *Font, text string, color sdl.Color) *sdl.Surface {
 	return (*sdl.Surface)(unsafe.Pointer(surface));
 }
 
+// Returns the rendering style of the font.
 func (f *Font) GetFontStyle() int	{ return int(C.TTF_GetFontStyle(f.cfont)) }
 
+// Sets the rendering style of the font.
 func (f *Font) SetFontStyle(style int)	{ C.TTF_SetFontStyle(f.cfont, C.int(style)) }
 
+// Returns the maximum height of all the glyphs of the font.
 func (f *Font) FontHeight() int	{ return int(C.TTF_FontHeight(f.cfont)) }
 
+// Returns the maximum pixel ascent (from the baseline) of all the glyphs
+// of the font.
 func (f *Font) FontAscent() int	{ return int(C.TTF_FontAscent(f.cfont)) }
 
+// Returns the maximum pixel descent (from the baseline) of all the glyphs
+// of the font.
 func (f *Font) FontDescent() int	{ return int(C.TTF_FontDescent(f.cfont)) }
 
+// Returns the recommended pixel height of a rendered line of text.
 func (f *Font) FontLineSkip() int	{ return int(C.TTF_FontLineSkip(f.cfont)) }
