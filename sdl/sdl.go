@@ -1,3 +1,10 @@
+/*
+A binding of SDL and SDL_image.
+
+The binding is works in pretty much the same way as it does in C, although
+some of the functions have been altered to give them an object-oriented
+flavor (eg. Rather than sdl.Flip(surface) it's surface.Flip() )
+*/
 package sdl
 
 // struct private_hwdata{};
@@ -6,7 +13,6 @@ package sdl
 // #include <SDL/SDL.h>
 // #include <SDL/SDL_image.h>
 import "C"
-import "image"
 import "unsafe"
 
 type cast unsafe.Pointer
@@ -15,26 +21,36 @@ type cast unsafe.Pointer
 
 func GetError() string	{ return C.GoString(C.SDL_GetError()) }
 
+// Initializes SDL.
 func Init(flags uint32) int	{ return int(C.SDL_Init(C.Uint32(flags))) }
 func Quit()			{ C.SDL_Quit() }
 
 //SDL_video
 
+// Sets up a video mode with the specified width, height, bits-per-pixel and
+// returns a corresponding surface.  You don't need to call the Free method
+// of the returned surface, as it will be done automatically by sdl.Quit.
 func SetVideoMode(w int, h int, bpp int, flags uint32) *Surface {
 	var screen = C.SDL_SetVideoMode(C.int(w), C.int(h), C.int(bpp), C.Uint32(flags));
 	return (*Surface)(cast(screen));
 }
 
+// Returns a pointer to the current display surface.
 func GetVideoSurface() *Surface	{ return (*Surface)(cast(C.SDL_GetVideoSurface())) }
 
+// Checks to see if a particular video mode is supported.  Returns 0 if not
+// supported, or the bits-per-pixel of the closest available mode.
 func VideoModeOK(width int, height int, bpp int, flags uint32) int {
 	return int(C.SDL_VideoModeOK(C.int(width), C.int(height), C.int(bpp), C.Uint32(flags)))
 }
 
-func SDL_UpdateRect(screen *Surface, x int32, y int32, w uint32, h uint32) {
+// Makes sure the given area is updated on the given screen.  If x, y, w, and
+// h are all 0, the whole screen will be updated.
+func (screen *Surface) UpdateRect(x int32, y int32, w uint32, h uint32) {
 	C.SDL_UpdateRect((*C.SDL_Surface)(cast(screen)), C.Sint32(x), C.Sint32(y), C.Uint32(w), C.Uint32(h))
 }
 
+// Sets the window title and icon name.
 func WM_SetCaption(title string, icon string) {
 	ctitle := C.CString(title);
 	cicon := C.CString(icon);
