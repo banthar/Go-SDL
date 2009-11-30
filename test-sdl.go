@@ -33,7 +33,7 @@ func main() {
 				running = false;
 				break;
 			case sdl.KEYDOWN:
-				println(sdl.GetKeyName(sdl.Key(e.Keyboard().Keysym.Sym)));
+				println(sdl.GetKeyName(sdl.Key(e.Keyboard().Keysym.Sym)))
 			case sdl.MOUSEBUTTONDOWN:
 				println("Click:", e.MouseButton().X, e.MouseButton().Y);
 				x = int16(e.MouseButton().X - 16);
@@ -45,7 +45,7 @@ func main() {
 		screen.FillRect(nil, 0x302019);
 		screen.Blit(&sdl.Rect{0, 0, 0, 0}, text, nil);
 		screen.Blit(&sdl.Rect{x, y, 0, 0}, image, nil);
-		screen.Blit(&sdl.Rect{0,0,0,0}, text, nil);
+		screen.Blit(&sdl.Rect{0, 0, 0, 0}, text, nil);
 		screen.Flip();
 		sdl.Delay(25);
 	}
@@ -56,5 +56,4 @@ func main() {
 
 	ttf.Quit();
 	sdl.Quit();
-
 }

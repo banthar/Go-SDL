@@ -85,9 +85,9 @@ func (surface *Surface) ColorModel() image.ColorModel {
 	return nil
 }
 
-func (surface *Surface) Width() int { return int(surface.W) }
+func (surface *Surface) Width() int	{ return int(surface.W) }
 
-func (surface *Surface) Height() int { return int(surface.H) }
+func (surface *Surface) Height() int	{ return int(surface.H) }
 
 func (surface *Surface) Set(x, y int, c image.Color) {
 	//TODO endianess, bpp, alpha, etc
@@ -160,16 +160,15 @@ func GetKeyRepeat() (int, int) {
 
 // TODO
 // Uint8 * SDL_GetKeyState(int *numkeys)
-func GetKeyState() []uint8
-{
-    var numkeys C.int;
-    array:=C.SDL_GetKeyState( &numkeys );
+func GetKeyState() []uint8 {
+	var numkeys C.int;
+	array := C.SDL_GetKeyState(&numkeys);
 
-    var ptr=make([]uint8,numkeys);
+	var ptr = make([]uint8, numkeys);
 
-    *((**C.Uint8)(unsafe.Pointer(&ptr)))=array;
+	*((**C.Uint8)(unsafe.Pointer(&ptr))) = array;
 
-    return ptr;
+	return ptr;
 
 }
 
@@ -229,4 +228,3 @@ func (event *Event) MouseMotion() *MouseMotionEvent {
 //SDL time
 
 func Delay(ms uint32)	{ C.SDL_Delay(C.Uint32(ms)) }
-
