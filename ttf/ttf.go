@@ -9,8 +9,6 @@ import "unsafe";
 
 type Font struct {
     cfont *C.TTF_Font;
-    Height int;
-    Ascent int;
 }
 
 func Init() int {
@@ -32,7 +30,7 @@ func OpenFont(file string, ptsize int) *Font {
     cfile := C.CString(file);
     cfont := C.TTF_OpenFont(cfile, C.int(ptsize));
     C.free(unsafe.Pointer(cfile));
-    font := &Font{cfont, int(C.TTF_FontHeight(cfont)), int(C.TTF_FontAscent(cfont))};
+    font := &Font{cfont};
     return font;
 }
 
@@ -40,7 +38,7 @@ func OpenFontIndex(file string, ptsize int, index int) *Font {
     cfile := C.CString(file);
     cfont := C.TTF_OpenFontIndex(cfile, C.int(ptsize), C.long(index));
     C.free(unsafe.Pointer(cfile));
-    font := &Font{cfont, int(C.TTF_FontHeight(cfont)), int(C.TTF_FontAscent(cfont))};
+    font := &Font{cfont};
     return font;
 }
 
@@ -79,4 +77,20 @@ func (f *Font) GetFontStyle() int {
 
 func (f *Font) SetFontStyle(style int) {
     C.TTF_SetFontStyle(f.cfont, C.int(style));
+}
+
+func (f *Font) FontHeight() int {
+	return int(C.TTF_FontHeight(f.cfont));
+}
+
+func (f *Font) FontAscent() int {
+	return int(C.TTF_FontAscent(f.cfont));
+}
+
+func (f *Font) FontDescent() int {
+	return int(C.TTF_FontDescent(f.cfont));
+}
+
+func (f *Font) FontLineSkip() int {
+	return int(C.TTF_FontLineSkip(f.cfont));
 }
