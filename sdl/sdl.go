@@ -6,9 +6,8 @@ package sdl
 // #include <SDL/SDL.h>
 // #include <SDL/SDL_image.h>
 import "C"
+import "image"
 import "unsafe"
-
-//type Surface C.SDL_Surface;
 
 type cast unsafe.Pointer
 
@@ -104,21 +103,19 @@ func GetKeyRepeat() (int, int) {
 	C.SDL_GetKeyRepeat((*C.int)(cast(&delay)), (*C.int)(cast(&interval)));
 
 	return delay, interval;
-
 }
 
 // TODO
 // Uint8 * SDL_GetKeyState(int *numkeys)
-func GetKeyState() []uint8
-{
-    var numkeys C.int;
-    array:=C.SDL_GetKeyState( &numkeys );
+func GetKeyState() []uint8 {
+	var numkeys C.int;
+	array := C.SDL_GetKeyState(&numkeys);
 
-    var ptr=make([]uint8,numkeys);
+	var ptr = make([]uint8, numkeys);
 
-    *((**C.Uint8)(unsafe.Pointer(&ptr)))=array;
+	*((**C.Uint8)(unsafe.Pointer(&ptr))) = array;
 
-    return ptr;
+	return ptr;
 
 }
 
