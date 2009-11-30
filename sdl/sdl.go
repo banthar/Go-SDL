@@ -160,10 +160,18 @@ func GetKeyRepeat() (int, int) {
 
 // TODO
 // Uint8 * SDL_GetKeyState(int *numkeys)
-// func GetKeyState(numkeys *int) *uint8
-// {
-// 	return (*uint8)(C.SDL_GetKeyState((*C.int)(numkeys)));
-// }
+func GetKeyState() []uint8
+{
+    var numkeys C.int;
+    array:=C.SDL_GetKeyState( &numkeys );
+
+    var ptr=make([]uint8,numkeys);
+
+    *((**C.Uint8)(unsafe.Pointer(&ptr)))=array;
+
+    return ptr;
+
+}
 
 type Mod C.int
 type Key C.int
