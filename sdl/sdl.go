@@ -17,15 +17,18 @@ import "unsafe"
 
 type cast unsafe.Pointer
 
-//SDL
+// General
 
+// Gets SDL error string
 func GetError() string	{ return C.GoString(C.SDL_GetError()) }
 
 // Initializes SDL.
 func Init(flags uint32) int	{ return int(C.SDL_Init(C.Uint32(flags))) }
-func Quit()			{ C.SDL_Quit() }
 
-//SDL_video
+// Shuts down SDL
+func Quit()	{ C.SDL_Quit() }
+
+// Video
 
 // Sets up a video mode with the specified width, height, bits-per-pixel and
 // returns a corresponding surface.  You don't need to call the Free method
@@ -59,16 +62,21 @@ func WM_SetCaption(title string, icon string) {
 	C.free(unsafe.Pointer(cicon));
 }
 
+// Swaps OpenGL framebuffers/Update Display.
 func GL_SwapBuffers()	{ C.SDL_GL_SwapBuffers() }
 
+// Swaps screen buffers.
 func (screen *Surface) Flip() int	{ return int(C.SDL_Flip((*C.SDL_Surface)(cast(screen)))) }
 
+// Frees (deletes) a Surface
 func (screen *Surface) Free()	{ C.SDL_FreeSurface((*C.SDL_Surface)(cast(screen))) }
 
+// Locks a surface for direct access.
 func (screen *Surface) Lock() int {
 	return int(C.SDL_LockSurface((*C.SDL_Surface)(cast(screen))))
 }
 
+// Unlocks a previously locked surface.
 func (screen *Surface) Unlock() int	{ return int(C.SDL_Flip((*C.SDL_Surface)(cast(screen)))) }
 
 func (dst *Surface) Blit(dstrect *Rect, src *Surface, srcrect *Rect) int {
@@ -81,6 +89,7 @@ func (dst *Surface) Blit(dstrect *Rect, src *Surface, srcrect *Rect) int {
 	return int(ret);
 }
 
+// This function performs a fast fill of the given rectangle with some color.
 func (dst *Surface) FillRect(dstrect *Rect, color uint32) int {
 	var ret = C.SDL_FillRect(
 		(*C.SDL_Surface)(cast(dst)),
@@ -90,12 +99,12 @@ func (dst *Surface) FillRect(dstrect *Rect, color uint32) int {
 	return int(ret);
 }
 
+// Gets RGBA values from a pixel in the specified pixel format.
 func GetRGBA(color uint32, format *PixelFormat, r *uint8, g *uint8, b *uint8, a *uint8) {
 	C.SDL_GetRGBA(C.Uint32(color), (*C.SDL_PixelFormat)(cast(format)), (*C.Uint8)(r), (*C.Uint8)(g), (*C.Uint8)(b), (*C.Uint8)(a))
 }
 
-//SDL image
-
+// Loads Surface from file (using IMG_Load).
 func Load(file string) *Surface {
 	cfile := C.CString(file);
 	var screen = C.IMG_Load(cfile);
@@ -103,14 +112,17 @@ func Load(file string) *Surface {
 	return (*Surface)(cast(screen));
 }
 
-// SDL keys
+// Events
 
+// Enables UNICODE translation.
 func EnableUNICODE(enable int) int	{ return int(C.SDL_EnableUNICODE(C.int(enable))) }
 
+// Sets keyboard repeat rate.
 func EnableKeyRepeat(delay int, interval int) int {
 	return int(C.SDL_EnableKeyRepeat(C.int(delay), C.int(interval)))
 }
 
+// Gets keyboard repeat rate.
 func GetKeyRepeat() (int, int) {
 
 	var delay int;
@@ -121,49 +133,54 @@ func GetKeyRepeat() (int, int) {
 	return delay, interval;
 }
 
-// TODO
-// Uint8 * SDL_GetKeyState(int *numkeys)
+// Gets a snapshot of the current keyboard state
 func GetKeyState() []uint8 {
 	var numkeys C.int;
 	array := C.SDL_GetKeyState(&numkeys);
 
 	var ptr = make([]uint8, numkeys);
 
-	*((**C.Uint8)(unsafe.Pointer(&ptr))) = array;
+	*((**C.Uint8)(unsafe.Pointer(&ptr))) = array;	// TODO
 
 	return ptr;
 
 }
 
+// Modifier
 type Mod C.int
+
+// Key
 type Key C.int
 
-// Uint8 SDL_GetMouseState(int *x, int *y);
+// Retrieves the current state of the mouse.
 func GetMouseState(x *int, y *int) uint8 {
 	return uint8(C.SDL_GetMouseState((*C.int)(cast(x)), (*C.int)(cast(y))))
 }
 
-// SDLMod SDL_GetModState(void)
+// Gets the state of modifier keys
 func GetModState() Mod	{ return Mod(C.SDL_GetModState()) }
 
-// void SDL_SetModState(SDLMod modstate)
+// Sets the state of modifier keys
 func SetModState(modstate Mod)	{ C.SDL_SetModState(C.SDLMod(modstate)) }
 
-// char * SDL_GetKeyName(SDLKey key)
+// Gets the name of an SDL virtual keysym
 func GetKeyName(key Key) string	{ return C.GoString(C.SDL_GetKeyName(C.SDLKey(key))) }
 
-//SDL events
+// Events
 
+// Waits indefinitely for the next available event
 func (event *Event) Wait() bool {
 	var ret = C.SDL_WaitEvent((*C.SDL_Event)(cast(event)));
 	return ret != 0;
 }
 
+// Polls for currently pending events
 func (event *Event) Poll() bool {
 	var ret = C.SDL_PollEvent((*C.SDL_Event)(cast(event)));
 	return ret != 0;
 }
 
+// Waits indefinitely for the next available event
 func (event *Event) Keyboard() *KeyboardEvent {
 	if event.Type == KEYUP || event.Type == KEYDOWN {
 		return (*KeyboardEvent)(cast(event))
@@ -172,6 +189,7 @@ func (event *Event) Keyboard() *KeyboardEvent {
 	return nil;
 }
 
+// Returns MouseButtonEvent or nil if event has other type
 func (event *Event) MouseButton() *MouseButtonEvent {
 	if event.Type == MOUSEBUTTONDOWN || event.Type == MOUSEBUTTONUP {
 		return (*MouseButtonEvent)(cast(event))
@@ -180,6 +198,7 @@ func (event *Event) MouseButton() *MouseButtonEvent {
 	return nil;
 }
 
+// Returns MouseMotion or nil if event has other type
 func (event *Event) MouseMotion() *MouseMotionEvent {
 	if event.Type == MOUSEMOTION {
 		return (*MouseMotionEvent)(cast(event))
@@ -188,6 +207,10 @@ func (event *Event) MouseMotion() *MouseMotionEvent {
 	return nil;
 }
 
-//SDL time
+// Time
 
+// Gets the number of milliseconds since the SDL library initialization.
+func GetTicks() uint32	{ return uint32(C.SDL_GetTicks()) }
+
+// Waits a specified number of milliseconds before returning.
 func Delay(ms uint32)	{ C.SDL_Delay(C.Uint32(ms)) }
