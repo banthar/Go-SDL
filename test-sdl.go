@@ -17,6 +17,7 @@ func main() {
 	running := true;
 	var x, y int16;
 	font := ttf.OpenFont("Fontin Sans.otf", 72);
+	font.SetFontStyle(ttf.STYLE_UNDERLINE);
 	white := sdl.Color{255, 255, 255, 0};
 	text := ttf.RenderText_Blended(font, "Test", white);
 

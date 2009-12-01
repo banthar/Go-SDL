@@ -6,6 +6,7 @@ include $(GOROOT)/src/Make.$(GOARCH)
 
 TARG=sdl/ttf
 
+GOFILES:=ttf_defs.go
 CGOFILES:=ttf.go
 CGO_LDFLAGS:=-lSDL_ttf
 
