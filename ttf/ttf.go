@@ -65,7 +65,7 @@ func RenderText_Solid(font *Font, text string, color sdl.Color) *sdl.Surface {
 
 // Renders text in the specified color (and with the specified background color)
 // and returns an SDL surface.  Shaded rendering is slower than solid
-// rendering and the text is in a solid box, but it's better looking.  
+// rendering and the text is in a solid box, but it's better looking.
 func RenderText_Shaded(font *Font, text string, color sdl.Color, bgcolor sdl.Color) *sdl.Surface {
 	ctext := C.CString(text);
 	ccol := C.SDL_Color{C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.Unused)};
