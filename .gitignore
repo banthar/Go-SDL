@@ -9,7 +9,10 @@ main
 **.cgo*.8
 **.cgo*.6
 **/_obj
+<<<<<<< HEAD:.gitignore
+=======
 **/*.out
+>>>>>>> 966c1ab204a35f6810dd89766dfd6f438248d6ea:.gitignore
 test-sdl
 shoot.png
 
