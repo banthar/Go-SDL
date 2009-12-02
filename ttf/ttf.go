@@ -22,10 +22,7 @@ func Init() int	{ return int(C.TTF_Init()) }
 
 // Checks to see if SDL_ttf is initialized.  Returns 1 if true, 0 if false.
 func WasInit() int {
-	if C.TTF_WasInit() == 1 {
-		return 1
-	}
-	return 0;
+	return int(C.TTF_WasInit());
 }
 
 // Shuts down SDL_ttf.

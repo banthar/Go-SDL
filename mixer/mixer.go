@@ -1,5 +1,9 @@
 /*
 A binding of SDL_mixer.
+
+The binding works pretty much the same as the original, although a few
+functions have been changed to be in a more object-oriented style
+(eg. Rather than mixer.FreeMusic(song) it's song.Free() )
 */
 package mixer
 
@@ -77,4 +81,36 @@ func RewindMusic() {
 // Sets the position of the currently playing music.
 func SetMusicPosition(position float) int {
 	return int(C.Mix_SetMusicPosition(C.double(position)));
+}
+
+// Halt playback of music.
+func HaltMusic() {
+	C.Mix_HaltMusic();
+}
+
+// Fades out music over the milliseconds specified.  Music is halted after
+// the fade out is completed.
+func FadeOutMusic(ms int) int {
+	return int(C.Mix_FadeOutMusic(C.int(ms)));
+}
+
+
+// Returns the type of the currently playing music.
+func GetMusicType() {
+	//TODO
+}
+
+// Returns the type of the music.
+func (m *Music) GetMusicType() {
+	//TODO
+}
+
+// Returns 1 if music is currently playing and 0 if not.
+func PlayingMusic() int {
+	return int(C.Mix_PlayingMusic());
+}
+
+// Returns 1 if music is paused and 0 if not.
+func PausedMusic() int {
+	return int(C.Mix_PausedMusic());
 }
