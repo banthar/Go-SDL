@@ -15,7 +15,8 @@ type Music struct {
 	cmusic *C.Mix_Music;
 }
 
-// Initializes SDL_mixer.
+// Initializes SDL_mixer.  Return 0 if successful and -1 if there were
+// initialization errors.
 func OpenAudio(frequency int, format uint16, channels int, chunksize int) int {
 	return int(C.Mix_OpenAudio(C.int(frequency), C.Uint16(format),
 		C.int(channels), C.int(chunksize)));
@@ -113,4 +114,9 @@ func PlayingMusic() int {
 // Returns 1 if music is paused and 0 if not.
 func PausedMusic() int {
 	return int(C.Mix_PausedMusic());
+}
+
+// Tells you whether music is fading in, out, or not at all.
+func FadingMusic() {
+	//TODO
 }

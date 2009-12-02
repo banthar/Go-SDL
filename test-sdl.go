@@ -3,12 +3,14 @@ package main
 import (
 	"sdl";
 	"sdl/ttf";
+	"sdl/mixer";
 )
 
 
 func main() {
-	sdl.Init(sdl.INIT_VIDEO);
+	sdl.Init(sdl.INIT_EVERYTHING);
 	ttf.Init();
+	mixer.OpenAudio(22050, 16, 2, 4096);
 
 	var screen = sdl.SetVideoMode(640, 480, 32, 0);
 	sdl.WM_SetCaption("Go-SDL SDL Test", "");
@@ -20,6 +22,8 @@ func main() {
 	font.SetFontStyle(ttf.STYLE_UNDERLINE);
 	white := sdl.Color{255, 255, 255, 0};
 	text := ttf.RenderText_Blended(font, "Test", white);
+	music := mixer.LoadMUS("test.ogg");
+	music.PlayMusic(-1);
 
 	for running {
 
@@ -52,6 +56,7 @@ func main() {
 	}
 
 	image.Free();
+	music.Free();
 	font.Close();
 
 	ttf.Quit();
