@@ -7,11 +7,14 @@ flavor (eg. Rather than sdl.Flip(surface) it's surface.Flip() )
 */
 package sdl
 
+
 // struct private_hwdata{};
 // struct SDL_BlitMap{};
 // #define map _map
+//
 // #include <SDL/SDL.h>
 // #include <SDL/SDL_image.h>
+// static void SetError(const char* description){SDL_SetError("%s",description);}
 import "C"
 import "unsafe"
 
@@ -19,14 +22,37 @@ type cast unsafe.Pointer
 
 // General
 
-// Gets SDL error string
-func GetError() string	{ return C.GoString(C.SDL_GetError()) }
-
 // Initializes SDL.
 func Init(flags uint32) int	{ return int(C.SDL_Init(C.Uint32(flags))) }
 
 // Shuts down SDL
 func Quit()	{ C.SDL_Quit() }
+
+// Initializes subsystems.
+func InitSubSystem(flags uint32) int	{ return int(C.SDL_InitSubSystem(C.Uint32(flags))) }
+
+// Shuts down a subsystem.
+func QuitSubSystem(flags uint32)	{ C.SDL_QuitSubSystem(C.Uint32(flags)) }
+
+// Checks which subsystems are initialized.
+func WasInit(flags uint32) int	{ return int(C.SDL_WasInit(C.Uint32(flags))) }
+
+// Error Handling
+
+// Gets SDL error string
+func GetError() string	{ return C.GoString(C.SDL_GetError()) }
+
+// Set a string describing an error to be submitted to the SDL Error system.
+func SetError(description string) {
+	cdescription := C.CString(description);
+	C.SetError(cdescription);
+	C.free(unsafe.Pointer(cdescription));
+}
+
+// TODO SDL_Error
+
+// Clear the current SDL error
+func ClearError()	{ C.SDL_ClearError() }
 
 // Video
 
@@ -180,7 +206,7 @@ func (event *Event) Poll() bool {
 	return ret != 0;
 }
 
-// Waits indefinitely for the next available event
+// Returns KeyboardEvent or nil if event has other type
 func (event *Event) Keyboard() *KeyboardEvent {
 	if event.Type == KEYUP || event.Type == KEYDOWN {
 		return (*KeyboardEvent)(cast(event))
