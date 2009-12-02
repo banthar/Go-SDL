@@ -36,8 +36,7 @@ func OpenFont(file string, ptsize int) *Font {
 	cfile := C.CString(file);
 	cfont := C.TTF_OpenFont(cfile, C.int(ptsize));
 	C.free(unsafe.Pointer(cfile));
-	font := &Font{cfont};
-	return font;
+	return &Font{cfont};
 }
 
 // Loads a font from a file containing multiple font faces at the specified
@@ -46,8 +45,7 @@ func OpenFontIndex(file string, ptsize int, index int) *Font {
 	cfile := C.CString(file);
 	cfont := C.TTF_OpenFontIndex(cfile, C.int(ptsize), C.long(index));
 	C.free(unsafe.Pointer(cfile));
-	font := &Font{cfont};
-	return font;
+	return &Font{cfont};
 }
 
 // Frees the pointer to the font.
