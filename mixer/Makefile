@@ -6,6 +6,7 @@ include $(GOROOT)/src/Make.$(GOARCH)
 
 TARG=sdl/mixer
 
+GOFILES:=mixer_defs.go
 CGOFILES:=mixer.go
 CGO_LDFLAGS:=-lSDL_mixer
 
