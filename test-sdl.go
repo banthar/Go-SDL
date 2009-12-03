@@ -21,6 +21,11 @@ func main() {
 	white := sdl.Color{255, 255, 255, 0};
 	text := ttf.RenderText_Blended(font, "Test", white);
 
+    if(sdl.GetKeyName(270)!="[+]")
+    {
+        panic("GetKeyName broken");
+    }
+
 	for running {
 
 		x++;
@@ -34,7 +39,7 @@ func main() {
 				running = false;
 				break;
 			case sdl.KEYDOWN:
-				println(sdl.GetKeyName(sdl.Key(e.Keyboard().Keysym.Sym)))
+				println(e.Keyboard().Keysym.Sym,": ",sdl.GetKeyName(sdl.Key(e.Keyboard().Keysym.Sym)))
 			case sdl.MOUSEBUTTONDOWN:
 				println("Click:", e.MouseButton().X, e.MouseButton().Y);
 				x = int16(e.MouseButton().X - 16);
@@ -46,7 +51,6 @@ func main() {
 		screen.FillRect(nil, 0x302019);
 		screen.Blit(&sdl.Rect{0, 0, 0, 0}, text, nil);
 		screen.Blit(&sdl.Rect{x, y, 0, 0}, image, nil);
-		screen.Blit(&sdl.Rect{0, 0, 0, 0}, text, nil);
 		screen.Flip();
 		sdl.Delay(25);
 	}
