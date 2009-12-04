@@ -21,9 +21,7 @@ type Font struct {
 func Init() int	{ return int(C.TTF_Init()) }
 
 // Checks to see if SDL_ttf is initialized.  Returns 1 if true, 0 if false.
-func WasInit() int {
-	return int(C.TTF_WasInit());
-}
+func WasInit() int	{ return int(C.TTF_WasInit()) }
 
 // Shuts down SDL_ttf.
 func Quit()	{ C.TTF_Quit() }
@@ -33,6 +31,11 @@ func OpenFont(file string, ptsize int) *Font {
 	cfile := C.CString(file);
 	cfont := C.TTF_OpenFont(cfile, C.int(ptsize));
 	C.free(unsafe.Pointer(cfile));
+
+	if cfont == nil {
+		return nil
+	}
+
 	return &Font{cfont};
 }
 
@@ -42,6 +45,11 @@ func OpenFontIndex(file string, ptsize int, index int) *Font {
 	cfile := C.CString(file);
 	cfont := C.TTF_OpenFontIndex(cfile, C.int(ptsize), C.long(index));
 	C.free(unsafe.Pointer(cfile));
+
+	if cfont == nil {
+		return nil
+	}
+
 	return &Font{cfont};
 }
 
