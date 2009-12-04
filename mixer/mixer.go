@@ -30,6 +30,11 @@ func LoadMUS(file string) *Music {
 	cfile := C.CString(file);
 	cmusic := C.Mix_LoadMUS(cfile);
 	C.free(unsafe.Pointer(cfile));
+
+	if cmusic == nil {
+		return nil
+	}
+
 	return &Music{cmusic};
 }
 
