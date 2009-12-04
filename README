@@ -1,4 +1,5 @@
-Make sure you have SDL, SDL_image, and SDL_ttf (all in -dev version).
+Make sure you have SDL, SDL_image, SDL_mixer, and SDL_ttf (all in -dev version).
 
-If the bindings fail to compile, run 'hg pull -u' in $GOROOT and rebuild Go.  The release version of Go doesn't have some changes necessary to build the ttf binding last I checked.
+If the bindings fail to compile, run 'hg pull -u' in $GOROOT and rebuild Go.  The release version of Go doesn't have some changes necessary to build the ttf and mixer bindings last I checked.
 
+Music to test SDL_mixer is by Kevin MacLeod.

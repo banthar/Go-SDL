@@ -22,10 +22,7 @@ func Init() int	{ return int(C.TTF_Init()) }
 
 // Checks to see if SDL_ttf is initialized.  Returns 1 if true, 0 if false.
 func WasInit() int {
-	if C.TTF_WasInit() == 1 {
-		return 1
-	}
-	return 0;
+	return int(C.TTF_WasInit());
 }
 
 // Shuts down SDL_ttf.
@@ -36,8 +33,7 @@ func OpenFont(file string, ptsize int) *Font {
 	cfile := C.CString(file);
 	cfont := C.TTF_OpenFont(cfile, C.int(ptsize));
 	C.free(unsafe.Pointer(cfile));
-	font := &Font{cfont};
-	return font;
+	return &Font{cfont};
 }
 
 // Loads a font from a file containing multiple font faces at the specified
@@ -46,8 +42,7 @@ func OpenFontIndex(file string, ptsize int, index int) *Font {
 	cfile := C.CString(file);
 	cfont := C.TTF_OpenFontIndex(cfile, C.int(ptsize), C.long(index));
 	C.free(unsafe.Pointer(cfile));
-	font := &Font{cfont};
-	return font;
+	return &Font{cfont};
 }
 
 // Frees the pointer to the font.
