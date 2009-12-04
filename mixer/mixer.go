@@ -86,13 +86,13 @@ func FadeOutMusic(ms int) int	{ return int(C.Mix_FadeOutMusic(C.int(ms))) }
 
 
 // Returns the type of the currently playing music.
-func GetMusicType() {
-	//TODO
+func GetMusicType() int {
+	return int(C.Mix_GetMusicType(nil));
 }
 
 // Returns the type of the music.
-func (m *Music) GetMusicType() {
-	//TODO
+func (m *Music) GetMusicType() int {
+	return int(C.Mix_GetMusicType(m.cmusic));
 }
 
 // Returns 1 if music is currently playing and 0 if not.

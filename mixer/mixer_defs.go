@@ -15,3 +15,13 @@ const (
 	DEFAULT_CHANNELS	= 2;
 	MAX_VOLUME		= 128;
 )
+
+const (
+	MUS_NONE = iota;
+	MUS_CMD;
+	MUS_WAV;
+	MUS_MOD;
+	MUS_MID;
+	MUS_OGG;
+	MUS_MP3;
+)
