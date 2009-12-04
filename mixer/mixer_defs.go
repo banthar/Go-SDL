@@ -17,7 +17,7 @@ const (
 )
 
 const (
-	MUS_NONE = iota;
+	MUS_NONE	= iota;
 	MUS_CMD;
 	MUS_WAV;
 	MUS_MOD;
