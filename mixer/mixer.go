@@ -98,6 +98,4 @@ func PlayingMusic() int	{ return int(C.Mix_PlayingMusic()) }
 func PausedMusic() int	{ return int(C.Mix_PausedMusic()) }
 
 // Tells you whether music is fading in, out, or not at all.
-func FadingMusic() {
-	//TODO
-}
+func FadingMusic() int	{ return int(C.Mix_FadingMusic()) }

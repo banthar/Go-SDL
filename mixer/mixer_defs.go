@@ -25,3 +25,9 @@ const (
 	MUS_OGG;
 	MUS_MP3;
 )
+
+const (
+	NO_FADING	= iota;
+	FADING_OUT;
+	FADING_IN;
+)
