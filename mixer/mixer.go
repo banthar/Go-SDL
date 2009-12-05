@@ -11,6 +11,7 @@ package mixer
 import "C"
 import "unsafe"
 
+// A music file.
 type Music struct {
 	cmusic *C.Mix_Music;
 }
