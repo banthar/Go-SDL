@@ -11,6 +11,7 @@ package mixer
 import "C"
 import "unsafe"
 
+// A music file.
 type Music struct {
 	cmusic *C.Mix_Music;
 }
@@ -86,14 +87,10 @@ func FadeOutMusic(ms int) int	{ return int(C.Mix_FadeOutMusic(C.int(ms))) }
 
 
 // Returns the type of the currently playing music.
-func GetMusicType() {
-	//TODO
-}
+func GetMusicType() int	{ return int(C.Mix_GetMusicType(nil)) }
 
 // Returns the type of the music.
-func (m *Music) GetMusicType() {
-	//TODO
-}
+func (m *Music) GetMusicType() int	{ return int(C.Mix_GetMusicType(m.cmusic)) }
 
 // Returns 1 if music is currently playing and 0 if not.
 func PlayingMusic() int	{ return int(C.Mix_PlayingMusic()) }
@@ -102,6 +99,4 @@ func PlayingMusic() int	{ return int(C.Mix_PlayingMusic()) }
 func PausedMusic() int	{ return int(C.Mix_PausedMusic()) }
 
 // Tells you whether music is fading in, out, or not at all.
-func FadingMusic() {
-	//TODO
-}
+func FadingMusic() int	{ return int(C.Mix_FadingMusic()) }
