@@ -5,6 +5,7 @@ import (
 	"sdl/ttf";
 	"sdl/mixer";
 	"math";
+    "fmt";
 )
 
 type Point struct {
@@ -112,8 +113,22 @@ func main() {
 			case sdl.QUIT:
 				running = false;
 				break;
-			case sdl.KEYDOWN:
-				println(e.Keyboard().Keysym.Sym, ": ", sdl.GetKeyName(sdl.Key(e.Keyboard().Keysym.Sym)))
+			case sdl.KEYDOWN,sdl.KEYUP:
+                println("");
+				println(e.Keyboard().Keysym.Sym, ": ", sdl.GetKeyName(sdl.Key(e.Keyboard().Keysym.Sym)));
+
+                fmt.Printf("%04x ",e.Type);
+
+                for i:=0 ; i< len(e.Pad0) ;i++
+                {
+                    fmt.Printf("%02x ",e.Pad0[i]);
+                }
+                println();
+
+                k := e.Keyboard();
+
+	            fmt.Printf("Type: %02x Which: %02x State: %02x Pad: %02x\n", k.Type, k.Which, k.State, k.Pad0[0]);
+	            fmt.Printf("Scancode: %02x Sym: %08x Mod: %04x Unicode: %04x\n", k.Keysym.Scancode, k.Keysym.Sym, k.Keysym.Mod, k.Keysym.Unicode);
 			case sdl.MOUSEBUTTONDOWN:
 				println("Click:", e.MouseButton().X, e.MouseButton().Y);
 				in = out;
