@@ -89,7 +89,7 @@ func WM_GetCaption() (title, icon string) {
 }
 
 // Sets the window title and icon name.
-func WM_SetCaption(title string, icon string) {
+func WM_SetCaption(title, icon string) {
 	ctitle := C.CString(title);
 	cicon := C.CString(icon);
 	C.SDL_WM_SetCaption(ctitle, cicon);
@@ -135,7 +135,7 @@ func (dst *Surface) FillRect(dstrect *Rect, color uint32) int {
 }
 
 // Gets RGBA values from a pixel in the specified pixel format.
-func GetRGBA(color uint32, format *PixelFormat, r *uint8, g *uint8, b *uint8, a *uint8) {
+func GetRGBA(color uint32, format *PixelFormat, r, g, b, a *uint8) {
 	C.SDL_GetRGBA(C.Uint32(color), (*C.SDL_PixelFormat)(cast(format)), (*C.Uint8)(r), (*C.Uint8)(g), (*C.Uint8)(b), (*C.Uint8)(a))
 }
 
@@ -153,7 +153,7 @@ func Load(file string) *Surface {
 func EnableUNICODE(enable int) int	{ return int(C.SDL_EnableUNICODE(C.int(enable))) }
 
 // Sets keyboard repeat rate.
-func EnableKeyRepeat(delay int, interval int) int {
+func EnableKeyRepeat(delay, interval int) int {
 	return int(C.SDL_EnableKeyRepeat(C.int(delay), C.int(interval)))
 }
 
@@ -188,7 +188,7 @@ type Mod C.int
 type Key C.int
 
 // Retrieves the current state of the mouse.
-func GetMouseState(x *int, y *int) uint8 {
+func GetMouseState(x, y *int) uint8 {
 	return uint8(C.SDL_GetMouseState((*C.int)(cast(x)), (*C.int)(cast(y))))
 }
 

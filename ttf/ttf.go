@@ -41,7 +41,7 @@ func OpenFont(file string, ptsize int) *Font {
 
 // Loads a font from a file containing multiple font faces at the specified
 // point size.
-func OpenFontIndex(file string, ptsize int, index int) *Font {
+func OpenFontIndex(file string, ptsize, index int) *Font {
 	cfile := C.CString(file);
 	cfont := C.TTF_OpenFontIndex(cfile, C.int(ptsize), C.long(index));
 	C.free(unsafe.Pointer(cfile));
@@ -69,7 +69,7 @@ func RenderText_Solid(font *Font, text string, color sdl.Color) *sdl.Surface {
 // Renders text in the specified color (and with the specified background color)
 // and returns an SDL surface.  Shaded rendering is slower than solid
 // rendering and the text is in a solid box, but it's better looking.
-func RenderText_Shaded(font *Font, text string, color sdl.Color, bgcolor sdl.Color) *sdl.Surface {
+func RenderText_Shaded(font *Font, text string, color, bgcolor sdl.Color) *sdl.Surface {
 	ctext := C.CString(text);
 	ccol := C.SDL_Color{C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.Unused)};
 	cbgcol := C.SDL_Color{C.Uint8(bgcolor.R), C.Uint8(bgcolor.G), C.Uint8(bgcolor.B), C.Uint8(bgcolor.Unused)};

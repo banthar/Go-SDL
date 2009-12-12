@@ -18,7 +18,7 @@ type Music struct {
 
 // Initializes SDL_mixer.  Return 0 if successful and -1 if there were
 // initialization errors.
-func OpenAudio(frequency int, format uint16, channels int, chunksize int) int {
+func OpenAudio(frequency int, format uint16, channels, chunksize int) int {
 	return int(C.Mix_OpenAudio(C.int(frequency), C.Uint16(format),
 		C.int(channels), C.int(chunksize)))
 }
@@ -51,12 +51,12 @@ func (m *Music) PlayMusic(loops int) int {
 // Play the music and loop a specified number of times.  During the first loop,
 // fade in for the milliseconds specified.  Passing -1 makes the music loop
 // continuously.  The fade-in effect only occurs during the first loop.
-func (m *Music) FadeInMusic(loops int, ms int) int {
+func (m *Music) FadeInMusic(loops, ms int) int {
 	return int(C.Mix_FadeInMusic(m.cmusic, C.int(loops), C.int(ms)))
 }
 
 // Same as FadeInMusic, only with a specified position to start the music at.
-func (m *Music) FadeInMusicPos(loops int, ms int, position float) int {
+func (m *Music) FadeInMusicPos(loops, ms int, position float) int {
 	return int(C.Mix_FadeInMusicPos(m.cmusic, C.int(loops), C.int(ms),
 		C.double(position)))
 }
