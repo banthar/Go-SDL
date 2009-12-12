@@ -79,6 +79,15 @@ func (screen *Surface) UpdateRect(x int32, y int32, w uint32, h uint32) {
 	C.SDL_UpdateRect((*C.SDL_Surface)(cast(screen)), C.Sint32(x), C.Sint32(y), C.Uint32(w), C.Uint32(h))
 }
 
+// Gets the window title and icon name.
+func WM_GetCaption() (title, icon string) {
+	//SDL frees these strings, apparently.
+	var ctitle, cicon *C.char;
+	C.SDL_WM_GetCaption(&ctitle, &cicon);
+	title, icon = C.GoString(ctitle), C.GoString(cicon);
+	return;
+}
+
 // Sets the window title and icon name.
 func WM_SetCaption(title string, icon string) {
 	ctitle := C.CString(title);
