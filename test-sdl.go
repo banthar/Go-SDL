@@ -68,7 +68,7 @@ func main() {
 	if image == nil {
 		panic(sdl.GetError())
 	}
-	
+
 	sdl.WM_SetIcon(image, nil);
 
 	running := true;

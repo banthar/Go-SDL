@@ -98,13 +98,11 @@ func WM_SetCaption(title, icon string) {
 }
 
 // Minimizes the window
-func WM_IconifyWindow() int {
-	return int(C.SDL_WM_IconifyWindow());
-}
+func WM_IconifyWindow() int	{ return int(C.SDL_WM_IconifyWindow()) }
 
 // Sets the icon for the display window.
 func WM_SetIcon(icon *Surface, mask *uint8) {
-	C.SDL_WM_SetIcon((*C.SDL_Surface)(cast(icon)), (*C.Uint8)(mask));
+	C.SDL_WM_SetIcon((*C.SDL_Surface)(cast(icon)), (*C.Uint8)(mask))
 }
 
 // Swaps OpenGL framebuffers/Update Display.
