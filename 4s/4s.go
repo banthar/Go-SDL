@@ -8,29 +8,29 @@
 package main
 
 import (
-	"sdl";
-	"log";
-	"os";
-	"runtime";
+	"sdl"
+	"log"
+	"os"
+	"runtime"
 )
 
 
 func main() {
 
-	runtime.LockOSThread();
+	runtime.LockOSThread()
 
-	args := os.Args;
-	p := pieces4;
+	args := os.Args
+	p := pieces4
 	if len(args) > 1 && args[1] == "-5" {
 		p = pieces5
 	}
-	dx, dy := 500, 500;
-	w, err := sdl.InitContext(dx, dy);
+	dx, dy := 500, 500
+	w, err := sdl.InitContext(dx, dy)
 	if err != nil {
 		log.Exit(err)
 	}
 
-	Play(p, w);
+	Play(p, w)
 }
 
 func PlaySound(b []uint16) {
