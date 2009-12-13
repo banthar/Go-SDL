@@ -97,6 +97,11 @@ func WM_SetCaption(title, icon string) {
 	C.free(unsafe.Pointer(cicon));
 }
 
+// Minimizes the window
+func WM_IconifyWindow() int {
+	return int(C.SDL_WM_IconifyWindow());
+}
+
 // Swaps OpenGL framebuffers/Update Display.
 func GL_SwapBuffers()	{ C.SDL_GL_SwapBuffers() }
 
