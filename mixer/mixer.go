@@ -13,7 +13,7 @@ import "unsafe"
 
 // A music file.
 type Music struct {
-	cmusic *C.Mix_Music;
+	cmusic *C.Mix_Music
 }
 
 // Initializes SDL_mixer.  Return 0 if successful and -1 if there were
@@ -28,15 +28,15 @@ func CloseAudio()	{ C.Mix_CloseAudio() }
 
 // Loads a music file to use.
 func LoadMUS(file string) *Music {
-	cfile := C.CString(file);
-	cmusic := C.Mix_LoadMUS(cfile);
-	C.free(unsafe.Pointer(cfile));
+	cfile := C.CString(file)
+	cmusic := C.Mix_LoadMUS(cfile)
+	C.free(unsafe.Pointer(cfile))
 
 	if cmusic == nil {
 		return nil
 	}
 
-	return &Music{cmusic};
+	return &Music{cmusic}
 }
 
 // Frees the loaded music file.

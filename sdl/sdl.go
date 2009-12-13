@@ -44,9 +44,9 @@ func GetError() string	{ return C.GoString(C.SDL_GetError()) }
 
 // Set a string describing an error to be submitted to the SDL Error system.
 func SetError(description string) {
-	cdescription := C.CString(description);
-	C.SetError(cdescription);
-	C.free(unsafe.Pointer(cdescription));
+	cdescription := C.CString(description)
+	C.SetError(cdescription)
+	C.free(unsafe.Pointer(cdescription))
 }
 
 // TODO SDL_Error
@@ -60,8 +60,8 @@ func ClearError()	{ C.SDL_ClearError() }
 // returns a corresponding surface.  You don't need to call the Free method
 // of the returned surface, as it will be done automatically by sdl.Quit.
 func SetVideoMode(w int, h int, bpp int, flags uint32) *Surface {
-	var screen = C.SDL_SetVideoMode(C.int(w), C.int(h), C.int(bpp), C.Uint32(flags));
-	return (*Surface)(cast(screen));
+	var screen = C.SDL_SetVideoMode(C.int(w), C.int(h), C.int(bpp), C.Uint32(flags))
+	return (*Surface)(cast(screen))
 }
 
 // Returns a pointer to the current display surface.
@@ -82,19 +82,19 @@ func (screen *Surface) UpdateRect(x int32, y int32, w uint32, h uint32) {
 // Gets the window title and icon name.
 func WM_GetCaption() (title, icon string) {
 	//SDL frees these strings, apparently.
-	var ctitle, cicon *C.char;
-	C.SDL_WM_GetCaption(&ctitle, &cicon);
-	title, icon = C.GoString(ctitle), C.GoString(cicon);
-	return;
+	var ctitle, cicon *C.char
+	C.SDL_WM_GetCaption(&ctitle, &cicon)
+	title, icon = C.GoString(ctitle), C.GoString(cicon)
+	return
 }
 
 // Sets the window title and icon name.
 func WM_SetCaption(title, icon string) {
-	ctitle := C.CString(title);
-	cicon := C.CString(icon);
-	C.SDL_WM_SetCaption(ctitle, cicon);
-	C.free(unsafe.Pointer(ctitle));
-	C.free(unsafe.Pointer(cicon));
+	ctitle := C.CString(title)
+	cicon := C.CString(icon)
+	C.SDL_WM_SetCaption(ctitle, cicon)
+	C.free(unsafe.Pointer(ctitle))
+	C.free(unsafe.Pointer(cicon))
 }
 
 // Minimizes the window
@@ -127,9 +127,9 @@ func (dst *Surface) Blit(dstrect *Rect, src *Surface, srcrect *Rect) int {
 		(*C.SDL_Surface)(cast(src)),
 		(*C.SDL_Rect)(cast(srcrect)),
 		(*C.SDL_Surface)(cast(dst)),
-		(*C.SDL_Rect)(cast(dstrect)));
+		(*C.SDL_Rect)(cast(dstrect)))
 
-	return int(ret);
+	return int(ret)
 }
 
 // This function performs a fast fill of the given rectangle with some color.
@@ -137,9 +137,9 @@ func (dst *Surface) FillRect(dstrect *Rect, color uint32) int {
 	var ret = C.SDL_FillRect(
 		(*C.SDL_Surface)(cast(dst)),
 		(*C.SDL_Rect)(cast(dstrect)),
-		C.Uint32(color));
+		C.Uint32(color))
 
-	return int(ret);
+	return int(ret)
 }
 
 // Gets RGBA values from a pixel in the specified pixel format.
@@ -149,10 +149,10 @@ func GetRGBA(color uint32, format *PixelFormat, r, g, b, a *uint8) {
 
 // Loads Surface from file (using IMG_Load).
 func Load(file string) *Surface {
-	cfile := C.CString(file);
-	var screen = C.IMG_Load(cfile);
-	C.free(unsafe.Pointer(cfile));
-	return (*Surface)(cast(screen));
+	cfile := C.CString(file)
+	var screen = C.IMG_Load(cfile)
+	C.free(unsafe.Pointer(cfile))
+	return (*Surface)(cast(screen))
 }
 
 // Events
@@ -168,24 +168,24 @@ func EnableKeyRepeat(delay, interval int) int {
 // Gets keyboard repeat rate.
 func GetKeyRepeat() (int, int) {
 
-	var delay int;
-	var interval int;
+	var delay int
+	var interval int
 
-	C.SDL_GetKeyRepeat((*C.int)(cast(&delay)), (*C.int)(cast(&interval)));
+	C.SDL_GetKeyRepeat((*C.int)(cast(&delay)), (*C.int)(cast(&interval)))
 
-	return delay, interval;
+	return delay, interval
 }
 
 // Gets a snapshot of the current keyboard state
 func GetKeyState() []uint8 {
-	var numkeys C.int;
-	array := C.SDL_GetKeyState(&numkeys);
+	var numkeys C.int
+	array := C.SDL_GetKeyState(&numkeys)
 
-	var ptr = make([]uint8, numkeys);
+	var ptr = make([]uint8, numkeys)
 
-	*((**C.Uint8)(unsafe.Pointer(&ptr))) = array;	// TODO
+	*((**C.Uint8)(unsafe.Pointer(&ptr))) = array	// TODO
 
-	return ptr;
+	return ptr
 
 }
 
@@ -213,14 +213,14 @@ func GetKeyName(key Key) string	{ return C.GoString(C.SDL_GetKeyName(C.SDLKey(ke
 
 // Waits indefinitely for the next available event
 func (event *Event) Wait() bool {
-	var ret = C.SDL_WaitEvent((*C.SDL_Event)(cast(event)));
-	return ret != 0;
+	var ret = C.SDL_WaitEvent((*C.SDL_Event)(cast(event)))
+	return ret != 0
 }
 
 // Polls for currently pending events
 func (event *Event) Poll() bool {
-	var ret = C.SDL_PollEvent((*C.SDL_Event)(cast(event)));
-	return ret != 0;
+	var ret = C.SDL_PollEvent((*C.SDL_Event)(cast(event)))
+	return ret != 0
 }
 
 // Returns KeyboardEvent or nil if event has other type
@@ -229,7 +229,7 @@ func (event *Event) Keyboard() *KeyboardEvent {
 		return (*KeyboardEvent)(cast(event))
 	}
 
-	return nil;
+	return nil
 }
 
 // Returns MouseButtonEvent or nil if event has other type
@@ -238,7 +238,7 @@ func (event *Event) MouseButton() *MouseButtonEvent {
 		return (*MouseButtonEvent)(cast(event))
 	}
 
-	return nil;
+	return nil
 }
 
 // Returns MouseMotion or nil if event has other type
@@ -247,7 +247,7 @@ func (event *Event) MouseMotion() *MouseMotionEvent {
 		return (*MouseMotionEvent)(cast(event))
 	}
 
-	return nil;
+	return nil
 }
 
 // Time
