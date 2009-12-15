@@ -81,7 +81,7 @@ func (screen *Surface) UpdateRect(x int32, y int32, w uint32, h uint32) {
 
 // Gets the window title and icon name.
 func WM_GetCaption() (title, icon string) {
-	//SDL frees these strings, apparently.
+	//SDL seems to free these strings.  TODO: Check to see if that's the case
 	var ctitle, cicon *C.char
 	C.SDL_WM_GetCaption(&ctitle, &cicon)
 	title, icon = C.GoString(ctitle), C.GoString(cicon)
