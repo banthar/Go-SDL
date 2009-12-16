@@ -9,11 +9,11 @@ import "unsafe"
 import "time"
 
 type Context struct {
-	screen		*Surface
-	mouse_chan	chan draw.Mouse
-	key_chan	chan int
-	resize_chan	chan bool
-	quit_chan	chan bool
+	screen      *Surface
+	mouse_chan  chan draw.Mouse
+	key_chan    chan int
+	resize_chan chan bool
+	quit_chan   chan bool
 }
 
 func InitContext(w int, h int) (*Context, os.Error) {
@@ -37,7 +37,7 @@ func InitContext(w int, h int) (*Context, os.Error) {
 
 }
 
-func (this *Context) Screen() draw.Image	{ return this.screen }
+func (this *Context) Screen() draw.Image { return this.screen }
 
 func (this *Context) FlushImage() {
 
@@ -83,8 +83,8 @@ func (this *Context) MouseChan() <-chan draw.Mouse {
 	return this.mouse_chan
 }
 
-func (this *Context) ResizeChan() <-chan bool	{ return this.resize_chan }
-func (this *Context) QuitChan() <-chan bool	{ return this.quit_chan }
+func (this *Context) ResizeChan() <-chan bool { return this.resize_chan }
+func (this *Context) QuitChan() <-chan bool   { return this.quit_chan }
 
 // surface --> Image
 
@@ -93,9 +93,9 @@ func (surface *Surface) ColorModel() image.ColorModel {
 	return nil
 }
 
-func (surface *Surface) Width() int	{ return int(surface.W) }
+func (surface *Surface) Width() int { return int(surface.W) }
 
-func (surface *Surface) Height() int	{ return int(surface.H) }
+func (surface *Surface) Height() int { return int(surface.H) }
 
 func (surface *Surface) Set(x, y int, c image.Color) {
 	//TODO endianess, bpp, alpha, etc

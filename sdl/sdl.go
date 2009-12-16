@@ -23,24 +23,24 @@ type cast unsafe.Pointer
 // General
 
 // Initializes SDL.
-func Init(flags uint32) int	{ return int(C.SDL_Init(C.Uint32(flags))) }
+func Init(flags uint32) int { return int(C.SDL_Init(C.Uint32(flags))) }
 
 // Shuts down SDL
-func Quit()	{ C.SDL_Quit() }
+func Quit() { C.SDL_Quit() }
 
 // Initializes subsystems.
-func InitSubSystem(flags uint32) int	{ return int(C.SDL_InitSubSystem(C.Uint32(flags))) }
+func InitSubSystem(flags uint32) int { return int(C.SDL_InitSubSystem(C.Uint32(flags))) }
 
 // Shuts down a subsystem.
-func QuitSubSystem(flags uint32)	{ C.SDL_QuitSubSystem(C.Uint32(flags)) }
+func QuitSubSystem(flags uint32) { C.SDL_QuitSubSystem(C.Uint32(flags)) }
 
 // Checks which subsystems are initialized.
-func WasInit(flags uint32) int	{ return int(C.SDL_WasInit(C.Uint32(flags))) }
+func WasInit(flags uint32) int { return int(C.SDL_WasInit(C.Uint32(flags))) }
 
 // Error Handling
 
 // Gets SDL error string
-func GetError() string	{ return C.GoString(C.SDL_GetError()) }
+func GetError() string { return C.GoString(C.SDL_GetError()) }
 
 // Set a string describing an error to be submitted to the SDL Error system.
 func SetError(description string) {
@@ -52,7 +52,7 @@ func SetError(description string) {
 // TODO SDL_Error
 
 // Clear the current SDL error
-func ClearError()	{ C.SDL_ClearError() }
+func ClearError() { C.SDL_ClearError() }
 
 // Video
 
@@ -65,7 +65,7 @@ func SetVideoMode(w int, h int, bpp int, flags uint32) *Surface {
 }
 
 // Returns a pointer to the current display surface.
-func GetVideoSurface() *Surface	{ return (*Surface)(cast(C.SDL_GetVideoSurface())) }
+func GetVideoSurface() *Surface { return (*Surface)(cast(C.SDL_GetVideoSurface())) }
 
 // Checks to see if a particular video mode is supported.  Returns 0 if not
 // supported, or the bits-per-pixel of the closest available mode.
@@ -103,7 +103,7 @@ func WM_SetIcon(icon *Surface, mask *uint8) {
 }
 
 // Minimizes the window
-func WM_IconifyWindow() int	{ return int(C.SDL_WM_IconifyWindow()) }
+func WM_IconifyWindow() int { return int(C.SDL_WM_IconifyWindow()) }
 
 // Toggles fullscreen mode
 func WM_ToggleFullScreen(surface *Surface) int {
@@ -111,13 +111,13 @@ func WM_ToggleFullScreen(surface *Surface) int {
 }
 
 // Swaps OpenGL framebuffers/Update Display.
-func GL_SwapBuffers()	{ C.SDL_GL_SwapBuffers() }
+func GL_SwapBuffers() { C.SDL_GL_SwapBuffers() }
 
 // Swaps screen buffers.
-func (screen *Surface) Flip() int	{ return int(C.SDL_Flip((*C.SDL_Surface)(cast(screen)))) }
+func (screen *Surface) Flip() int { return int(C.SDL_Flip((*C.SDL_Surface)(cast(screen)))) }
 
 // Frees (deletes) a Surface
-func (screen *Surface) Free()	{ C.SDL_FreeSurface((*C.SDL_Surface)(cast(screen))) }
+func (screen *Surface) Free() { C.SDL_FreeSurface((*C.SDL_Surface)(cast(screen))) }
 
 // Locks a surface for direct access.
 func (screen *Surface) Lock() int {
@@ -125,7 +125,7 @@ func (screen *Surface) Lock() int {
 }
 
 // Unlocks a previously locked surface.
-func (screen *Surface) Unlock() int	{ return int(C.SDL_Flip((*C.SDL_Surface)(cast(screen)))) }
+func (screen *Surface) Unlock() int { return int(C.SDL_Flip((*C.SDL_Surface)(cast(screen)))) }
 
 func (dst *Surface) Blit(dstrect *Rect, src *Surface, srcrect *Rect) int {
 	var ret = C.SDL_UpperBlit(
@@ -163,7 +163,7 @@ func Load(file string) *Surface {
 // Events
 
 // Enables UNICODE translation.
-func EnableUNICODE(enable int) int	{ return int(C.SDL_EnableUNICODE(C.int(enable))) }
+func EnableUNICODE(enable int) int { return int(C.SDL_EnableUNICODE(C.int(enable))) }
 
 // Sets keyboard repeat rate.
 func EnableKeyRepeat(delay, interval int) int {
@@ -188,7 +188,7 @@ func GetKeyState() []uint8 {
 
 	var ptr = make([]uint8, numkeys)
 
-	*((**C.Uint8)(unsafe.Pointer(&ptr))) = array	// TODO
+	*((**C.Uint8)(unsafe.Pointer(&ptr))) = array // TODO
 
 	return ptr
 
@@ -206,13 +206,13 @@ func GetMouseState(x, y *int) uint8 {
 }
 
 // Gets the state of modifier keys
-func GetModState() Mod	{ return Mod(C.SDL_GetModState()) }
+func GetModState() Mod { return Mod(C.SDL_GetModState()) }
 
 // Sets the state of modifier keys
-func SetModState(modstate Mod)	{ C.SDL_SetModState(C.SDLMod(modstate)) }
+func SetModState(modstate Mod) { C.SDL_SetModState(C.SDLMod(modstate)) }
 
 // Gets the name of an SDL virtual keysym
-func GetKeyName(key Key) string	{ return C.GoString(C.SDL_GetKeyName(C.SDLKey(key))) }
+func GetKeyName(key Key) string { return C.GoString(C.SDL_GetKeyName(C.SDLKey(key))) }
 
 // Events
 
@@ -258,7 +258,7 @@ func (event *Event) MouseMotion() *MouseMotionEvent {
 // Time
 
 // Gets the number of milliseconds since the SDL library initialization.
-func GetTicks() uint32	{ return uint32(C.SDL_GetTicks()) }
+func GetTicks() uint32 { return uint32(C.SDL_GetTicks()) }
 
 // Waits a specified number of milliseconds before returning.
-func Delay(ms uint32)	{ C.SDL_Delay(C.Uint32(ms)) }
+func Delay(ms uint32) { C.SDL_Delay(C.Uint32(ms)) }

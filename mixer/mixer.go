@@ -24,7 +24,7 @@ func OpenAudio(frequency int, format uint16, channels, chunksize int) int {
 }
 
 // Shuts down SDL_mixer.
-func CloseAudio()	{ C.Mix_CloseAudio() }
+func CloseAudio() { C.Mix_CloseAudio() }
 
 // Loads a music file to use.
 func LoadMUS(file string) *Music {
@@ -40,7 +40,7 @@ func LoadMUS(file string) *Music {
 }
 
 // Frees the loaded music file.
-func (m *Music) Free()	{ C.Mix_FreeMusic(m.cmusic) }
+func (m *Music) Free() { C.Mix_FreeMusic(m.cmusic) }
 
 // Play the music and loop a specified number of times.  Passing -1 makes
 // the music loop continuously.
@@ -62,16 +62,16 @@ func (m *Music) FadeInMusicPos(loops, ms int, position float) int {
 }
 
 // Sets the volume to the value specified.
-func VolumeMusic(volume int) int	{ return int(C.Mix_VolumeMusic(C.int(volume))) }
+func VolumeMusic(volume int) int { return int(C.Mix_VolumeMusic(C.int(volume))) }
 
 // Pauses the music playback.
-func PauseMusic()	{ C.Mix_PauseMusic() }
+func PauseMusic() { C.Mix_PauseMusic() }
 
 // Unpauses the music.
-func ResumeMusic()	{ C.Mix_ResumeMusic() }
+func ResumeMusic() { C.Mix_ResumeMusic() }
 
 // Rewinds music to the start.
-func RewindMusic()	{ C.Mix_RewindMusic() }
+func RewindMusic() { C.Mix_RewindMusic() }
 
 // Sets the position of the currently playing music.
 func SetMusicPosition(position float) int {
@@ -79,24 +79,24 @@ func SetMusicPosition(position float) int {
 }
 
 // Halt playback of music.
-func HaltMusic()	{ C.Mix_HaltMusic() }
+func HaltMusic() { C.Mix_HaltMusic() }
 
 // Fades out music over the milliseconds specified.  Music is halted after
 // the fade out is completed.
-func FadeOutMusic(ms int) int	{ return int(C.Mix_FadeOutMusic(C.int(ms))) }
+func FadeOutMusic(ms int) int { return int(C.Mix_FadeOutMusic(C.int(ms))) }
 
 
 // Returns the type of the currently playing music.
-func GetMusicType() int	{ return int(C.Mix_GetMusicType(nil)) }
+func GetMusicType() int { return int(C.Mix_GetMusicType(nil)) }
 
 // Returns the type of the music.
-func (m *Music) GetMusicType() int	{ return int(C.Mix_GetMusicType(m.cmusic)) }
+func (m *Music) GetMusicType() int { return int(C.Mix_GetMusicType(m.cmusic)) }
 
 // Returns 1 if music is currently playing and 0 if not.
-func PlayingMusic() int	{ return int(C.Mix_PlayingMusic()) }
+func PlayingMusic() int { return int(C.Mix_PlayingMusic()) }
 
 // Returns 1 if music is paused and 0 if not.
-func PausedMusic() int	{ return int(C.Mix_PausedMusic()) }
+func PausedMusic() int { return int(C.Mix_PausedMusic()) }
 
 // Tells you whether music is fading in, out, or not at all.
-func FadingMusic() int	{ return int(C.Mix_FadingMusic()) }
+func FadingMusic() int { return int(C.Mix_FadingMusic()) }
