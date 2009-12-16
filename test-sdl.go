@@ -9,15 +9,15 @@ import (
 )
 
 type Point struct {
-	x	int
-	y	int
+	x int
+	y int
 }
 
-func (a Point) add(b Point) Point	{ return Point{a.x + b.x, a.y + b.y} }
+func (a Point) add(b Point) Point { return Point{a.x + b.x, a.y + b.y} }
 
-func (a Point) sub(b Point) Point	{ return Point{a.x - b.x, a.y - b.y} }
+func (a Point) sub(b Point) Point { return Point{a.x - b.x, a.y - b.y} }
 
-func (a Point) length() float64	{ return math.Sqrt(float64(a.x*a.x + a.y*a.y)) }
+func (a Point) length() float64 { return math.Sqrt(float64(a.x*a.x + a.y*a.y)) }
 
 func (a Point) mul(b float64) Point {
 	return Point{int(float64(a.x) * b), int(float64(a.y) * b)}

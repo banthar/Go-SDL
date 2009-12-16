@@ -18,13 +18,13 @@ type Font struct {
 }
 
 // Initializes SDL_ttf.
-func Init() int	{ return int(C.TTF_Init()) }
+func Init() int { return int(C.TTF_Init()) }
 
 // Checks to see if SDL_ttf is initialized.  Returns 1 if true, 0 if false.
-func WasInit() int	{ return int(C.TTF_WasInit()) }
+func WasInit() int { return int(C.TTF_WasInit()) }
 
 // Shuts down SDL_ttf.
-func Quit()	{ C.TTF_Quit() }
+func Quit() { C.TTF_Quit() }
 
 // Loads a font from a file at the specified point size.
 func OpenFont(file string, ptsize int) *Font {
@@ -54,7 +54,7 @@ func OpenFontIndex(file string, ptsize, index int) *Font {
 }
 
 // Frees the pointer to the font.
-func (f *Font) Close()	{ C.TTF_CloseFont(f.cfont) }
+func (f *Font) Close() { C.TTF_CloseFont(f.cfont) }
 
 // Renders text in the specified color and returns an SDL surface.  Solid
 // rendering is quick, although not as smooth as the other rendering types.
@@ -90,21 +90,21 @@ func RenderText_Blended(font *Font, text string, color sdl.Color) *sdl.Surface {
 }
 
 // Returns the rendering style of the font.
-func (f *Font) GetFontStyle() int	{ return int(C.TTF_GetFontStyle(f.cfont)) }
+func (f *Font) GetFontStyle() int { return int(C.TTF_GetFontStyle(f.cfont)) }
 
 // Sets the rendering style of the font.
-func (f *Font) SetFontStyle(style int)	{ C.TTF_SetFontStyle(f.cfont, C.int(style)) }
+func (f *Font) SetFontStyle(style int) { C.TTF_SetFontStyle(f.cfont, C.int(style)) }
 
 // Returns the maximum height of all the glyphs of the font.
-func (f *Font) FontHeight() int	{ return int(C.TTF_FontHeight(f.cfont)) }
+func (f *Font) FontHeight() int { return int(C.TTF_FontHeight(f.cfont)) }
 
 // Returns the maximum pixel ascent (from the baseline) of all the glyphs
 // of the font.
-func (f *Font) FontAscent() int	{ return int(C.TTF_FontAscent(f.cfont)) }
+func (f *Font) FontAscent() int { return int(C.TTF_FontAscent(f.cfont)) }
 
 // Returns the maximum pixel descent (from the baseline) of all the glyphs
 // of the font.
-func (f *Font) FontDescent() int	{ return int(C.TTF_FontDescent(f.cfont)) }
+func (f *Font) FontDescent() int { return int(C.TTF_FontDescent(f.cfont)) }
 
 // Returns the recommended pixel height of a rendered line of text.
-func (f *Font) FontLineSkip() int	{ return int(C.TTF_FontLineSkip(f.cfont)) }
+func (f *Font) FontLineSkip() int { return int(C.TTF_FontLineSkip(f.cfont)) }
