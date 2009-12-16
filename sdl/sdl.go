@@ -97,12 +97,17 @@ func WM_SetCaption(title, icon string) {
 	C.free(unsafe.Pointer(cicon))
 }
 
-// Minimizes the window
-func WM_IconifyWindow() int	{ return int(C.SDL_WM_IconifyWindow()) }
-
 // Sets the icon for the display window.
 func WM_SetIcon(icon *Surface, mask *uint8) {
 	C.SDL_WM_SetIcon((*C.SDL_Surface)(cast(icon)), (*C.Uint8)(mask))
+}
+
+// Minimizes the window
+func WM_IconifyWindow() int	{ return int(C.SDL_WM_IconifyWindow()) }
+
+// Toggles fullscreen mode
+func WM_ToggleFullScreen(surface *Surface) int {
+	return int(C.SDL_WM_ToggleFullScreen((*C.SDL_Surface)(cast(surface))))
 }
 
 // Swaps OpenGL framebuffers/Update Display.
