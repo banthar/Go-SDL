@@ -1,4 +1,4 @@
-// godefs -g sdl sdl.c
+// godefs -g sdl constants.c
 
 // MACHINE GENERATED - DO NOT EDIT.
 
@@ -514,7 +514,8 @@ type Event struct {
 
 type Keysym struct {
 	Scancode uint8
-	Sym      int
+	Pad0     [3]byte
+	Sym      byte
 	Mod      byte
 	Unicode  uint16
 	Pad1     [2]byte
