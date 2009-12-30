@@ -79,7 +79,7 @@ func main() {
 		panic(sdl.GetError())
 	}
 
-	font.SetFontStyle(ttf.STYLE_UNDERLINE)
+	font.SetStyle(ttf.STYLE_UNDERLINE)
 	white := sdl.Color{255, 255, 255, 0}
 	text := ttf.RenderText_Blended(font, "Test (with music)", white)
 	music := mixer.LoadMUS("test.ogg")

@@ -90,21 +90,21 @@ func RenderText_Blended(font *Font, text string, color sdl.Color) *sdl.Surface {
 }
 
 // Returns the rendering style of the font.
-func (f *Font) GetFontStyle() int { return int(C.TTF_GetFontStyle(f.cfont)) }
+func (f *Font) GetStyle() int { return int(C.TTF_GetFontStyle(f.cfont)) }
 
 // Sets the rendering style of the font.
-func (f *Font) SetFontStyle(style int) { C.TTF_SetFontStyle(f.cfont, C.int(style)) }
+func (f *Font) SetStyle(style int) { C.TTF_SetFontStyle(f.cfont, C.int(style)) }
 
 // Returns the maximum height of all the glyphs of the font.
-func (f *Font) FontHeight() int { return int(C.TTF_FontHeight(f.cfont)) }
+func (f *Font) Height() int { return int(C.TTF_FontHeight(f.cfont)) }
 
 // Returns the maximum pixel ascent (from the baseline) of all the glyphs
 // of the font.
-func (f *Font) FontAscent() int { return int(C.TTF_FontAscent(f.cfont)) }
+func (f *Font) Ascent() int { return int(C.TTF_FontAscent(f.cfont)) }
 
 // Returns the maximum pixel descent (from the baseline) of all the glyphs
 // of the font.
-func (f *Font) FontDescent() int { return int(C.TTF_FontDescent(f.cfont)) }
+func (f *Font) Descent() int { return int(C.TTF_FontDescent(f.cfont)) }
 
 // Returns the recommended pixel height of a rendered line of text.
-func (f *Font) FontLineSkip() int { return int(C.TTF_FontLineSkip(f.cfont)) }
+func (f *Font) LineSkip() int { return int(C.TTF_FontLineSkip(f.cfont)) }
