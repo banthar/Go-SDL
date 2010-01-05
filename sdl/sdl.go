@@ -205,6 +205,12 @@ func GetMouseState(x, y *int) uint8 {
 	return uint8(C.SDL_GetMouseState((*C.int)(cast(x)), (*C.int)(cast(y))))
 }
 
+// Retrieves the current state of the mouse relative to the last time this
+// function was called.
+func GetRelativeMouseState(x, y *int) uint8 {
+	return uint8(C.SDL_GetRelativeMouseState((*C.int)(cast(x)), (*C.int)(cast(y))))
+}
+
 // Gets the state of modifier keys
 func GetModState() Mod { return Mod(C.SDL_GetModState()) }
 
