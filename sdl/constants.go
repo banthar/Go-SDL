@@ -333,13 +333,15 @@ const (
 
 type Surface struct {
 	Flags          uint32
+	Pad0           [4]byte
 	Format         *PixelFormat
 	W              int32
 	H              int32
 	Pitch          uint16
-	Pad0           [2]byte
+	Pad1           [6]byte
 	Pixels         *byte
 	Offset         int32
+	Pad2           [4]byte
 	Hwdata         *[0]byte /* sprivate_hwdata */
 	Clip_rect      Rect
 	Unused1        uint32
@@ -368,7 +370,7 @@ type PixelFormat struct {
 	Amask         uint32
 	Colorkey      uint32
 	Alpha         uint8
-	Pad1          [3]byte
+	Pad1          [7]byte
 }
 
 type Rect struct {
@@ -387,6 +389,7 @@ type Color struct {
 
 type Palette struct {
 	Ncolors int32
+	Pad0    [4]byte
 	Colors  *Color
 }
 
@@ -408,7 +411,7 @@ type Overlay struct {
 	Pixels  **uint8
 	Hwfuncs *[0]byte /* sprivate_yuvhwfuncs */
 	Hwdata  *[0]byte /* sprivate_yuvhwdata */
-	Pad0    [4]byte
+	Pad0    [8]byte
 }
 
 type ActiveEvent struct {
@@ -503,13 +506,13 @@ type SysWMmsg struct{}
 
 type SysWMEvent struct {
 	Type uint8
-	Pad0 [3]byte
+	Pad0 [7]byte
 	Msg  *SysWMmsg
 }
 
 type Event struct {
 	Type uint8
-	Pad0 [19]byte
+	Pad0 [23]byte
 }
 
 type Keysym struct {
@@ -517,6 +520,6 @@ type Keysym struct {
 	Pad0     [3]byte
 	Sym      byte
 	Mod      byte
+	Pad1     [5]byte
 	Unicode  uint16
-	Pad1     [2]byte
 }

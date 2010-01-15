@@ -61,6 +61,8 @@ func main() {
 		panic(sdl.GetError())
 	}
 
+	sdl.EnableUNICODE(1);
+
 	sdl.WM_SetCaption("Go-SDL SDL Test", "")
 
 	image := sdl.Load("test.png")
