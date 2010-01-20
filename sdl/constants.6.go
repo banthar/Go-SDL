@@ -516,10 +516,9 @@ type Event struct {
 }
 
 type Keysym struct {
-	Scancode uint8
-	Pad0     [3]byte
-	Sym      byte
-	Mod      byte
-	Pad1     [1]byte
+	Sym      uint32
+	Mod      uint32
 	Unicode  uint16
+
+	Scancode uint8 // broken
 }
