@@ -6,7 +6,7 @@ include $(GOROOT)/src/Make.$(GOARCH)
 
 TARG=sdl
 
-GOFILES:=constants.go
+GOFILES:=constants.$(O).go
 
 # uncomment this line to enable exp/draw support
 # GOFILES:=$(GOFILES) sdldraw.go
@@ -21,6 +21,6 @@ CLEANFILES+=sdl
 
 include $(GOROOT)/src/Make.pkg
 
-constants.go: constants.c
-	godefs -g sdl constants.c > constants.go
-	gofmt -w constants.go
+constants.$(O).go: constants.c
+	godefs -g sdl constants.c > constants.$(O).go
+	gofmt -w constants.$(O).go
