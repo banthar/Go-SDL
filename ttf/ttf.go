@@ -141,3 +141,38 @@ func (f *Font) Descent() int { return int(C.TTF_FontDescent(f.cfont)) }
 
 // Returns the recommended pixel height of a rendered line of text.
 func (f *Font) LineSkip() int { return int(C.TTF_FontLineSkip(f.cfont)) }
+
+// Returns the number of available faces (sub-fonts) in the font.
+func (f *Font) Faces() int { return int(C.TTF_FontFaces(f.cfont)) }
+
+// Returns >0 if the font's currently selected face is fixed width
+// (i.e. monospace), 0 if not.
+func (f *Font) IsFixedWidth() int { return int(C.TTF_FontFaceIsFixedWidth(f.cfont)) }
+
+// Returns the family name of the font's currently selected face,
+// or a blank string if unavailable.
+func (f *Font) FamilyName() string {
+	if f == nil {
+		return "nil"
+	}
+	p := C.TTF_FontFaceFamilyName(f.cfont)
+	if p == nil {
+		return ""
+	}
+	s := C.GoString(p)
+	return s
+}
+
+// Returns the style name of the font's currently selected face,
+// or a blank string if unavailable.
+func (f *Font) StyleName() string {
+	if f == nil {
+		return "nil"
+	}
+	p := C.TTF_FontFaceStyleName(f.cfont)
+	if p == nil {
+		return ""
+	}
+	s := C.GoString(p)
+	return s
+}
