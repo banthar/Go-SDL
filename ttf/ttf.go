@@ -56,7 +56,7 @@ func OpenFontIndex(file string, ptsize, index int) *Font {
 // Frees the pointer to the font.
 func (f *Font) Close() { C.TTF_CloseFont(f.cfont) }
 
-// Renders text in the specified color and returns an SDL surface.  Solid
+// Renders Latin-1 text in the specified color and returns an SDL surface.  Solid
 // rendering is quick, although not as smooth as the other rendering types.
 func RenderText_Solid(font *Font, text string, color sdl.Color) *sdl.Surface {
 	ctext := C.CString(text)
@@ -66,8 +66,18 @@ func RenderText_Solid(font *Font, text string, color sdl.Color) *sdl.Surface {
 	return (*sdl.Surface)(unsafe.Pointer(surface))
 }
 
-// Renders text in the specified color (and with the specified background color)
-// and returns an SDL surface.  Shaded rendering is slower than solid
+// Renders UTF-8 text in the specified color and returns an SDL surface.  Solid
+// rendering is quick, although not as smooth as the other rendering types.
+func RenderUTF8_Solid(font *Font, text string, color sdl.Color) *sdl.Surface {
+	ctext := C.CString(text)
+	ccol := C.SDL_Color{C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.Unused)}
+	surface := C.TTF_RenderUTF8_Solid(font.cfont, ctext, ccol)
+	C.free(unsafe.Pointer(ctext))
+	return (*sdl.Surface)(unsafe.Pointer(surface))
+}
+
+// Renders Latin-1 text in the specified color (and with the specified background
+// color) and returns an SDL surface.  Shaded rendering is slower than solid
 // rendering and the text is in a solid box, but it's better looking.
 func RenderText_Shaded(font *Font, text string, color, bgcolor sdl.Color) *sdl.Surface {
 	ctext := C.CString(text)
@@ -78,13 +88,36 @@ func RenderText_Shaded(font *Font, text string, color, bgcolor sdl.Color) *sdl.S
 	return (*sdl.Surface)(unsafe.Pointer(surface))
 }
 
-// Renders text in the specified color and returns an SDL surface.  Blended
-// rendering is the slowest of the three methods, although it produces the best
-// results, especially when blitted over another image.
+// Renders UTF-8 text in the specified color (and with the specified background
+// color) and returns an SDL surface.  Shaded rendering is slower than solid
+// rendering and the text is in a solid box, but it's better looking.
+func RenderUTF8_Shaded(font *Font, text string, color, bgcolor sdl.Color) *sdl.Surface {
+	ctext := C.CString(text)
+	ccol := C.SDL_Color{C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.Unused)}
+	cbgcol := C.SDL_Color{C.Uint8(bgcolor.R), C.Uint8(bgcolor.G), C.Uint8(bgcolor.B), C.Uint8(bgcolor.Unused)}
+	surface := C.TTF_RenderUTF8_Shaded(font.cfont, ctext, ccol, cbgcol)
+	C.free(unsafe.Pointer(ctext))
+	return (*sdl.Surface)(unsafe.Pointer(surface))
+}
+
+// Renders Latin-1 text in the specified color and returns an SDL surface.
+// Blended rendering is the slowest of the three methods, although it produces
+// the best results, especially when blitted over another image.
 func RenderText_Blended(font *Font, text string, color sdl.Color) *sdl.Surface {
 	ctext := C.CString(text)
 	ccol := C.SDL_Color{C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.Unused)}
 	surface := C.TTF_RenderText_Blended(font.cfont, ctext, ccol)
+	C.free(unsafe.Pointer(ctext))
+	return (*sdl.Surface)(unsafe.Pointer(surface))
+}
+
+// Renders UTF-8 text in the specified color and returns an SDL surface.
+// Blended rendering is the slowest of the three methods, although it produces
+// the best results, especially when blitted over another image.
+func RenderUTF8_Blended(font *Font, text string, color sdl.Color) *sdl.Surface {
+	ctext := C.CString(text)
+	ccol := C.SDL_Color{C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.Unused)}
+	surface := C.TTF_RenderUTF8_Blended(font.cfont, ctext, ccol)
 	C.free(unsafe.Pointer(ctext))
 	return (*sdl.Surface)(unsafe.Pointer(surface))
 }
