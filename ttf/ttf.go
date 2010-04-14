@@ -176,3 +176,45 @@ func (f *Font) StyleName() string {
 	s := C.GoString(p)
 	return s
 }
+
+// Returns the metrics (dimensions) of a glyph.
+//
+// Return values are:
+//   minx, maxx, miny, maxy, advance, err
+//
+// The last return value (err) is 0 for success, -1 for any error (for example
+// if the glyph is not available in this font).
+//
+// For more information on glyph metrics, visit
+// http://freetype.sourceforge.net/freetype2/docs/tutorial/step2.html
+func (f *Font) GlyphMetrics(ch uint16) (int, int, int, int, int, int) {
+	minx := C.int(0)
+	maxx := C.int(0)
+	miny := C.int(0)
+	maxy := C.int(0)
+	advance := C.int(0)
+	err := C.TTF_GlyphMetrics(f.cfont, C.Uint16(ch), &minx, &maxx, &miny, &maxy, &advance)
+	return int(minx), int(maxx), int(miny), int(maxy), int(advance), int(err)
+}
+
+// Return the width and height of the rendered Latin-1 text.
+//
+// Return values are (width, height, err) where err is 0 for success, -1 on any error.
+func (f *Font) SizeText(text string) (int, int, int) {
+	w := C.int(0)
+	h := C.int(0)
+	s := C.CString(text)
+	err := C.TTF_SizeText(f.cfont, s, &w, &h)
+	return int(w), int(h), int(err)
+}
+
+// Return the width and height of the rendered UTF-8 text.
+//
+// Return values are (width, height, err) where err is 0 for success, -1 on any error.
+func (f *Font) SizeUTF8(text string) (int, int, int) {
+	w := C.int(0)
+	h := C.int(0)
+	s := C.CString(text)
+	err := C.TTF_SizeUTF8(f.cfont, s, &w, &h)
+	return int(w), int(h), int(err)
+}
