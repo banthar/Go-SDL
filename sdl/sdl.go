@@ -147,6 +147,23 @@ func (dst *Surface) FillRect(dstrect *Rect, color uint32) int {
 	return int(ret)
 }
 
+// Adjusts the alpha properties of a Surface.
+func (s *Surface) SetAlpha(flags uint32, alpha uint8) int {
+	return int(C.SDL_SetAlpha((*C.SDL_Surface)(cast(s)), C.Uint32(flags), C.Uint8(alpha)))
+}
+
+// Gets the clipping rectangle for a surface.
+func (s *Surface) GetClipRect(r *Rect) {
+	C.SDL_GetClipRect((*C.SDL_Surface)(cast(s)), (*C.SDL_Rect)(cast(r)))
+	return
+}
+
+// Sets the clipping rectangle for a surface.
+func (s *Surface) SetClipRect(r *Rect) {
+	C.SDL_SetClipRect((*C.SDL_Surface)(cast(s)), (*C.SDL_Rect)(cast(r)))
+	return
+}
+
 // Gets RGBA values from a pixel in the specified pixel format.
 func GetRGBA(color uint32, format *PixelFormat, r, g, b, a *uint8) {
 	C.SDL_GetRGBA(C.Uint32(color), (*C.SDL_PixelFormat)(cast(format)), (*C.Uint8)(r), (*C.Uint8)(g), (*C.Uint8)(b), (*C.Uint8)(a))
@@ -158,6 +175,14 @@ func Load(file string) *Surface {
 	var screen = C.IMG_Load(cfile)
 	C.free(unsafe.Pointer(cfile))
 	return (*Surface)(cast(screen))
+}
+
+// Creates an empty Surface.
+func CreateRGBSurface(flags uint32, width int, height int, bpp int,
+		Rmask uint32, Gmask uint32, Bmask uint32, Amask uint32) *Surface {
+	p := C.SDL_CreateRGBSurface(C.Uint32(flags), C.int(width), C.int(height), C.int(bpp),
+			C.Uint32(Rmask), C.Uint32(Gmask), C.Uint32(Bmask), C.Uint32(Amask))
+	return (*Surface)(cast(p))
 }
 
 // Events
