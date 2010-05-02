@@ -4,16 +4,7 @@
 
 include $(GOROOT)/src/Make.$(GOARCH)
 
-all: install
+TARG=test
+GOFILES=test.go
 
-install:
-	make -C sdl install
-	make -C ttf install
-	make -C mixer install
-
-clean:
-	make -C sdl clean
-	make -C ttf clean
-	make -C mixer clean
-	make -C 4s clean
-	make -C test clean
+include $(GOROOT)/src/Make.cmd
