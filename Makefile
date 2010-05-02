@@ -4,14 +4,14 @@
 
 include $(GOROOT)/src/Make.$(GOARCH)
 
-all: libs test-sdl
+all: install test-sdl
 
-libs:
+install:
 	make -C sdl install
 	make -C ttf install
 	make -C mixer install
 
-test-sdl: test-sdl.go libs
+test-sdl: test-sdl.go install
 	$(GC) test-sdl.go
 	$(LD) -o $@ test-sdl.$(O)
 
