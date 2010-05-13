@@ -6,6 +6,7 @@ package sdl
 
 // Constants
 const (
+	INIT_TIMER          = 0x1
 	INIT_AUDIO          = 0x10
 	INIT_VIDEO          = 0x20
 	INIT_CDROM          = 0x100
@@ -516,9 +517,9 @@ type Event struct {
 }
 
 type Keysym struct {
-	Sym      uint32
-	Mod      uint32
-	Unicode  uint16
+	Sym     uint32
+	Mod     uint32
+	Unicode uint16
 
 	Scancode uint8 // broken
 }

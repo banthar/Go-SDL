@@ -178,10 +178,9 @@ func Load(file string) *Surface {
 }
 
 // Creates an empty Surface.
-func CreateRGBSurface(flags uint32, width int, height int, bpp int,
-		Rmask uint32, Gmask uint32, Bmask uint32, Amask uint32) *Surface {
+func CreateRGBSurface(flags uint32, width int, height int, bpp int, Rmask uint32, Gmask uint32, Bmask uint32, Amask uint32) *Surface {
 	p := C.SDL_CreateRGBSurface(C.Uint32(flags), C.int(width), C.int(height), C.int(bpp),
-			C.Uint32(Rmask), C.Uint32(Gmask), C.Uint32(Bmask), C.Uint32(Amask))
+		C.Uint32(Rmask), C.Uint32(Gmask), C.Uint32(Bmask), C.Uint32(Amask))
 	return (*Surface)(cast(p))
 }
 

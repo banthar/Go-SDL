@@ -21,6 +21,8 @@ func main() {
 		panic(sdl.GetError())
 	}
 
+	defer sdl.Quit()
+
 	var screen = sdl.SetVideoMode(640, 480, 32, 0)
 
 	if screen == nil {
@@ -29,17 +31,14 @@ func main() {
 
 	sdl.WM_SetCaption("Template", "")
 
-	running := true
-
-	for running {
+	for true {
 
 		e := &sdl.Event{}
 
 		for e.Poll() {
 			switch e.Type {
 			case sdl.QUIT:
-				running = false
-				break
+				return
 			default:
 			}
 		}
@@ -52,7 +51,5 @@ func main() {
 		sdl.Delay(25)
 
 	}
-
-	sdl.Quit()
 
 }
