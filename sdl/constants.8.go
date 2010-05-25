@@ -392,11 +392,11 @@ type Palette struct {
 }
 
 type internalVideoInfo struct {
-	Flags		uint32
-	Video_mem   uint32
-	Vfmt        *PixelFormat
-	Current_w   int32
-	Current_h   int32
+	Flags     uint32
+	Video_mem uint32
+	Vfmt      *PixelFormat
+	Current_w int32
+	Current_h int32
 }
 
 type Overlay struct {
