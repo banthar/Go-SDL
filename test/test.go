@@ -57,6 +57,13 @@ func main() {
 
 	var screen = sdl.SetVideoMode(640, 480, 32, 0)
 
+	var video_info = sdl.GetVideoInfo();
+
+	println("HW_available = ", video_info.HW_available);
+	println("WM_available = ", video_info.WM_available);
+	println("Video_mem = ", video_info.Video_mem,"kb");
+
+
 	if screen == nil {
 		panic(sdl.GetError())
 	}
