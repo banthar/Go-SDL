@@ -94,8 +94,6 @@ func GetVideoInfo() *VideoInfo {
 
 	flags := vinfo.Flags
 
-	println(flags)
-
 	return &VideoInfo{
 		HW_available: flags&(1<<0) != 0,
 		WM_available: flags&(1<<1) != 0,
