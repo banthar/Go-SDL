@@ -391,9 +391,8 @@ type Palette struct {
 	Colors  *Color
 }
 
-type VideoInfo struct {
-	Pad0        [2]byte
-	UnusedBits3 uint16
+type internalVideoInfo struct {
+	Flags		uint32
 	Video_mem   uint32
 	Vfmt        *PixelFormat
 	Current_w   int32
