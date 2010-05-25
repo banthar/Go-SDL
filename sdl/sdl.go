@@ -73,6 +73,44 @@ func VideoModeOK(width int, height int, bpp int, flags uint32) int {
 	return int(C.SDL_VideoModeOK(C.int(width), C.int(height), C.int(bpp), C.Uint32(flags)))
 }
 
+type VideoInfo struct {
+	HW_available bool         "Flag: Can you create hardware surfaces?"
+	WM_available bool         "Flag: Can you talk to a window manager?"
+	Blit_hw      bool         "Flag: Accelerated blits HW --> HW"
+	Blit_hw_CC   bool         "Flag: Accelerated blits with Colorkey"
+	Blit_hw_A    bool         "Flag: Accelerated blits with Alpha"
+	Blit_sw      bool         "Flag: Accelerated blits SW --> HW"
+	Blit_sw_CC   bool         "Flag: Accelerated blits with Colorkey"
+	Blit_sw_A    bool         "Flag: Accelerated blits with Alpha"
+	Blit_fill    bool         "Flag: Accelerated color fill"
+	Video_mem    uint32       "The total amount of video memory (in K)"
+	Vfmt         *PixelFormat "Value: The format of the video surface"
+	Current_w    int32        "Value: The current video mode width"
+	Current_h    int32        "Value: The current video mode height"
+}
+
+func GetVideoInfo() *VideoInfo {
+	vinfo := (*internalVideoInfo)(cast(C.SDL_GetVideoInfo()))
+
+	flags := vinfo.Flags
+
+	return &VideoInfo{
+		HW_available: flags&(1<< 0) != 0,
+		WM_available: flags&(1<< 1) != 0,
+		Blit_hw:      flags&(1<< 9) != 0,
+		Blit_hw_CC:   flags&(1<<10) != 0,
+		Blit_hw_A:    flags&(1<<11) != 0,
+		Blit_sw:      flags&(1<<12) != 0,
+		Blit_sw_CC:   flags&(1<<13) != 0,
+		Blit_sw_A:    flags&(1<<14) != 0,
+		Blit_fill:    flags&(1<<15) != 0,
+		Video_mem:    vinfo.Video_mem,
+		Vfmt:         vinfo.Vfmt,
+		Current_w:    vinfo.Current_w,
+		Current_h:    vinfo.Current_h,
+	}
+}
+
 // Makes sure the given area is updated on the given screen.  If x, y, w, and
 // h are all 0, the whole screen will be updated.
 func (screen *Surface) UpdateRect(x int32, y int32, w uint32, h uint32) {
