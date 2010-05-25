@@ -10,6 +10,7 @@ install:
 	make -C sdl install
 	make -C ttf install
 	make -C mixer install
+	make -C gfx install
 
 clean:
 	make -C sdl clean
@@ -17,3 +18,4 @@ clean:
 	make -C mixer clean
 	make -C 4s clean
 	make -C test clean
+	make -C gfx clean
