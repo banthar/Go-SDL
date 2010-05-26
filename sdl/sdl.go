@@ -151,6 +151,10 @@ func WM_ToggleFullScreen(surface *Surface) int {
 // Swaps OpenGL framebuffers/Update Display.
 func GL_SwapBuffers() { C.SDL_GL_SwapBuffers() }
 
+func GL_SetAttribute(attr int, value int) int {
+  return int(C.SDL_GL_SetAttribute(C.SDL_GLattr(attr), C.int(value)))
+}
+
 // Swaps screen buffers.
 func (screen *Surface) Flip() int { return int(C.SDL_Flip((*C.SDL_Surface)(cast(screen)))) }
 

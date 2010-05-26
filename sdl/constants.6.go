@@ -328,6 +328,23 @@ const (
 	KMOD_CAPS           = 0x2000
 	KMOD_MODE           = 0x4000
 	KMOD_RESERVED       = 0x8000
+	GL_RED_SIZE           = 0
+	GL_GREEN_SIZE         = 0x1
+	GL_BLUE_SIZE          = 0x2
+	GL_ALPHA_SIZE         = 0x3
+	GL_BUFFER_SIZE        = 0x4
+	GL_DOUBLEBUFFER       = 0x5
+	GL_DEPTH_SIZE         = 0x6
+	GL_STENCIL_SIZE       = 0x7
+	GL_ACCUM_RED_SIZE     = 0x8
+	GL_ACCUM_GREEN_SIZE   = 0x9
+	GL_ACCUM_BLUE_SIZE    = 0xa
+	GL_ACCUM_ALPHA_SIZE   = 0xb
+	GL_STEREO             = 0xc
+	GL_MULTISAMPLEBUFFERS = 0xd
+	GL_MULTISAMPLESAMPLES = 0xe
+	GL_ACCELERATED_VISUAL = 0xf
+	GL_SWAP_CONTROL       = 0x10
 )
 
 // Types
