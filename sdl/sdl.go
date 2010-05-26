@@ -327,6 +327,24 @@ func (event *Event) MouseMotion() *MouseMotionEvent {
 	return nil
 }
 
+// Returns ActiveEvent or nil if event has other type
+func (event *Event) Active() *ActiveEvent {
+  if event.Type == ACTIVEEVENT {
+    return (*ActiveEvent)(cast(event))
+  }
+
+  return nil
+}
+
+// Returns ResizeEvent or nil if event has other type
+func (event *Event) Resize() *ResizeEvent {
+  if event.Type == VIDEORESIZE {
+    return (*ResizeEvent)(cast(event))
+  }
+
+  return nil
+}
+
 // Time
 
 // Gets the number of milliseconds since the SDL library initialization.
