@@ -55,17 +55,17 @@ func main() {
 		panic(sdl.GetError())
 	}
 
-	var screen = sdl.SetVideoMode(640, 480, 32, 0)
+	var screen = sdl.SetVideoMode(640, 480, 32, sdl.RESIZABLE)
+
+	if screen == nil {
+		panic(sdl.GetError())
+	}
 
 	var video_info = sdl.GetVideoInfo()
 
 	println("HW_available = ", video_info.HW_available)
 	println("WM_available = ", video_info.WM_available)
 	println("Video_mem = ", video_info.Video_mem, "kb")
-
-	if screen == nil {
-		panic(sdl.GetError())
-	}
 
 	sdl.EnableUNICODE(1)
 
@@ -143,6 +143,14 @@ func main() {
 				in = out
 				out = make(chan Point)
 				go worm(in, out, draw)
+			case sdl.VIDEORESIZE:
+				println("resize screen ",e.Resize().W, e.Resize().H);
+
+				screen = sdl.SetVideoMode(int(e.Resize().W), int(e.Resize().H), 32, sdl.RESIZABLE)
+
+				if screen == nil {
+					panic(sdl.GetError())
+				}
 			default:
 			}
 		}
