@@ -122,7 +122,8 @@ func WM_GetCaption() (title, icon string) {
 	//SDL seems to free these strings.  TODO: Check to see if that's the case
 	var ctitle, cicon *C.char
 	C.SDL_WM_GetCaption(&ctitle, &cicon)
-	title, icon = C.GoString(ctitle), C.GoString(cicon)
+	title = C.GoString(ctitle)
+	icon = C.GoString(cicon)
 	return
 }
 
