@@ -117,6 +117,12 @@ func (screen *Surface) UpdateRect(x int32, y int32, w uint32, h uint32) {
 	C.SDL_UpdateRect((*C.SDL_Surface)(cast(screen)), C.Sint32(x), C.Sint32(y), C.Uint32(w), C.Uint32(h))
 }
 
+func (screen *Surface) UpdateRects(rects []Rect) {
+	if len(rects) > 0 {
+		C.SDL_UpdateRects((*C.SDL_Surface)(cast(screen)), C.int(len(rects)), (*C.SDL_Rect)(cast(&rects[0])))
+	}
+}
+
 // Gets the window title and icon name.
 func WM_GetCaption() (title, icon string) {
 	//SDL seems to free these strings.  TODO: Check to see if that's the case
