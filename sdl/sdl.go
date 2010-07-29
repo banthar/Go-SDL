@@ -73,6 +73,28 @@ func VideoModeOK(width int, height int, bpp int, flags uint32) int {
 	return int(C.SDL_VideoModeOK(C.int(width), C.int(height), C.int(bpp), C.Uint32(flags)))
 }
 
+func ListModes(format *PixelFormat, flags uint32) []Rect {
+	modes := C.SDL_ListModes((*C.SDL_PixelFormat)(cast(format)), C.Uint32(flags))
+	if modes == nil { //no modes available
+		return make([]Rect, 0)
+	}
+	var any int
+	*((***C.SDL_Rect)(unsafe.Pointer(&any))) = modes
+	if any == -1 { //any dimension is ok
+		return nil
+	}
+
+	var count int
+	ptr := *modes //first element in the list
+	for count = 0; ptr != nil; count++ {
+		ptr = *(**C.SDL_Rect)(unsafe.Pointer( uintptr(unsafe.Pointer(modes)) + uintptr(count * unsafe.Sizeof(ptr)) ))
+	}
+	var ret = make([]Rect, count - 1)
+
+	*((***C.SDL_Rect)(unsafe.Pointer(&ret))) = modes // TODO
+	return ret
+}
+
 type VideoInfo struct {
 	HW_available bool         "Flag: Can you create hardware surfaces?"
 	WM_available bool         "Flag: Can you talk to a window manager?"
