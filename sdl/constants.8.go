@@ -349,7 +349,7 @@ const (
 
 // Types
 
-type Surface struct {
+type InternalSurface struct {
 	Flags          uint32
 	Format         *PixelFormat
 	W              int32

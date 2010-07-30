@@ -3,12 +3,12 @@
 
 // for i in `grep '#define SDL_.*0x' -r SDL_video.h  | sed 's/\s/\n/g' | grep SDL_ | sed s/SDL_//` ; do echo -e "\t\$$i = SDL_$i,"  ; done
 
-typedef SDL_Surface $Surface;
+typedef SDL_Surface $InternalSurface;
 typedef SDL_PixelFormat $PixelFormat;
 typedef SDL_Rect $Rect;
 typedef SDL_Color $Color;
 typedef SDL_Palette $Palette;
-typedef SDL_VideoInfo $VideoInfo;
+typedef SDL_VideoInfo $internalVideoInfo;
 typedef SDL_Overlay $Overlay;
 
 typedef SDL_ActiveEvent $ActiveEvent;
