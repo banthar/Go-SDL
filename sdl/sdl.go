@@ -235,6 +235,11 @@ func (s *Surface) SetClipRect(r *Rect) {
 	return
 }
 
+// Map a RGBA color value to a pixel format.
+func MapRGBA(format *PixelFormat, r, g, b, a uint8) uint32 {
+	return (uint32)(C.SDL_MapRGBA((*C.SDL_PixelFormat)(cast(format)), (C.Uint8)(r), (C.Uint8)(g), (C.Uint8)(b), (C.Uint8)(a)))
+}
+
 // Gets RGBA values from a pixel in the specified pixel format.
 func GetRGBA(color uint32, format *PixelFormat, r, g, b, a *uint8) {
 	C.SDL_GetRGBA(C.Uint32(color), (*C.SDL_PixelFormat)(cast(format)), (*C.Uint8)(r), (*C.Uint8)(g), (*C.Uint8)(b), (*C.Uint8)(a))
