@@ -8,7 +8,7 @@
 package main
 
 import (
-	"sdl"
+	"⚛sdl"
 	"log"
 	"os"
 	"runtime"

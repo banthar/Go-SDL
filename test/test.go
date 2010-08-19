@@ -1,9 +1,9 @@
 package main
 
 import (
-	"sdl"
-	"sdl/ttf"
-	"sdl/mixer"
+	"⚛sdl"
+	"⚛sdl/ttf"
+	"⚛sdl/mixer"
 	"math"
 	"fmt"
 )

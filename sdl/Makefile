@@ -4,7 +4,7 @@
 
 include $(GOROOT)/src/Make.$(GOARCH)
 
-TARG=sdl
+TARG=⚛sdl
 
 GOFILES:=constants.$(O).go
 
@@ -24,3 +24,7 @@ include $(GOROOT)/src/Make.pkg
 constants.$(O).go: constants.c
 	godefs -g sdl constants.c > constants.$(O).go
 	gofmt -w constants.$(O).go
+
+_cgo_defun.c _cgo_gotypes.go _cgo_export.c _cgo_export.h: $(CGOFILES)
+	CGOPKGPATH=$(dir) $(QUOTED_GOBIN)/cgo -- $(CGO_CFLAGS) $(CGOFILES)
+	sed s/cgo_sdl/cgo_⚛sdl/ --in-place _cgo_defun.c

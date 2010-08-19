@@ -4,7 +4,7 @@
 
 include $(GOROOT)/src/Make.$(GOARCH)
 
-TARG=sdl/mixer
+TARG=⚛sdl/mixer
 
 GOFILES:=constants.go
 CGOFILES:=mixer.go
@@ -13,3 +13,7 @@ CGO_LDFLAGS:=-lSDL_mixer
 CLEANFILES+=mixer
 
 include $(GOROOT)/src/Make.pkg
+
+_cgo_defun.c _cgo_gotypes.go _cgo_export.c _cgo_export.h: $(CGOFILES)
+	CGOPKGPATH=$(dir) $(QUOTED_GOBIN)/cgo -- $(CGO_CFLAGS) $(CGOFILES)
+	sed s/cgo_sdl/cgo_⚛sdl/ --in-place _cgo_defun.c

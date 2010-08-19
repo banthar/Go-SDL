@@ -5,7 +5,7 @@ A pure Go version of SDL_framerate
 package gfx
 
 import (
-  "sdl"
+  "⚛sdl"
 )
 
 type FPSmanager struct {

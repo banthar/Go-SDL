@@ -1,7 +1,7 @@
 package main
 
 import (
-	"sdl"
+	"⚛sdl"
 )
 
 func loadImage(name string) *sdl.Surface {
