@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-include $(GOROOT)/src/Make.$(GOARCH)
+include $(GOROOT)/src/Make.inc
 
 TARG=⚛sdl
 
@@ -26,5 +26,5 @@ constants.$(O).go: constants.c
 	gofmt -w constants.$(O).go
 
 _cgo_defun.c _cgo_gotypes.go _cgo_export.c _cgo_export.h: $(CGOFILES)
-	CGOPKGPATH=$(dir) $(QUOTED_GOBIN)/cgo -- $(CGO_CFLAGS) $(CGOFILES)
+	CGOPKGPATH=$(dir) cgo -- $(CGO_CFLAGS) $(CGOFILES)
 	sed s/cgo_sdl/cgo_⚛sdl/ --in-place _cgo_defun.c
