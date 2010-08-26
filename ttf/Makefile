@@ -13,7 +13,3 @@ CGO_LDFLAGS:=-lSDL_ttf
 CLEANFILES+=ttf
 
 include $(GOROOT)/src/Make.pkg
-
-_cgo_defun.c _cgo_gotypes.go _cgo_export.c _cgo_export.h: $(CGOFILES)
-	CGOPKGPATH=$(dir) cgo -- $(CGO_CFLAGS) $(CGOFILES)
-	sed s/cgo_sdl/cgo_⚛sdl/ --in-place _cgo_defun.c
