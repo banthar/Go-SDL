@@ -602,20 +602,3 @@ func (event *Event) Resize() *ResizeEvent {
 	return nil
 }
 
-// Time
-
-// Gets the number of milliseconds since the SDL library initialization.
-func GetTicks() uint32 {
-	globalMutex.Lock()
-	t := uint32(C.SDL_GetTicks())
-	globalMutex.Unlock()
-	return t
-}
-
-// Waits a specified number of milliseconds before returning.
-// TODO: This function is not needed in Go - eradicate it.
-func Delay(ms uint32) {
-	globalMutex.Lock()
-	C.SDL_Delay(C.Uint32(ms))
-	globalMutex.Unlock()
-}

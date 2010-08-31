@@ -2,6 +2,7 @@ package main
 
 import (
 	"⚛sdl"
+	"time"
 )
 
 func loadImage(name string) *sdl.Surface {
@@ -48,7 +49,7 @@ func main() {
 		//screen.Blit(&sdl.Rect{x,y, 0, 0}, image, nil)
 
 		screen.Flip()
-		sdl.Delay(25)
+		time.Sleep(25*1e6)
 
 	}
 

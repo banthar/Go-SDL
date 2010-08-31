@@ -6,6 +6,7 @@ import (
 	"⚛sdl/mixer"
 	"math"
 	"fmt"
+	"time"
 )
 
 type Point struct {
@@ -177,7 +178,7 @@ func main() {
 		worm_in <- p
 
 		screen.Flip()
-		sdl.Delay(25)
+		time.Sleep(25*1e6)
 	}
 
 	image.Free()
