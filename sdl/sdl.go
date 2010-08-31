@@ -260,6 +260,12 @@ func CreateRGBSurface(flags uint32, width int, height int, bpp int, Rmask uint32
 	return (*Surface)(cast(p))
 }
 
+// Converts a surface to the display format
+func DisplayFormat( src *Surface ) *Surface {
+	p := C.SDL_DisplayFormat( (*C.SDL_Surface)(cast(src)))
+	return (*Surface)(cast(p))
+}
+
 // Events
 
 // Enables UNICODE translation.
