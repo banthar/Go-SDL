@@ -2,6 +2,8 @@ package main
 
 import (
 	"⚛sdl"
+	"fmt"
+	"rand"
 	"time"
 )
 
@@ -17,40 +19,37 @@ func loadImage(name string) *sdl.Surface {
 }
 
 func main() {
-
-	if sdl.Init(sdl.INIT_EVERYTHING) != 0 {
+	if sdl.Init(sdl.INIT_VIDEO) != 0 {
 		panic(sdl.GetError())
 	}
 
 	defer sdl.Quit()
 
-	var screen = sdl.SetVideoMode(640, 480, 32, 0)
-
+	screen := sdl.SetVideoMode(400, 300, 32, 0)
 	if screen == nil {
 		panic(sdl.GetError())
 	}
 
 	sdl.WM_SetCaption("Template", "")
 
-	for true {
+	ticker := time.NewTicker(1e9 / 2 /*2 Hz*/ )
 
-		e := &sdl.Event{}
+loop:
+	for {
+		select {
+		case <-ticker.C:
+			// Note: For better efficiency, use UpdateRects instead of Flip
+			screen.FillRect(nil, /*color*/ rand.Uint32())
+			//screen.Blit(&sdl.Rect{x,y, 0, 0}, image, nil)
+			screen.Flip()
 
-		for e.Poll() {
-			switch e.Type {
-			case sdl.QUIT:
-				return
-			default:
+		case event := <-sdl.Events:
+			fmt.Printf("%#v\n", event)
+
+			switch e := event.(type) {
+			case sdl.QuitEvent:
+				break loop
 			}
 		}
-
-		screen.FillRect(nil, 0x000000)
-
-		//screen.Blit(&sdl.Rect{x,y, 0, 0}, image, nil)
-
-		screen.Flip()
-		time.Sleep(25*1e6)
-
 	}
-
 }

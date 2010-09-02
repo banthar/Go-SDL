@@ -29,7 +29,6 @@ func worm(in <-chan Point, out chan<- Point, draw chan<- Point) {
 	t := Point{0, 0}
 
 	for {
-
 		p := (<-in).sub(t)
 
 		if p.length() > 48 {
@@ -115,18 +114,43 @@ func main() {
 	out = make(chan Point)
 	go worm(in, out, draw)
 
+	ticker := time.NewTicker(1e9/50 /*50Hz*/)
+
+	// Note: The following SDL code is highly ineffective.
+	//       It is eating too much CPU. If you intend to use Go-SDL,
+	//       you should to do better than this.
+
 	for running {
+		select {
+		case <-ticker.C:
+			screen.FillRect(nil, 0x302019)
+			screen.Blit(&sdl.Rect{0, 0, 0, 0}, text, nil)
 
-		e := &sdl.Event{}
+			loop: for {
+				select {
+				case p := <-draw:
+					screen.Blit(&sdl.Rect{int16(p.x), int16(p.y), 0, 0}, image, nil)
 
-		for e.Poll() {
-			switch e.Type {
-			case sdl.QUIT:
+				case <-out:
+				default:
+					break loop
+				}
+			}
+
+			var p Point
+			sdl.GetMouseState(&p.x, &p.y)
+			worm_in <- p
+
+			screen.Flip()
+
+		case _event := <-sdl.Events:
+			switch e := _event.(type) {
+			case sdl.QuitEvent:
 				running = false
-				break
-			case sdl.KEYDOWN, sdl.KEYUP:
+
+			case sdl.KeyboardEvent:
 				println("")
-				println(e.Keyboard().Keysym.Sym, ": ", sdl.GetKeyName(sdl.Key(e.Keyboard().Keysym.Sym)))
+				println(e.Keysym.Sym, ": ", sdl.GetKeyName(sdl.Key(e.Keysym.Sym)))
 
 				fmt.Printf("%04x ", e.Type)
 
@@ -135,50 +159,26 @@ func main() {
 				}
 				println()
 
-				k := e.Keyboard()
+				fmt.Printf("Type: %02x Which: %02x State: %02x Pad: %02x\n", e.Type, e.Which, e.State, e.Pad0[0])
+				fmt.Printf("Scancode: %02x Sym: %08x Mod: %04x Unicode: %04x\n", e.Keysym.Scancode, e.Keysym.Sym, e.Keysym.Mod, e.Keysym.Unicode)
+			case sdl.MouseButtonEvent:
+				if e.Type == sdl.MOUSEBUTTONDOWN {
+					println("Click:", e.X, e.Y)
+					in = out
+					out = make(chan Point)
+					go worm(in, out, draw)
+				}
 
-				fmt.Printf("Type: %02x Which: %02x State: %02x Pad: %02x\n", k.Type, k.Which, k.State, k.Pad0[0])
-				fmt.Printf("Scancode: %02x Sym: %08x Mod: %04x Unicode: %04x\n", k.Keysym.Scancode, k.Keysym.Sym, k.Keysym.Mod, k.Keysym.Unicode)
-			case sdl.MOUSEBUTTONDOWN:
-				println("Click:", e.MouseButton().X, e.MouseButton().Y)
-				in = out
-				out = make(chan Point)
-				go worm(in, out, draw)
-			case sdl.VIDEORESIZE:
-				println("resize screen ",e.Resize().W, e.Resize().H);
+			case sdl.ResizeEvent:
+				println("resize screen ", e.W, e.H)
 
-				screen = sdl.SetVideoMode(int(e.Resize().W), int(e.Resize().H), 32, sdl.RESIZABLE)
+				screen = sdl.SetVideoMode(int(e.W), int(e.H), 32, sdl.RESIZABLE)
 
 				if screen == nil {
 					panic(sdl.GetError())
 				}
-			default:
 			}
 		}
-
-		screen.FillRect(nil, 0x302019)
-		screen.Blit(&sdl.Rect{0, 0, 0, 0}, text, nil)
-
-		loop := true
-
-		for loop {
-
-			select {
-			case p := <-draw:
-				screen.Blit(&sdl.Rect{int16(p.x), int16(p.y), 0, 0}, image, nil)
-			case <-out:
-			default:
-				loop = false
-			}
-
-		}
-
-		var p Point
-		sdl.GetMouseState(&p.x, &p.y)
-		worm_in <- p
-
-		screen.Flip()
-		time.Sleep(25*1e6)
 	}
 
 	image.Free()

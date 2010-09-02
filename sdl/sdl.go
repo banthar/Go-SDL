@@ -25,7 +25,7 @@ var globalMutex sync.Mutex
 
 type Surface struct {
 	intSurface *InternalSurface // TODO: InternalSurface should in fact be internalSurface (i.e: it should be non-public)
-	mutex      sync.Mutex
+	mutex      sync.RWMutex
 
 	Flags  uint32
 	Format *PixelFormat
@@ -56,13 +56,17 @@ func Wrap(intSurface *InternalSurface) *Surface {
 // Pull data from the internal-surface. Make sure to use this when
 // you expect that the internal-surface structure might have been changed.
 func (s *Surface) reload() {
-	s.Flags = s.intSurface.Flags
-	s.Format = s.intSurface.Format
-	s.W = s.intSurface.W
-	s.H = s.intSurface.H
-	s.Pitch = s.intSurface.Pitch
-	s.Pixels = s.intSurface.Pixels
-	s.Offset = s.intSurface.Offset
+	s.mutex.Lock()
+	{
+		s.Flags = s.intSurface.Flags
+		s.Format = s.intSurface.Format
+		s.W = s.intSurface.W
+		s.H = s.intSurface.H
+		s.Pitch = s.intSurface.Pitch
+		s.Pixels = s.intSurface.Pixels
+		s.Offset = s.intSurface.Offset
+	}
+	s.mutex.Unlock()
 }
 
 func (s *Surface) destroy() {
@@ -354,7 +358,7 @@ func (screen *Surface) Unlock() {
 }
 
 func (dst *Surface) Blit(dstrect *Rect, src *Surface, srcrect *Rect) int {
-	src.mutex.Lock()
+	src.mutex.RLock()
 	dst.mutex.Lock()
 
 	var ret = C.SDL_UpperBlit(
@@ -364,7 +368,7 @@ func (dst *Surface) Blit(dstrect *Rect, src *Surface, srcrect *Rect) int {
 		(*C.SDL_Rect)(cast(dstrect)))
 
 	dst.mutex.Unlock()
-	src.mutex.Unlock()
+	src.mutex.RUnlock()
 
 	return int(ret)
 }
@@ -393,9 +397,9 @@ func (s *Surface) SetAlpha(flags uint32, alpha uint8) int {
 
 // Gets the clipping rectangle for a surface.
 func (s *Surface) GetClipRect(r *Rect) {
-	s.mutex.Lock()
+	s.mutex.RLock()
 	C.SDL_GetClipRect((*C.SDL_Surface)(cast(s.intSurface)), (*C.SDL_Rect)(cast(r)))
-	s.mutex.Unlock()
+	s.mutex.RUnlock()
 	return
 }
 
@@ -532,16 +536,8 @@ func GetKeyName(key Key) string {
 
 // Events
 
-// Waits indefinitely for the next available event
-func (event *Event) Wait() bool {
-	globalMutex.Lock()
-	var ret = C.SDL_WaitEvent((*C.SDL_Event)(cast(event)))
-	globalMutex.Unlock()
-	return ret != 0
-}
-
 // Polls for currently pending events
-func (event *Event) Poll() bool {
+func (event *Event) poll() bool {
 	globalMutex.Lock()
 
 	var ret = C.SDL_PollEvent((*C.SDL_Event)(cast(event)))
@@ -555,50 +551,5 @@ func (event *Event) Poll() bool {
 	globalMutex.Unlock()
 
 	return ret != 0
-}
-
-// Returns KeyboardEvent or nil if event has other type
-func (event *Event) Keyboard() *KeyboardEvent {
-	if event.Type == KEYUP || event.Type == KEYDOWN {
-		return (*KeyboardEvent)(cast(event))
-	}
-
-	return nil
-}
-
-// Returns MouseButtonEvent or nil if event has other type
-func (event *Event) MouseButton() *MouseButtonEvent {
-	if event.Type == MOUSEBUTTONDOWN || event.Type == MOUSEBUTTONUP {
-		return (*MouseButtonEvent)(cast(event))
-	}
-
-	return nil
-}
-
-// Returns MouseMotion or nil if event has other type
-func (event *Event) MouseMotion() *MouseMotionEvent {
-	if event.Type == MOUSEMOTION {
-		return (*MouseMotionEvent)(cast(event))
-	}
-
-	return nil
-}
-
-// Returns ActiveEvent or nil if event has other type
-func (event *Event) Active() *ActiveEvent {
-	if event.Type == ACTIVEEVENT {
-		return (*ActiveEvent)(cast(event))
-	}
-
-	return nil
-}
-
-// Returns ResizeEvent or nil if event has other type
-func (event *Event) Resize() *ResizeEvent {
-	if event.Type == VIDEORESIZE {
-		return (*ResizeEvent)(cast(event))
-	}
-
-	return nil
 }
 

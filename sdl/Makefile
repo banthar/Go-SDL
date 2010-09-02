@@ -6,18 +6,16 @@ include $(GOROOT)/src/Make.inc
 
 TARG=⚛sdl
 
-GOFILES:=constants.$(O).go
+GOFILES:=\
+	constants.$(O).go\
+	event.go
 
 # uncomment this line to enable exp/draw support
 # GOFILES:=$(GOFILES) sdldraw.go
 
 CGOFILES:=sdl.go
-
 CGO_LDFLAGS:=`pkg-config --libs sdl` -lSDL_image
-
 CGO_CFLAGS:=`pkg-config --cflags sdl`
-
-CLEANFILES+=sdl
 
 include $(GOROOT)/src/Make.pkg
 

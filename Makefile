@@ -19,3 +19,4 @@ clean:
 	make -C 4s clean
 	make -C test clean
 	make -C gfx clean
+	make -C doc clean
