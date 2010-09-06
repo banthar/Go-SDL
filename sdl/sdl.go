@@ -552,4 +552,3 @@ func (event *Event) poll() bool {
 
 	return ret != 0
 }
-
