@@ -95,6 +95,12 @@ void callback_fillBuffer(Uint8 *data, size_t numBytes) {
 		if(needed == 0) {
 			//printf("producer: waiting until data is needed (1)\n");
 			pthread_cond_wait(&need, &m);
+
+			// Interrupted from 'callback_unblock' ?
+			if(needed == 0) {
+				//printf("producer: interrupted (1)\n");
+				break;
+			}
 		}
 
 		assert(stream != NULL);
@@ -114,6 +120,12 @@ void callback_fillBuffer(Uint8 *data, size_t numBytes) {
 			if(sent < numBytes) {
 				//printf("producer: waiting until data is needed (2)\n");
 				pthread_cond_wait(&need, &m);
+
+				// Interrupted from 'callback_unblock' ?
+				if(needed == 0) {
+					//printf("producer: interrupted (2)\n");
+					break;
+				}
 			}
 			else {
 				break;
@@ -133,6 +145,7 @@ void callback_unblock() {
 		needed = 0;
 		pthread_cond_signal(&avail);
 	}
+	pthread_cond_signal(&need);
 	pthread_mutex_unlock(&m);
 }
 
