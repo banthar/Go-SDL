@@ -4,6 +4,7 @@ _obj
 *.cgo*.go
 *.cgo*.c
 *.cgo*.[68]
+*cgo*.so
 *.out
 test/test
 shoot.png
