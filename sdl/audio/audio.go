@@ -13,6 +13,18 @@ import "C"
 import "unsafe"
 import "sync"
 
+// The version of Go-SDL audio bindings.
+// The version descriptor changes into a new unique string
+// after a semantically incompatible Go-SDL update.
+//
+// The returned value can be checked by users of this package
+// to make sure they are using a version with the expected semantics.
+//
+// If Go adds some kind of support for package versioning, this function will go away.
+func GoSdlAudioVersion() string {
+	return "⚛SDL audio bindings 1.0"
+}
+
 // Audio format
 const (
 	AUDIO_U8     = C.AUDIO_U8

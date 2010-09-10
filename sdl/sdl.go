@@ -75,7 +75,22 @@ func (s *Surface) destroy() {
 	s.Pixels = nil
 }
 
+
+// =======
 // General
+// =======
+
+// The version of Go-SDL bindings.
+// The version descriptor changes into a new unique string
+// after a semantically incompatible Go-SDL update.
+//
+// The returned value can be checked by users of this package
+// to make sure they are using a version with the expected semantics.
+//
+// If Go adds some kind of support for package versioning, this function will go away.
+func GoSdlVersion() string {
+	return "⚛SDL bindings 1.0"
+}
 
 // Initializes SDL.
 func Init(flags uint32) int {
@@ -122,7 +137,10 @@ func WasInit(flags uint32) int {
 	return status
 }
 
+
+// ==============
 // Error Handling
+// ==============
 
 // Gets SDL error string
 func GetError() string {
@@ -143,8 +161,6 @@ func SetError(description string) {
 	globalMutex.Unlock()
 }
 
-// TODO SDL_Error
-
 // Clear the current SDL error
 func ClearError() {
 	globalMutex.Lock()
@@ -152,7 +168,10 @@ func ClearError() {
 	globalMutex.Unlock()
 }
 
+
+// ======
 // Video
+// ======
 
 var currentVideoSurface *Surface = nil
 
@@ -441,7 +460,10 @@ func CreateRGBSurface(flags uint32, width int, height int, bpp int, Rmask uint32
 	return Wrap((*InternalSurface)(cast(p)))
 }
 
+
+// ======
 // Events
+// ======
 
 // Enables UNICODE translation.
 func EnableUNICODE(enable int) int {
@@ -533,8 +555,6 @@ func GetKeyName(key Key) string {
 	globalMutex.Unlock()
 	return name
 }
-
-// Events
 
 // Polls for currently pending events
 func (event *Event) poll() bool {
