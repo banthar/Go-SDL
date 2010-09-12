@@ -225,7 +225,7 @@ func (s *Surface) SetAlpha(flags uint32, alpha uint8) int {
 
 // Sets the color key (transparent pixel)  in  a  blittable  surface  and
 // enables or disables RLE blit acceleration.
-func (s *Surface) SetColorKey(flags uint32, ColorKey uint8) int {
+func (s *Surface) SetColorKey(flags uint32, ColorKey uint32) int {
 	return int(C.SDL_SetColorKey((*C.SDL_Surface)(cast(s)),
                    C.Uint32(flags), C.Uint32(ColorKey)))
 }
