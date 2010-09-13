@@ -223,6 +223,13 @@ func (s *Surface) SetAlpha(flags uint32, alpha uint8) int {
 	return int(C.SDL_SetAlpha((*C.SDL_Surface)(cast(s)), C.Uint32(flags), C.Uint8(alpha)))
 }
 
+// Sets the color key (transparent pixel)  in  a  blittable  surface  and
+// enables or disables RLE blit acceleration.
+func (s *Surface) SetColorKey(flags uint32, ColorKey uint32) int {
+	return int(C.SDL_SetColorKey((*C.SDL_Surface)(cast(s)),
+                   C.Uint32(flags), C.Uint32(ColorKey)))
+}
+
 // Gets the clipping rectangle for a surface.
 func (s *Surface) GetClipRect(r *Rect) {
 	C.SDL_GetClipRect((*C.SDL_Surface)(cast(s)), (*C.SDL_Rect)(cast(r)))
