@@ -127,6 +127,10 @@ func main() {
 				println("")
 				println(e.Keyboard().Keysym.Sym, ": ", sdl.GetKeyName(sdl.Key(e.Keyboard().Keysym.Sym)))
 
+				if e.Keyboard().Keysym.Sym == 27 {
+					running = false
+				}
+
 				fmt.Printf("%04x ", e.Type)
 
 				for i := 0; i < len(e.Pad0); i++ {
@@ -144,7 +148,7 @@ func main() {
 				out = make(chan Point)
 				go worm(in, out, draw)
 			case sdl.VIDEORESIZE:
-				println("resize screen ",e.Resize().W, e.Resize().H);
+				println("resize screen ", e.Resize().W, e.Resize().H)
 
 				screen = sdl.SetVideoMode(int(e.Resize().W), int(e.Resize().H), 32, sdl.RESIZABLE)
 

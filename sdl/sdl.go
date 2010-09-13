@@ -87,9 +87,9 @@ func ListModes(format *PixelFormat, flags uint32) []Rect {
 	var count int
 	ptr := *modes //first element in the list
 	for count = 0; ptr != nil; count++ {
-		ptr = *(**C.SDL_Rect)(unsafe.Pointer( uintptr(unsafe.Pointer(modes)) + uintptr(count * unsafe.Sizeof(ptr)) ))
+		ptr = *(**C.SDL_Rect)(unsafe.Pointer(uintptr(unsafe.Pointer(modes)) + uintptr(count*unsafe.Sizeof(ptr))))
 	}
-	var ret = make([]Rect, count - 1)
+	var ret = make([]Rect, count-1)
 
 	*((***C.SDL_Rect)(unsafe.Pointer(&ret))) = modes // TODO
 	return ret
@@ -181,7 +181,7 @@ func WM_ToggleFullScreen(surface *Surface) int {
 func GL_SwapBuffers() { C.SDL_GL_SwapBuffers() }
 
 func GL_SetAttribute(attr int, value int) int {
-  return int(C.SDL_GL_SetAttribute(C.SDL_GLattr(attr), C.int(value)))
+	return int(C.SDL_GL_SetAttribute(C.SDL_GLattr(attr), C.int(value)))
 }
 
 // Swaps screen buffers.
@@ -261,8 +261,8 @@ func CreateRGBSurface(flags uint32, width int, height int, bpp int, Rmask uint32
 }
 
 // Converts a surface to the display format
-func DisplayFormat( src *Surface ) *Surface {
-	p := C.SDL_DisplayFormat( (*C.SDL_Surface)(cast(src)))
+func DisplayFormat(src *Surface) *Surface {
+	p := C.SDL_DisplayFormat((*C.SDL_Surface)(cast(src)))
 	return (*Surface)(cast(p))
 }
 
@@ -369,20 +369,20 @@ func (event *Event) MouseMotion() *MouseMotionEvent {
 
 // Returns ActiveEvent or nil if event has other type
 func (event *Event) Active() *ActiveEvent {
-  if event.Type == ACTIVEEVENT {
-    return (*ActiveEvent)(cast(event))
-  }
+	if event.Type == ACTIVEEVENT {
+		return (*ActiveEvent)(cast(event))
+	}
 
-  return nil
+	return nil
 }
 
 // Returns ResizeEvent or nil if event has other type
 func (event *Event) Resize() *ResizeEvent {
-  if event.Type == VIDEORESIZE {
-    return (*ResizeEvent)(cast(event))
-  }
+	if event.Type == VIDEORESIZE {
+		return (*ResizeEvent)(cast(event))
+	}
 
-  return nil
+	return nil
 }
 
 // Time
