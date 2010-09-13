@@ -82,6 +82,9 @@ const (
 	VIDEOEXPOSEMASK     = 0x20000
 	QUITMASK            = 0x1000
 	SYSWMEVENTMASK      = 0x2000
+	QUERY               = -1
+	DISABLE             = 0
+	ENABLE              = 1
 	K_UNKNOWN           = 0
 	K_FIRST             = 0
 	K_BACKSPACE         = 0x8

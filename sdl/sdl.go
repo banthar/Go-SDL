@@ -37,7 +37,7 @@ type Surface struct {
 }
 
 // TODO: This should NOT be a public function,
-// but since we need it in the package "ttf" ... the Go language sucks here
+// but since we need it in the package "ttf" ... the Go language is failing here
 func Wrap(intSurface *InternalSurface) *Surface {
 	var s *Surface
 
@@ -54,19 +54,15 @@ func Wrap(intSurface *InternalSurface) *Surface {
 }
 
 // Pull data from the internal-surface. Make sure to use this when
-// you expect that the internal-surface structure might have been changed.
+// the internal-surface might have been changed.
 func (s *Surface) reload() {
-	s.mutex.Lock()
-	{
-		s.Flags = s.intSurface.Flags
-		s.Format = s.intSurface.Format
-		s.W = s.intSurface.W
-		s.H = s.intSurface.H
-		s.Pitch = s.intSurface.Pitch
-		s.Pixels = s.intSurface.Pixels
-		s.Offset = s.intSurface.Offset
-	}
-	s.mutex.Unlock()
+	s.Flags = s.intSurface.Flags
+	s.Format = s.intSurface.Format
+	s.W = s.intSurface.W
+	s.H = s.intSurface.H
+	s.Pitch = s.intSurface.Pitch
+	s.Pixels = s.intSurface.Pixels
+	s.Offset = s.intSurface.Offset
 }
 
 func (s *Surface) destroy() {
@@ -461,9 +457,9 @@ func CreateRGBSurface(flags uint32, width int, height int, bpp int, Rmask uint32
 }
 
 
-// ======
-// Events
-// ======
+// ========
+// Keyboard
+// ========
 
 // Enables UNICODE translation.
 func EnableUNICODE(enable int) int {
@@ -516,23 +512,6 @@ type Mod C.int
 // Key
 type Key C.int
 
-// Retrieves the current state of the mouse.
-func GetMouseState(x, y *int) uint8 {
-	globalMutex.Lock()
-	state := uint8(C.SDL_GetMouseState((*C.int)(cast(x)), (*C.int)(cast(y))))
-	globalMutex.Unlock()
-	return state
-}
-
-// Retrieves the current state of the mouse relative to the last time this
-// function was called.
-func GetRelativeMouseState(x, y *int) uint8 {
-	globalMutex.Lock()
-	state := uint8(C.SDL_GetRelativeMouseState((*C.int)(cast(x)), (*C.int)(cast(y))))
-	globalMutex.Unlock()
-	return state
-}
-
 // Gets the state of modifier keys
 func GetModState() Mod {
 	globalMutex.Lock()
@@ -556,6 +535,11 @@ func GetKeyName(key Key) string {
 	return name
 }
 
+
+// ======
+// Events
+// ======
+
 // Polls for currently pending events
 func (event *Event) poll() bool {
 	globalMutex.Lock()
@@ -571,4 +555,34 @@ func (event *Event) poll() bool {
 	globalMutex.Unlock()
 
 	return ret != 0
+}
+
+
+// =====
+// Mouse
+// =====
+
+// Retrieves the current state of the mouse.
+func GetMouseState(x, y *int) uint8 {
+	globalMutex.Lock()
+	state := uint8(C.SDL_GetMouseState((*C.int)(cast(x)), (*C.int)(cast(y))))
+	globalMutex.Unlock()
+	return state
+}
+
+// Retrieves the current state of the mouse relative to the last time this
+// function was called.
+func GetRelativeMouseState(x, y *int) uint8 {
+	globalMutex.Lock()
+	state := uint8(C.SDL_GetRelativeMouseState((*C.int)(cast(x)), (*C.int)(cast(y))))
+	globalMutex.Unlock()
+	return state
+}
+
+// Toggle whether or not the cursor is shown on the screen.
+func ShowCursor(toggle int) int {
+	globalMutex.Lock()
+	state := int(C.SDL_ShowCursor((C.int)(toggle)))
+	globalMutex.Unlock()
+	return state
 }
