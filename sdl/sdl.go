@@ -23,19 +23,6 @@ type cast unsafe.Pointer
 
 var globalMutex sync.Mutex
 
-type Surface struct {
-	intSurface *InternalSurface // TODO: InternalSurface should in fact be internalSurface (i.e: it should be non-public)
-	mutex      sync.RWMutex
-
-	Flags  uint32
-	Format *PixelFormat
-	W      int32
-	H      int32
-	Pitch  uint16
-	Pixels *byte
-	Offset int32
-}
-
 // TODO: This should NOT be a public function,
 // but since we need it in the package "ttf" ... the Go language is failing here
 func Wrap(intSurface *InternalSurface) *Surface {
@@ -57,7 +44,7 @@ func Wrap(intSurface *InternalSurface) *Surface {
 // the internal-surface might have been changed.
 func (s *Surface) reload() {
 	s.Flags = s.intSurface.Flags
-	s.Format = s.intSurface.Format
+	s.Format = (*PixelFormat)(cast(s.intSurface.Format))
 	s.W = s.intSurface.W
 	s.H = s.intSurface.H
 	s.Pitch = s.intSurface.Pitch
@@ -197,6 +184,28 @@ func VideoModeOK(width int, height int, bpp int, flags uint32) int {
 	status := int(C.SDL_VideoModeOK(C.int(width), C.int(height), C.int(bpp), C.Uint32(flags)))
 	globalMutex.Unlock()
 	return status
+}
+
+func ListModes(format *PixelFormat, flags uint32) []Rect {
+	modes := C.SDL_ListModes((*C.SDL_PixelFormat)(cast(format)), C.Uint32(flags))
+	if modes == nil { //no modes available
+		return make([]Rect, 0)
+	}
+	var any int
+	*((***C.SDL_Rect)(unsafe.Pointer(&any))) = modes
+	if any == -1 { //any dimension is ok
+		return nil
+	}
+
+	var count int
+	ptr := *modes //first element in the list
+	for count = 0; ptr != nil; count++ {
+		ptr = *(**C.SDL_Rect)(unsafe.Pointer(uintptr(unsafe.Pointer(modes)) + uintptr(count*unsafe.Sizeof(ptr))))
+	}
+	var ret = make([]Rect, count-1)
+
+	*((***C.SDL_Rect)(unsafe.Pointer(&ret))) = modes // TODO
+	return ret
 }
 
 type VideoInfo struct {
@@ -410,6 +419,13 @@ func (s *Surface) SetAlpha(flags uint32, alpha uint8) int {
 	return status
 }
 
+// Sets the color key (transparent pixel)  in  a  blittable  surface  and
+// enables or disables RLE blit acceleration.
+func (s *Surface) SetColorKey(flags uint32, ColorKey uint32) int {
+	return int(C.SDL_SetColorKey((*C.SDL_Surface)(cast(s)),
+		C.Uint32(flags), C.Uint32(ColorKey)))
+}
+
 // Gets the clipping rectangle for a surface.
 func (s *Surface) GetClipRect(r *Rect) {
 	s.mutex.RLock()
@@ -424,6 +440,11 @@ func (s *Surface) SetClipRect(r *Rect) {
 	C.SDL_SetClipRect((*C.SDL_Surface)(cast(s.intSurface)), (*C.SDL_Rect)(cast(r)))
 	s.mutex.Unlock()
 	return
+}
+
+// Map a RGBA color value to a pixel format.
+func MapRGBA(format *PixelFormat, r, g, b, a uint8) uint32 {
+	return (uint32)(C.SDL_MapRGBA((*C.SDL_PixelFormat)(cast(format)), (C.Uint8)(r), (C.Uint8)(g), (C.Uint8)(b), (C.Uint8)(a)))
 }
 
 // Gets RGBA values from a pixel in the specified pixel format.
@@ -456,6 +477,11 @@ func CreateRGBSurface(flags uint32, width int, height int, bpp int, Rmask uint32
 	return Wrap((*InternalSurface)(cast(p)))
 }
 
+// Converts a surface to the display format
+func DisplayFormat(src *Surface) *Surface {
+	p := C.SDL_DisplayFormat((*C.SDL_Surface)(cast(src)))
+	return (*Surface)(cast(p))
+}
 
 // ========
 // Keyboard
@@ -557,7 +583,6 @@ func (event *Event) poll() bool {
 	return ret != 0
 }
 
-
 // =====
 // Mouse
 // =====
@@ -577,6 +602,24 @@ func GetRelativeMouseState(x, y *int) uint8 {
 	state := uint8(C.SDL_GetRelativeMouseState((*C.int)(cast(x)), (*C.int)(cast(y))))
 	globalMutex.Unlock()
 	return state
+}
+
+// Returns ActiveEvent or nil if event has other type
+func (event *Event) Active() *ActiveEvent {
+	if event.Type == ACTIVEEVENT {
+		return (*ActiveEvent)(cast(event))
+	}
+
+	return nil
+}
+
+// Returns ResizeEvent or nil if event has other type
+func (event *Event) Resize() *ResizeEvent {
+	if event.Type == VIDEORESIZE {
+		return (*ResizeEvent)(cast(event))
+	}
+
+	return nil
 }
 
 // Toggle whether or not the cursor is shown on the screen.

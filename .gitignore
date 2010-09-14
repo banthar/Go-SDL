@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *~
 *.[o68]
 _obj
@@ -9,3 +10,16 @@ _obj
 test/test
 shoot.png
 *_cgo*
+=======
+**~
+main
+**.[o86]
+.obj/
+**.cgo*.*
+**/_obj
+**/*.out
+test/test
+shoot.png
+**_cgo*
+*.so
+>>>>>>> dd437a47253d3fac5aef44016bc2a4d5d35f3e34
