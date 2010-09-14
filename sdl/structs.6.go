@@ -3,9 +3,8 @@ package sdl
 import "sync"
 
 type Surface struct {
-	intSurface *InternalSurface // TODO: InternalSurface should in fact be internalSurface (i.e: it should be non-public)
-	mutex      sync.RWMutex
-
+	intSurface     *InternalSurface // TODO: InternalSurface should in fact be internalSurface (i.e: it should be non-public)
+	mutex          sync.RWMutex
 	Flags          uint32
 	Pad0           [4]byte
 	Format         *PixelFormat
