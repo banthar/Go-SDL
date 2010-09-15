@@ -12,6 +12,20 @@ import "C"
 import "⚛sdl"
 import "unsafe"
 
+func wrap(cSurface *C.SDL_Surface) *sdl.Surface {
+	var s *sdl.Surface
+
+	if cSurface != nil {
+		var surface sdl.Surface
+		surface.SetCSurface(unsafe.Pointer(cSurface))
+		s = &surface
+	} else {
+		s = nil
+	}
+
+	return s
+}
+
 // A ttf or otf font.
 type Font struct {
 	cfont *C.TTF_Font
@@ -63,7 +77,7 @@ func RenderText_Solid(font *Font, text string, color sdl.Color) *sdl.Surface {
 	ccol := C.SDL_Color{C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.Unused)}
 	surface := C.TTF_RenderText_Solid(font.cfont, ctext, ccol)
 	C.free(unsafe.Pointer(ctext))
-	return sdl.Wrap((*sdl.InternalSurface)(unsafe.Pointer(surface)))
+	return wrap(surface)
 }
 
 // Renders UTF-8 text in the specified color and returns an SDL surface.  Solid
@@ -73,7 +87,7 @@ func RenderUTF8_Solid(font *Font, text string, color sdl.Color) *sdl.Surface {
 	ccol := C.SDL_Color{C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.Unused)}
 	surface := C.TTF_RenderUTF8_Solid(font.cfont, ctext, ccol)
 	C.free(unsafe.Pointer(ctext))
-	return sdl.Wrap((*sdl.InternalSurface)(unsafe.Pointer(surface)))
+	return wrap(surface)
 }
 
 // Renders Latin-1 text in the specified color (and with the specified background
@@ -85,7 +99,7 @@ func RenderText_Shaded(font *Font, text string, color, bgcolor sdl.Color) *sdl.S
 	cbgcol := C.SDL_Color{C.Uint8(bgcolor.R), C.Uint8(bgcolor.G), C.Uint8(bgcolor.B), C.Uint8(bgcolor.Unused)}
 	surface := C.TTF_RenderText_Shaded(font.cfont, ctext, ccol, cbgcol)
 	C.free(unsafe.Pointer(ctext))
-	return sdl.Wrap((*sdl.InternalSurface)(unsafe.Pointer(surface)))
+	return wrap(surface)
 }
 
 // Renders UTF-8 text in the specified color (and with the specified background
@@ -97,7 +111,7 @@ func RenderUTF8_Shaded(font *Font, text string, color, bgcolor sdl.Color) *sdl.S
 	cbgcol := C.SDL_Color{C.Uint8(bgcolor.R), C.Uint8(bgcolor.G), C.Uint8(bgcolor.B), C.Uint8(bgcolor.Unused)}
 	surface := C.TTF_RenderUTF8_Shaded(font.cfont, ctext, ccol, cbgcol)
 	C.free(unsafe.Pointer(ctext))
-	return sdl.Wrap((*sdl.InternalSurface)(unsafe.Pointer(surface)))
+	return wrap(surface)
 }
 
 // Renders Latin-1 text in the specified color and returns an SDL surface.
@@ -108,7 +122,7 @@ func RenderText_Blended(font *Font, text string, color sdl.Color) *sdl.Surface {
 	ccol := C.SDL_Color{C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.Unused)}
 	surface := C.TTF_RenderText_Blended(font.cfont, ctext, ccol)
 	C.free(unsafe.Pointer(ctext))
-	return sdl.Wrap((*sdl.InternalSurface)(unsafe.Pointer(surface)))
+	return wrap(surface)
 }
 
 // Renders UTF-8 text in the specified color and returns an SDL surface.
@@ -119,7 +133,7 @@ func RenderUTF8_Blended(font *Font, text string, color sdl.Color) *sdl.Surface {
 	ccol := C.SDL_Color{C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.Unused)}
 	surface := C.TTF_RenderUTF8_Blended(font.cfont, ctext, ccol)
 	C.free(unsafe.Pointer(ctext))
-	return sdl.Wrap((*sdl.InternalSurface)(unsafe.Pointer(surface)))
+	return wrap(surface)
 }
 
 // Returns the rendering style of the font.

@@ -152,7 +152,7 @@ func main() {
 				println("")
 				println(e.Keysym.Sym, ": ", sdl.GetKeyName(sdl.Key(e.Keysym.Sym)))
 
-				if e.Keyboard().Keysym.Sym == 27 {
+				if e.Keysym.Sym == sdl.K_ESCAPE {
 					running = false
 				}
 
@@ -165,6 +165,7 @@ func main() {
 
 				fmt.Printf("Type: %02x Which: %02x State: %02x Pad: %02x\n", e.Type, e.Which, e.State, e.Pad0[0])
 				fmt.Printf("Scancode: %02x Sym: %08x Mod: %04x Unicode: %04x\n", e.Keysym.Scancode, e.Keysym.Sym, e.Keysym.Mod, e.Keysym.Unicode)
+
 			case sdl.MouseButtonEvent:
 				if e.Type == sdl.MOUSEBUTTONDOWN {
 					println("Click:", e.X, e.Y)
@@ -175,15 +176,6 @@ func main() {
 
 			case sdl.ResizeEvent:
 				println("resize screen ", e.W, e.H)
-				fmt.Printf("Type: %02x Which: %02x State: %02x Pad: %02x\n", k.Type, k.Which, k.State, k.Pad0[0])
-				fmt.Printf("Scancode: %02x Sym: %08x Mod: %04x Unicode: %04x\n", k.Keysym.Scancode, k.Keysym.Sym, k.Keysym.Mod, k.Keysym.Unicode)
-			case sdl.MOUSEBUTTONDOWN:
-				println("Click:", e.MouseButton().X, e.MouseButton().Y)
-				in = out
-				out = make(chan Point)
-				go worm(in, out, draw)
-			case sdl.VIDEORESIZE:
-				println("resize screen ", e.Resize().W, e.Resize().H)
 
 				screen = sdl.SetVideoMode(int(e.W), int(e.H), 32, sdl.RESIZABLE)
 

@@ -1,7 +1,5 @@
 #include <SDL/SDL.h>
 
-typedef SDL_Surface $InternalSurface;
-
 enum
 {
 

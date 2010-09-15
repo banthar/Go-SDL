@@ -23,15 +23,25 @@ type cast unsafe.Pointer
 
 var globalMutex sync.Mutex
 
-// TODO: This should NOT be a public function,
-// but since we need it in the package "ttf" ... the Go language is failing here
-func Wrap(intSurface *InternalSurface) *Surface {
+type Surface struct {
+	cSurface *C.SDL_Surface
+	mutex    sync.RWMutex
+
+	Flags  uint32
+	Format *PixelFormat
+	W      int32
+	H      int32
+	Pitch  uint16
+	Pixels unsafe.Pointer
+	Offset int32
+}
+
+func wrap(cSurface *C.SDL_Surface) *Surface {
 	var s *Surface
 
-	if intSurface != nil {
+	if cSurface != nil {
 		var surface Surface
-		surface.intSurface = intSurface
-		surface.reload()
+		surface.SetCSurface(unsafe.Pointer(cSurface))
 		s = &surface
 	} else {
 		s = nil
@@ -40,20 +50,26 @@ func Wrap(intSurface *InternalSurface) *Surface {
 	return s
 }
 
-// Pull data from the internal-surface. Make sure to use this when
-// the internal-surface might have been changed.
+// FIXME: Ideally, this should NOT be a public function, but it is needed in the package "ttf" ...
+func (s *Surface) SetCSurface(cSurface unsafe.Pointer) {
+	s.cSurface = (*C.SDL_Surface)(cSurface)
+	s.reload()
+}
+
+// Pull data from C.SDL_Surface.
+// Make sure to use this when the C surface might have been changed.
 func (s *Surface) reload() {
-	s.Flags = s.intSurface.Flags
-	s.Format = (*PixelFormat)(cast(s.intSurface.Format))
-	s.W = s.intSurface.W
-	s.H = s.intSurface.H
-	s.Pitch = s.intSurface.Pitch
-	s.Pixels = s.intSurface.Pixels
-	s.Offset = s.intSurface.Offset
+	s.Flags = uint32(s.cSurface.flags)
+	s.Format = (*PixelFormat)(cast(s.cSurface.format))
+	s.W = int32(s.cSurface.w)
+	s.H = int32(s.cSurface.h)
+	s.Pitch = uint16(s.cSurface.pitch)
+	s.Pixels = s.cSurface.pixels
+	s.Offset = int32(s.cSurface.offset)
 }
 
 func (s *Surface) destroy() {
-	s.intSurface = nil
+	s.cSurface = nil
 	s.Format = nil
 	s.Pixels = nil
 }
@@ -164,7 +180,7 @@ var currentVideoSurface *Surface = nil
 func SetVideoMode(w int, h int, bpp int, flags uint32) *Surface {
 	globalMutex.Lock()
 	var screen = C.SDL_SetVideoMode(C.int(w), C.int(h), C.int(bpp), C.Uint32(flags))
-	currentVideoSurface = Wrap((*InternalSurface)(cast(screen)))
+	currentVideoSurface = wrap(screen)
 	globalMutex.Unlock()
 	return currentVideoSurface
 }
@@ -186,25 +202,41 @@ func VideoModeOK(width int, height int, bpp int, flags uint32) int {
 	return status
 }
 
+// Returns the list of available screen dimensions for the given format.
+//
+// NOTE: The result of this function uses a different encoding than the underlying C function.
+// It returns an empty array if no modes are available,
+// and nil if any dimension is okay for the given format.
 func ListModes(format *PixelFormat, flags uint32) []Rect {
 	modes := C.SDL_ListModes((*C.SDL_PixelFormat)(cast(format)), C.Uint32(flags))
-	if modes == nil { //no modes available
+
+	// No modes available
+	if modes == nil {
 		return make([]Rect, 0)
 	}
-	var any int
-	*((***C.SDL_Rect)(unsafe.Pointer(&any))) = modes
-	if any == -1 { //any dimension is ok
+
+	// (modes == -1) --> Any dimension is ok
+	if uintptr(unsafe.Pointer(modes))+1 == uintptr(0) {
 		return nil
 	}
 
-	var count int
+	count := 0
 	ptr := *modes //first element in the list
-	for count = 0; ptr != nil; count++ {
+	for ptr != nil {
+		count++
 		ptr = *(**C.SDL_Rect)(unsafe.Pointer(uintptr(unsafe.Pointer(modes)) + uintptr(count*unsafe.Sizeof(ptr))))
 	}
-	var ret = make([]Rect, count-1)
 
-	*((***C.SDL_Rect)(unsafe.Pointer(&ret))) = modes // TODO
+	ret := make([]Rect, count)
+	for i := 0; i < count; i++ {
+		ptr := (**C.SDL_Rect)(unsafe.Pointer(uintptr(unsafe.Pointer(modes)) + uintptr(i*unsafe.Sizeof(*modes))))
+		var r *C.SDL_Rect = *ptr
+		ret[i].X = int16(r.x)
+		ret[i].Y = int16(r.y)
+		ret[i].W = uint16(r.w)
+		ret[i].H = uint16(r.h)
+	}
+
 	return ret
 }
 
@@ -254,7 +286,7 @@ func (screen *Surface) UpdateRect(x int32, y int32, w uint32, h uint32) {
 	globalMutex.Lock()
 	screen.mutex.Lock()
 
-	C.SDL_UpdateRect((*C.SDL_Surface)(cast(screen.intSurface)), C.Sint32(x), C.Sint32(y), C.Uint32(w), C.Uint32(h))
+	C.SDL_UpdateRect(screen.cSurface, C.Sint32(x), C.Sint32(y), C.Uint32(w), C.Uint32(h))
 
 	screen.mutex.Unlock()
 	globalMutex.Unlock()
@@ -265,7 +297,7 @@ func (screen *Surface) UpdateRects(rects []Rect) {
 		globalMutex.Lock()
 		screen.mutex.Lock()
 
-		C.SDL_UpdateRects((*C.SDL_Surface)(cast(screen.intSurface)), C.int(len(rects)), (*C.SDL_Rect)(cast(&rects[0])))
+		C.SDL_UpdateRects(screen.cSurface, C.int(len(rects)), (*C.SDL_Rect)(cast(&rects[0])))
 
 		screen.mutex.Unlock()
 		globalMutex.Unlock()
@@ -303,7 +335,7 @@ func WM_SetCaption(title, icon string) {
 // Sets the icon for the display window.
 func WM_SetIcon(icon *Surface, mask *uint8) {
 	globalMutex.Lock()
-	C.SDL_WM_SetIcon((*C.SDL_Surface)(cast(icon.intSurface)), (*C.Uint8)(mask))
+	C.SDL_WM_SetIcon(icon.cSurface, (*C.Uint8)(mask))
 	globalMutex.Unlock()
 }
 
@@ -318,7 +350,7 @@ func WM_IconifyWindow() int {
 // Toggles fullscreen mode
 func WM_ToggleFullScreen(surface *Surface) int {
 	globalMutex.Lock()
-	status := int(C.SDL_WM_ToggleFullScreen((*C.SDL_Surface)(cast(surface.intSurface))))
+	status := int(C.SDL_WM_ToggleFullScreen(surface.cSurface))
 	globalMutex.Unlock()
 	return status
 }
@@ -342,7 +374,7 @@ func (screen *Surface) Flip() int {
 	globalMutex.Lock()
 	screen.mutex.Lock()
 
-	status := int(C.SDL_Flip((*C.SDL_Surface)(cast(screen.intSurface))))
+	status := int(C.SDL_Flip(screen.cSurface))
 
 	screen.mutex.Unlock()
 	globalMutex.Unlock()
@@ -355,7 +387,7 @@ func (screen *Surface) Free() {
 	globalMutex.Lock()
 	screen.mutex.Lock()
 
-	C.SDL_FreeSurface((*C.SDL_Surface)(cast(screen.intSurface)))
+	C.SDL_FreeSurface(screen.cSurface)
 
 	screen.destroy()
 	if screen == currentVideoSurface {
@@ -369,7 +401,7 @@ func (screen *Surface) Free() {
 // Locks a surface for direct access.
 func (screen *Surface) Lock() int {
 	screen.mutex.Lock()
-	status := int(C.SDL_LockSurface((*C.SDL_Surface)(cast(screen.intSurface))))
+	status := int(C.SDL_LockSurface(screen.cSurface))
 	screen.mutex.Unlock()
 	return status
 }
@@ -377,7 +409,7 @@ func (screen *Surface) Lock() int {
 // Unlocks a previously locked surface.
 func (screen *Surface) Unlock() {
 	screen.mutex.Lock()
-	C.SDL_UnlockSurface((*C.SDL_Surface)(cast(screen.intSurface)))
+	C.SDL_UnlockSurface(screen.cSurface)
 	screen.mutex.Unlock()
 }
 
@@ -386,9 +418,9 @@ func (dst *Surface) Blit(dstrect *Rect, src *Surface, srcrect *Rect) int {
 	dst.mutex.Lock()
 
 	var ret = C.SDL_UpperBlit(
-		(*C.SDL_Surface)(cast(src.intSurface)),
+		src.cSurface,
 		(*C.SDL_Rect)(cast(srcrect)),
-		(*C.SDL_Surface)(cast(dst.intSurface)),
+		dst.cSurface,
 		(*C.SDL_Rect)(cast(dstrect)))
 
 	dst.mutex.Unlock()
@@ -402,7 +434,7 @@ func (dst *Surface) FillRect(dstrect *Rect, color uint32) int {
 	dst.mutex.Lock()
 
 	var ret = C.SDL_FillRect(
-		(*C.SDL_Surface)(cast(dst.intSurface)),
+		dst.cSurface,
 		(*C.SDL_Rect)(cast(dstrect)),
 		C.Uint32(color))
 
@@ -414,7 +446,7 @@ func (dst *Surface) FillRect(dstrect *Rect, color uint32) int {
 // Adjusts the alpha properties of a Surface.
 func (s *Surface) SetAlpha(flags uint32, alpha uint8) int {
 	s.mutex.Lock()
-	status := int(C.SDL_SetAlpha((*C.SDL_Surface)(cast(s.intSurface)), C.Uint32(flags), C.Uint8(alpha)))
+	status := int(C.SDL_SetAlpha(s.cSurface, C.Uint32(flags), C.Uint8(alpha)))
 	s.mutex.Unlock()
 	return status
 }
@@ -422,24 +454,24 @@ func (s *Surface) SetAlpha(flags uint32, alpha uint8) int {
 // Sets the color key (transparent pixel)  in  a  blittable  surface  and
 // enables or disables RLE blit acceleration.
 func (s *Surface) SetColorKey(flags uint32, ColorKey uint32) int {
-	return int(C.SDL_SetColorKey((*C.SDL_Surface)(cast(s)),
-		C.Uint32(flags), C.Uint32(ColorKey)))
+	s.mutex.Lock()
+	status := int(C.SDL_SetColorKey(s.cSurface, C.Uint32(flags), C.Uint32(ColorKey)))
+	s.mutex.Unlock()
+	return status
 }
 
 // Gets the clipping rectangle for a surface.
 func (s *Surface) GetClipRect(r *Rect) {
 	s.mutex.RLock()
-	C.SDL_GetClipRect((*C.SDL_Surface)(cast(s.intSurface)), (*C.SDL_Rect)(cast(r)))
+	C.SDL_GetClipRect(s.cSurface, (*C.SDL_Rect)(cast(r)))
 	s.mutex.RUnlock()
-	return
 }
 
 // Sets the clipping rectangle for a surface.
 func (s *Surface) SetClipRect(r *Rect) {
 	s.mutex.Lock()
-	C.SDL_SetClipRect((*C.SDL_Surface)(cast(s.intSurface)), (*C.SDL_Rect)(cast(r)))
+	C.SDL_SetClipRect(s.cSurface, (*C.SDL_Rect)(cast(r)))
 	s.mutex.Unlock()
-	return
 }
 
 // Map a RGBA color value to a pixel format.
@@ -462,7 +494,7 @@ func Load(file string) *Surface {
 
 	globalMutex.Unlock()
 
-	return Wrap((*InternalSurface)(cast(screen)))
+	return wrap(screen)
 }
 
 // Creates an empty Surface.
@@ -474,14 +506,17 @@ func CreateRGBSurface(flags uint32, width int, height int, bpp int, Rmask uint32
 
 	globalMutex.Unlock()
 
-	return Wrap((*InternalSurface)(cast(p)))
+	return wrap(p)
 }
 
 // Converts a surface to the display format
-func DisplayFormat(src *Surface) *Surface {
-	p := C.SDL_DisplayFormat((*C.SDL_Surface)(cast(src)))
-	return (*Surface)(cast(p))
+func (s *Surface) DisplayFormat() *Surface {
+	s.mutex.RLock()
+	p := C.SDL_DisplayFormat(s.cSurface)
+	s.mutex.RUnlock()
+	return wrap(p)
 }
+
 
 // ========
 // Keyboard
@@ -583,6 +618,7 @@ func (event *Event) poll() bool {
 	return ret != 0
 }
 
+
 // =====
 // Mouse
 // =====
@@ -602,24 +638,6 @@ func GetRelativeMouseState(x, y *int) uint8 {
 	state := uint8(C.SDL_GetRelativeMouseState((*C.int)(cast(x)), (*C.int)(cast(y))))
 	globalMutex.Unlock()
 	return state
-}
-
-// Returns ActiveEvent or nil if event has other type
-func (event *Event) Active() *ActiveEvent {
-	if event.Type == ACTIVEEVENT {
-		return (*ActiveEvent)(cast(event))
-	}
-
-	return nil
-}
-
-// Returns ResizeEvent or nil if event has other type
-func (event *Event) Resize() *ResizeEvent {
-	if event.Type == VIDEORESIZE {
-		return (*ResizeEvent)(cast(event))
-	}
-
-	return nil
 }
 
 // Toggle whether or not the cursor is shown on the screen.

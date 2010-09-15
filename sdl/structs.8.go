@@ -1,27 +1,5 @@
 package sdl
 
-import "sync"
-
-type Surface struct {
-	intSurface     *InternalSurface // TODO: InternalSurface should in fact be internalSurface (i.e: it should be non-public)
-	mutex          sync.RWMutex
-	Flags          uint32
-	Format         *PixelFormat
-	W              int32
-	H              int32
-	Pitch          uint16
-	Pad0           [2]byte
-	Pixels         *byte
-	Offset         int32
-	Hwdata         *[0]byte /* sprivate_hwdata */
-	Clip_rect      Rect
-	Unused1        uint32
-	Locked         uint32
-	Map            *[0]byte /* sSDL_BlitMap */
-	Format_version uint32
-	Refcount       int32
-}
-
 type PixelFormat struct {
 	Palette       *Palette
 	BitsPerPixel  uint8
