@@ -53,10 +53,6 @@ type AudioSpec struct {
 }
 
 func OpenAudio(desired, obtained_orNil *AudioSpec) int {
-	mutex.Lock()
-	opened++
-	mutex.Unlock()
-
 	var C_desired, C_obtained *C.SDL_AudioSpec
 
 	C_desired = new(C.SDL_AudioSpec)
@@ -75,6 +71,12 @@ func OpenAudio(desired, obtained_orNil *AudioSpec) int {
 	}
 
 	status := C.SDL_OpenAudio(C_desired, C_obtained)
+
+	if status == 0 {
+		mutex.Lock()
+		opened++
+		mutex.Unlock()
+	}
 
 	if obtained_orNil != nil {
 		obtained := obtained_orNil
