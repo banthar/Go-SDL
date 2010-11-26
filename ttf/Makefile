@@ -8,8 +8,8 @@ TARG=sdl/ttf
 
 GOFILES:=constants.go
 CGOFILES:=ttf.go
-CGO_CFLAGS:=-I /usr/local/include
-CGO_LDFLAGS:=-lSDL_ttf -L /usr/local/lib
+CGO_CFLAGS:=-I /usr/local/include -Ic:/msys/1.0/local/include
+CGO_LDFLAGS:=-lSDL_ttf -L /usr/local/lib -Lc:/msys/1.0/local/lib
 
 CLEANFILES+=ttf
 
