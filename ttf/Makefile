@@ -9,7 +9,7 @@ TARG=sdl/ttf
 GOFILES:=constants.go
 CGOFILES:=ttf.go
 CGO_CFLAGS:=-I /usr/local/include
-CGO_LDFLAGS:=-lSDL_ttf -L /usr/local/lib
+CGO_LDFLAGS:=-lSDL_ttf -L/usr/local/lib
 
 CLEANFILES+=ttf
 
