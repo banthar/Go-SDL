@@ -93,6 +93,8 @@ func OpenAudio(desired, obtained_orNil *AudioSpec) int {
 }
 
 func CloseAudio() {
+	PauseAudio(true)
+
 	mutex.Lock()
 	{
 		opened--
