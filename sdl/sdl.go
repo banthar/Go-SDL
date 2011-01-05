@@ -22,6 +22,7 @@ package sdl
 // static int __SDL_RWclose(SDL_RWops *ctx) { return SDL_RWclose(ctx); }
 import "C"
 import "unsafe"
+import "os"
 
 type cast unsafe.Pointer
 
@@ -420,7 +421,7 @@ func RWFromFile(file, mode string) *RWops {
 
 // FIXME(salviati): It'd be nice if we could get rid of this
 // extra mode parameter.
-func RWFromFP(f *os.File, int autoclose, mode string) *RWops {
+func RWFromFP(f *os.File, autoclose int, mode string) *RWops {
 	fd := C.int(f.Fd())
 	fp := C.fdopen(fd, C.CString(mode))
 	ptr := C.SDL_RWFromFP(fp, C.int(autoclose))
