@@ -15,6 +15,11 @@ package sdl
 // #include <SDL/SDL.h>
 // #include <SDL/SDL_image.h>
 // static void SetError(const char* description){SDL_SetError("%s",description);}
+// static int __SDL_RWseek(SDL_RWops *ctx, int offset, int whence) { return SDL_RWseek(ctx, offset, whence); }
+// static int __SDL_RWtell(SDL_RWops *ctx) { return SDL_RWseek(ctx, 0, RW_SEEK_CUR); }
+// static int __SDL_RWread(SDL_RWops *ctx, void *ptr, int size, int n) { return SDL_RWread(ctx, ptr, size, n); }
+// static int __SDL_RWwrite(SDL_RWops *ctx, const void *ptr, int size, int n) { return SDL_RWwrite(ctx, ptr, size, n); }
+// static int __SDL_RWclose(SDL_RWops *ctx) { return SDL_RWclose(ctx); }
 import "C"
 import "unsafe"
 
@@ -399,3 +404,81 @@ func GetTicks() uint32 { return uint32(C.SDL_GetTicks()) }
 
 // Waits a specified number of milliseconds before returning.
 func Delay(ms uint32) { C.SDL_Delay(C.Uint32(ms)) }
+
+type RWops struct {
+	ptr *C.SDL_RWops
+}
+
+func (rwops *RWops) Free() {
+	C.SDL_FreeRW(rwops.ptr)
+}
+
+func RWFromFile(file, mode string) *RWops {
+	ptr := C.SDL_RWFromFile(C.CString(file), C.CString(mode))
+	return &RWops{ptr: ptr}
+}
+
+// Needs a bit of workaround
+//func RWFromFP(f *os.File, int autoclose) *RWops {
+//}
+
+func RWFromMem(mem []byte) *RWops {
+	ptr := C.SDL_RWFromMem( unsafe.Pointer(&mem[0]), C.int(len(mem)) )
+	return &RWops{ptr: ptr}
+}
+
+func RWFromConstMem(mem []byte) *RWops {
+	ptr := C.SDL_RWFromConstMem( unsafe.Pointer(&mem[0]), C.int(len(mem)) )
+	return &RWops{ptr: ptr}
+}
+
+// Do we need this one?
+/*func AllocRW() *RWops {
+	ptr := C.SDL_AllocRW()
+	return &RWops{ptr: ptr}
+}*/
+
+const (
+	RW_SEEK_SET	= 0	/* Seek from the beginning of data */
+	RW_SEEK_CUR	= 1	/* Seek relative to current read point */
+	RW_SEEK_END = 2	/* Seek relative to the end of data */
+)
+
+func (rwops *RWops) Seek(offset, whence int) int {
+	return int( C.__SDL_RWseek(rwops.ptr, C.int(offset), C.int(whence)) )
+}
+
+func (rwops *RWops) Tell() int {
+	return int(C.__SDL_RWtell(rwops.ptr))
+}
+
+func (rwops *RWops) Read(mem []byte, size int) int {
+	return int( C.__SDL_RWread(rwops.ptr, unsafe.Pointer(&mem[0]), C.int(size), C.int(len(mem))) )
+}
+
+func (rwops *RWops) Write(mem []byte, size int) int {
+	return int( C.__SDL_RWwrite(rwops.ptr, unsafe.Pointer(&mem[0]), C.int(size), C.int(len(mem))) )
+}
+
+func (rwops *RWops) Close() int {
+	return int(C.__SDL_RWclose(rwops.ptr))
+}
+
+func (rwops *RWops) Load(freesrc int) *Surface {
+	im := C.IMG_Load_RW(rwops.ptr, C.int(freesrc))
+	return (*Surface)(cast(im))
+}
+
+func (rwops *RWops) ReadLE16() uint16 { return uint16( C.SDL_ReadLE16(rwops.ptr) ) }
+func (rwops *RWops) ReadBE16() uint16 { return uint16( C.SDL_ReadBE16(rwops.ptr) ) }
+func (rwops *RWops) ReadLE32() uint32 { return uint32( C.SDL_ReadLE32(rwops.ptr) ) }
+func (rwops *RWops) ReadBE32() uint32 { return uint32( C.SDL_ReadBE32(rwops.ptr) ) }
+func (rwops *RWops) ReadLE64() uint64 { return uint64( C.SDL_ReadLE64(rwops.ptr) ) }
+func (rwops *RWops) ReadBE64() uint64 { return uint64( C.SDL_ReadBE64(rwops.ptr) ) }
+
+func (rwops *RWops) WriteLE16(value uint16) int { return int( C.SDL_WriteLE16(rwops.ptr, C.Uint16(value)) ) }
+func (rwops *RWops) WriteBE16(value uint16) int { return int( C.SDL_WriteBE16(rwops.ptr, C.Uint16(value)) ) }
+func (rwops *RWops) WriteLE32(value uint32) int { return int( C.SDL_WriteLE32(rwops.ptr, C.Uint32(value)) ) }
+func (rwops *RWops) WriteBE32(value uint32) int { return int( C.SDL_WriteBE32(rwops.ptr, C.Uint32(value)) ) }
+func (rwops *RWops) WriteLE64(value uint64) int { return int( C.SDL_WriteLE64(rwops.ptr, C.Uint64(value)) ) }
+func (rwops *RWops) WriteBE64(value uint64) int { return int( C.SDL_WriteBE64(rwops.ptr, C.Uint64(value)) ) }
