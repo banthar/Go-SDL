@@ -418,9 +418,14 @@ func RWFromFile(file, mode string) *RWops {
 	return &RWops{ptr: ptr}
 }
 
-// Needs a bit of workaround
-//func RWFromFP(f *os.File, int autoclose) *RWops {
-//}
+// FIXME(salviati): It'd be nice if we could get rid of this
+// extra mode parameter.
+func RWFromFP(f *os.File, int autoclose, mode string) *RWops {
+	fd := C.int(f.Fd())
+	fp := C.fdopen(fd, C.CString(mode))
+	ptr := C.SDL_RWFromFP(fp, C.int(autoclose))
+	return &RWops{ptr: ptr}
+}
 
 func RWFromMem(mem []byte) *RWops {
 	ptr := C.SDL_RWFromMem( unsafe.Pointer(&mem[0]), C.int(len(mem)) )
@@ -433,10 +438,10 @@ func RWFromConstMem(mem []byte) *RWops {
 }
 
 // Do we need this one?
-/*func AllocRW() *RWops {
+func AllocRW() *RWops {
 	ptr := C.SDL_AllocRW()
 	return &RWops{ptr: ptr}
-}*/
+}
 
 const (
 	RW_SEEK_SET	= 0	/* Seek from the beginning of data */
