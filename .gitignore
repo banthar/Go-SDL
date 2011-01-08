@@ -9,3 +9,4 @@ _obj
 test/test
 shoot.png
 *_cgo*
+sdl_audio_callback.so

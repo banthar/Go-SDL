@@ -165,7 +165,8 @@ type Event struct {
 
 type Keysym struct {
 	Scancode uint8
-	Sym     uint32
-	Mod     uint32
-	Unicode uint16
+	Pad0     [3]byte
+	Sym      uint32
+	Mod      uint32
+	Unicode  uint16
 }

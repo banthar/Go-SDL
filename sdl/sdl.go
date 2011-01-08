@@ -1,7 +1,7 @@
 /*
 A binding of SDL and SDL_image.
 
-The binding is works in pretty much the same way as it does in C, although
+The binding works in pretty much the same way as it does in C, although
 some of the functions have been altered to give them an object-oriented
 flavor (eg. Rather than sdl.Flip(surface) it's surface.Flip() )
 */
