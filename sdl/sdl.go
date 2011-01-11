@@ -421,10 +421,12 @@ func RWFromFile(file, mode string) *RWops {
 
 // FIXME(salviati): It'd be nice if we could get rid of this
 // extra mode parameter.
-func RWFromFP(f *os.File, autoclose int, mode string) *RWops {
+func RWFromFP(f *os.File, autoclose bool, mode string) *RWops {
 	fd := C.int(f.Fd())
 	fp := C.fdopen(fd, C.CString(mode))
-	ptr := C.SDL_RWFromFP(fp, C.int(autoclose))
+	autocloseInt := 0
+	if autoclose { autocloseInt = 1 }
+	ptr := C.SDL_RWFromFP(fp, C.int(autocloseInt))
 	return &RWops{ptr: ptr}
 }
 
@@ -470,8 +472,10 @@ func (rwops *RWops) Close() int {
 	return int(C.__SDL_RWclose(rwops.ptr))
 }
 
-func (rwops *RWops) Load(freesrc int) *Surface {
-	im := C.IMG_Load_RW(rwops.ptr, C.int(freesrc))
+func (rwops *RWops) Load(freesrc bool) *Surface {
+	freesrcInt := 0
+	if freesrc { freesrcInt = 1 }
+	im := C.IMG_Load_RW(rwops.ptr, C.int(freesrcInt))
 	return (*Surface)(cast(im))
 }
 
