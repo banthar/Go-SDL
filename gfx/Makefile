@@ -8,7 +8,7 @@ TARG=sdl/gfx
 
 GOFILES:=constants.go\
 	framerate.go
-CGOFILES:=rotozoom.go blitfunc.go
+CGOFILES:=rotozoom.go blitfunc.go imagefilter.go
 CGO_LDFLAGS:=-lSDL_gfx -L/usr/local/lib
 CGO_CFLAGS+=-I/usr/include/SDL
 CLEANFILES+=gfx
