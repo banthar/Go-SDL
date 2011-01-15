@@ -10,9 +10,9 @@ type ptr unsafe.Pointer
 
 func b2ci(b bool) C.int {
 	if b {
-		return C.int(0)
+		return C.int(1)
 	}
-	return C.int(1)
+	return C.int(0)
 }
 
 func RotozoomSurface(src *sdl.Surface, angle, zoom float64, smooth bool) *sdl.Surface {
