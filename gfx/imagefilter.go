@@ -161,7 +161,7 @@ func ImageFilterSobelX(src, dest *byte, rows, columns int) int {
 	return int( C.SDL_imageFilterSobelX( u8p(ptr(src)), u8p(ptr(dest)), C.int(rows), C.int(columns)) )
 }
 
-func SDL_imageFilterSobelXShiftRight(src, dest *byte, rows, columns int, NRightShift byte) int {
+func ImageFilterSobelXShiftRight(src, dest *byte, rows, columns int, NRightShift byte) int {
 	return int( C.SDL_imageFilterSobelXShiftRight( u8p(ptr(src)), u8p(ptr(dest)), C.int(rows), C.int(columns), C.uchar(NRightShift)) )
 }
 
