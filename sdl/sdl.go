@@ -279,6 +279,12 @@ func DisplayFormat(src *Surface) *Surface {
 	return (*Surface)(cast(p))
 }
 
+// Converts a surface to the display format with alpha
+func DisplayFormatAlpha(src *Surface) *Surface {
+	p := C.SDL_DisplayFormatAlpha((*C.SDL_Surface)(cast(src)))
+	return (*Surface)(cast(p))
+}
+
 // Events
 
 // Enables UNICODE translation.
@@ -347,6 +353,12 @@ func (event *Event) Wait() bool {
 	return ret != 0
 }
 
+// Push the event onto the event queue
+func (event *Event) Push() bool {
+	var ret = C.SDL_PushEvent((*C.SDL_Event)(cast(event)))
+	return ret != 0
+}
+
 // Polls for currently pending events
 func (event *Event) Poll() bool {
 	var ret = C.SDL_PollEvent((*C.SDL_Event)(cast(event)))
@@ -405,6 +417,10 @@ func GetTicks() uint32 { return uint32(C.SDL_GetTicks()) }
 
 // Waits a specified number of milliseconds before returning.
 func Delay(ms uint32) { C.SDL_Delay(C.Uint32(ms)) }
+
+func ShowCursor(toggle int) int {
+	return int(C.SDL_ShowCursor(C.int(toggle)))
+}
 
 type RWops struct {
 	ptr *C.SDL_RWops
