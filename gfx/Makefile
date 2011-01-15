@@ -8,8 +8,9 @@ TARG=sdl/gfx
 
 GOFILES:=constants.go\
 	framerate.go
-CGOFILES:=rotozoom.go
+CGOFILES:=rotozoom.go blitfunc.go
 CGO_LDFLAGS:=-lSDL_gfx -L/usr/local/lib
+CGO_CFLAGS+=-I/usr/include/SDL
 CLEANFILES+=gfx
 
 include $(GOROOT)/src/Make.pkg
