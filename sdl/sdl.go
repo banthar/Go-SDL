@@ -336,6 +336,12 @@ func DisplayFormat(src *Surface) *Surface {
 	return (*Surface)(cast(p))
 }
 
+// Converts a surface to the display format with alpha
+func DisplayFormatAlpha(src *Surface) *Surface {
+	p := C.SDL_DisplayFormatAlpha((*C.SDL_Surface)(cast(src)))
+	return (*Surface)(cast(p))
+}
+
 // Events
 
 // Enables UNICODE translation.
@@ -401,6 +407,12 @@ func GetKeyName(key Key) string { return C.GoString(C.SDL_GetKeyName(C.SDLKey(ke
 // Waits indefinitely for the next available event
 func (event *Event) Wait() bool {
 	var ret = C.SDL_WaitEvent((*C.SDL_Event)(cast(event)))
+	return ret != 0
+}
+
+// Push the event onto the event queue
+func (event *Event) Push() bool {
+	var ret = C.SDL_PushEvent((*C.SDL_Event)(cast(event)))
 	return ret != 0
 }
 
@@ -471,6 +483,12 @@ func AllocRW() (*RWops) {
 
 func FreeRW(rw *RWops) {
 	C.SDL_FreeRW((*C.SDL_RWops)(rw))
+func ShowCursor(toggle int) int {
+	return int(C.SDL_ShowCursor(C.int(toggle)))
+}
+
+type RWops struct {
+	ptr *C.SDL_RWops
 }
 
 func RWFromMem(m []byte) (*RWops) {

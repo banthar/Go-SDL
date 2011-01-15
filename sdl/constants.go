@@ -345,6 +345,12 @@ const (
 	GL_MULTISAMPLESAMPLES = 0xe
 	GL_ACCELERATED_VISUAL = 0xf
 	GL_SWAP_CONTROL       = 0x10
+	ALPHA_TRANSPARENT     = 0
+	ALPHA_OPAQUE          = 0xff
+	ENABLE                = 1
+	DISABLE               = 0
+	IGNORE                = 0
+	QUERY                 = -1
 )
 
 // Types
