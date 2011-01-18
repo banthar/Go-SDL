@@ -125,9 +125,9 @@ func main() {
 				break
 			case sdl.KEYDOWN, sdl.KEYUP:
 				println("")
-				println(e.Keyboard().Keysym.Sym, ": ", sdl.GetKeyName(sdl.Key(e.Keyboard().Keysym.Sym)))
+				println(e.Keyboard().Keysym.GetSym(), ": ", sdl.GetKeyName(sdl.Key(e.Keyboard().Keysym.GetSym())))
 
-				if e.Keyboard().Keysym.Sym == 27 {
+				if e.Keyboard().Keysym.GetSym() == 27 {
 					running = false
 				}
 
@@ -141,7 +141,7 @@ func main() {
 				k := e.Keyboard()
 
 				fmt.Printf("Type: %02x Which: %02x State: %02x Pad: %02x\n", k.Type, k.Which, k.State, k.Pad0[0])
-				fmt.Printf("Scancode: %02x Sym: %08x Mod: %04x Unicode: %04x\n", k.Keysym.Scancode, k.Keysym.Sym, k.Keysym.Mod, k.Keysym.Unicode)
+				fmt.Printf("Scancode: %02x Sym: %08x Mod: %04x Unicode: %04x\n", k.Keysym.GetScancode(), k.Keysym.GetSym(), k.Keysym.GetMod(), k.Keysym.GetUnicode())
 			case sdl.MOUSEBUTTONDOWN:
 				println("Click:", e.MouseButton().X, e.MouseButton().Y)
 				in = out

@@ -356,6 +356,38 @@ func (event *Event) Keyboard() *KeyboardEvent {
 	return nil
 }
 
+func (event *KeyboardEvent)KeysymScancode() (uint8) {
+	return *(*uint8)(cast(&((*C.SDL_KeyboardEvent)(cast(event)).keysym.scancode)))
+}
+
+func (event *KeyboardEvent)KeysymSym() (Key) {
+	return *(*Key)(cast(&((*C.SDL_KeyboardEvent)(cast(event)).keysym.sym)))
+}
+
+func (event *KeyboardEvent)KeysymMod() (Mod) {
+	return *(*Mod)(cast(&((*C.SDL_KeyboardEvent)(cast(event)).keysym.mod)))
+}
+
+func (event *KeyboardEvent)KeysymUnicode() (uint16) {
+	return *(*uint16)(cast(&((*C.SDL_KeyboardEvent)(cast(event)).keysym.unicode)))
+}
+
+func (ks *Keysym)GetScancode() (uint8) {
+	return *(*uint8)(cast(&((*C.SDL_keysym)(cast(ks)).scancode)))
+}
+
+func (ks *Keysym)GetSym() (Key) {
+	return *(*Key)(cast(&((*C.SDL_keysym)(cast(ks)).sym)))
+}
+
+func (ks *Keysym)GetMod() (Mod) {
+	return *(*Mod)(cast(&((*C.SDL_keysym)(cast(ks)).mod)))
+}
+
+func (ks *Keysym)GetUnicode() (uint16) {
+	return *(*uint16)(cast(&((*C.SDL_keysym)(cast(ks)).unicode)))
+}
+
 // Returns MouseButtonEvent or nil if event has other type
 func (event *Event) MouseButton() *MouseButtonEvent {
 	if event.Type == MOUSEBUTTONDOWN || event.Type == MOUSEBUTTONUP {
