@@ -20,6 +20,7 @@ package sdl
 // static int __SDL_RWread(SDL_RWops *ctx, void *ptr, int size, int n) { return SDL_RWread(ctx, ptr, size, n); }
 // static int __SDL_RWwrite(SDL_RWops *ctx, const void *ptr, int size, int n) { return SDL_RWwrite(ctx, ptr, size, n); }
 // static int __SDL_RWclose(SDL_RWops *ctx) { return SDL_RWclose(ctx); }
+// static int __SDL_SaveBMP(SDL_Surface *surface, const char *file) { return SDL_SaveBMP(surface, file); }
 import "C"
 import "unsafe"
 import "os"
@@ -276,6 +277,13 @@ func Load(file string) *Surface {
 	return (*Surface)(cast(screen))
 }
 
+func (src *Surface) SaveBMP(file string) int {
+	cfile := C.CString(file)
+	res := C.__SDL_SaveBMP( (*C.SDL_Surface)(cast(src)), cfile)
+	C.free(unsafe.Pointer(cfile))
+	return int(res)
+}
+
 // Creates an empty Surface.
 func CreateRGBSurface(flags uint32, width int, height int, bpp int, Rmask uint32, Gmask uint32, Bmask uint32, Amask uint32) *Surface {
 	p := C.SDL_CreateRGBSurface(C.Uint32(flags), C.int(width), C.int(height), C.int(bpp),
@@ -285,7 +293,7 @@ func CreateRGBSurface(flags uint32, width int, height int, bpp int, Rmask uint32
 
 // Converts a surface to the display format
 func DisplayFormat(src *Surface) *Surface {
-	p := C.SDL_DisplayFormat((*C.SDL_Surface)(cast(src)))
+	p := C.SDL_DisplayFormat( (*C.SDL_Surface)(cast(src)) )
 	return (*Surface)(cast(p))
 }
 
