@@ -256,6 +256,11 @@ func MapRGB(format *PixelFormat, r, g, b uint8) uint32 {
 	return (uint32)(C.SDL_MapRGB((*C.SDL_PixelFormat)(cast(format)), (C.Uint8)(r), (C.Uint8)(g), (C.Uint8)(b)))
 }
 
+// Gets RGB values from a pixel in the specified pixel format.
+func GetRGB(color uint32, format *PixelFormat, r, g, b *uint8) {
+	C.SDL_GetRGB(C.Uint32(color), (*C.SDL_PixelFormat)(cast(format)), (*C.Uint8)(r), (*C.Uint8)(g), (*C.Uint8)(b))
+}
+
 // Map a RGBA color value to a pixel format.
 func MapRGBA(format *PixelFormat, r, g, b, a uint8) uint32 {
 	return (uint32)(C.SDL_MapRGBA((*C.SDL_PixelFormat)(cast(format)), (C.Uint8)(r), (C.Uint8)(g), (C.Uint8)(b), (C.Uint8)(a)))
@@ -272,6 +277,13 @@ func Load(file string) *Surface {
 	var screen = C.IMG_Load(cfile)
 	C.free(unsafe.Pointer(cfile))
 	return (*Surface)(cast(screen))
+}
+
+func (src *Surface) SaveBMP(file string) int {
+	cfile := C.CString(file)
+	res := C.__SDL_SaveBMP( (*C.SDL_Surface)(cast(src)), cfile)
+	C.free(unsafe.Pointer(cfile))
+	return int(res)
 }
 
 // Loads Surface from RWops (using IMG_Load_RW).
@@ -332,7 +344,7 @@ func CreateRGBSurface(flags uint32, width int, height int, bpp int, Rmask uint32
 
 // Converts a surface to the display format
 func DisplayFormat(src *Surface) *Surface {
-	p := C.SDL_DisplayFormat((*C.SDL_Surface)(cast(src)))
+	p := C.SDL_DisplayFormat( (*C.SDL_Surface)(cast(src)) )
 	return (*Surface)(cast(p))
 }
 

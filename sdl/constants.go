@@ -351,6 +351,13 @@ const (
 	DISABLE               = 0
 	IGNORE                = 0
 	QUERY                 = -1
+	BUTTON_LEFT           = 1
+	BUTTON_MIDDLE         = 2
+	BUTTON_RIGHT          = 3
+	BUTTON_WHEELUP        = 4
+	BUTTON_WHEELDOWN      = 5
+	BUTTON_X1             = 6
+	BUTTON_X2             = 7
 )
 
 // Types
