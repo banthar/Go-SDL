@@ -513,6 +513,13 @@ func (rwops *RWops) Load(freesrc bool) *Surface {
 	return (*Surface)(cast(im))
 }
 
+func Putenv(s string) int {
+	cstr := C.CString(s)
+	ret := C.SDL_putenv(cstr)
+	C.free(unsafe.Pointer(cstr))
+	return int(ret)
+}
+
 func (rwops *RWops) ReadLE16() uint16 { return uint16( C.SDL_ReadLE16(rwops.ptr) ) }
 func (rwops *RWops) ReadBE16() uint16 { return uint16( C.SDL_ReadBE16(rwops.ptr) ) }
 func (rwops *RWops) ReadLE32() uint32 { return uint32( C.SDL_ReadLE32(rwops.ptr) ) }
