@@ -4,7 +4,7 @@ This is an improved version of Banthar's [Go-SDL](http://github.com/banthar/Go-S
 
 The improvements/differences are:
 
-* SDL functions (maybe except for SDL-ttf) can be safely called from multiple concurrent goroutines
+* SDL functions (except for SDL-mixer) can be safely called from multiple concurrent goroutines
 * All SDL events are delivered via a Go channel
 * Support for low-level SDL sound functions
 
