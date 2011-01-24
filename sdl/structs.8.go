@@ -169,3 +169,23 @@ type Keysym struct {
 	Mod      uint32
 	Unicode  uint16
 }
+
+type BallDelta struct {
+	Dx int
+	Dy int
+}
+
+// type Joystick struct {
+// 	Index uint8		// Device index
+// 	Name	*int8 // Joystick name - system dependent
+// 	Naxes int		// Number of axis controls on the joystick
+// 	Axes *int16		// Current axis states
+// 	Nhats int		// Number of hats on the joystick
+// 	Hats *uint8		// Current hat states
+// 	Nballs int		// Number of trackballs on the joystick
+// 	Balls *BallDelta // Current ball motion deltas	
+// 	Nbuttons int		// Number of buttons on the joystick
+// 	Buttons *uint8		// Current button states
+// 	Hwdata  *[0]byte // Driver dependent information
+// 	Ref_count int		// Reference count for multiple opens
+// }
