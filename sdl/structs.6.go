@@ -170,3 +170,8 @@ type Keysym struct {
 	Mod      uint32
 	Unicode  uint16
 }
+
+type BallDelta struct {
+	Dx int
+	Dy int
+}
