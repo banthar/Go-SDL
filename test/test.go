@@ -53,7 +53,7 @@ func main() {
 	if sdl.NumJoysticks() > 0 {
 		// Open joystick
 		joy = sdl.JoystickOpen(0)
-		
+
 		if joy != nil {
 			println("Opened Joystick 0")
 			println("Name: ", sdl.JoystickName(0))
@@ -61,7 +61,7 @@ func main() {
 			println("Number of Buttons: ", joy.NumButtons())
 			println("Number of Balls: ", joy.NumBalls())
 		} else {
-			println("Couldn't open Joystick!");
+			println("Couldn't open Joystick!")
 		}
 	}
 
@@ -129,7 +129,7 @@ func main() {
 	out = make(chan Point)
 	go worm(in, out, draw)
 
-	ticker := time.NewTicker(1e9/50 /*50Hz*/)
+	ticker := time.NewTicker(1e9 / 50 /*50Hz*/ )
 
 	// Note: The following SDL code is highly ineffective.
 	//       It is eating too much CPU. If you intend to use Go-SDL,
@@ -141,7 +141,8 @@ func main() {
 			screen.FillRect(nil, 0x302019)
 			screen.Blit(&sdl.Rect{0, 0, 0, 0}, text, nil)
 
-			loop: for {
+		loop:
+			for {
 				select {
 				case p := <-draw:
 					screen.Blit(&sdl.Rect{int16(p.x), int16(p.y), 0, 0}, image, nil)
@@ -194,7 +195,7 @@ func main() {
 
 			case sdl.JoyButtonEvent:
 				println("Joystick Button Event ->", e.Button)
-				println("State of button", e.Button, "->", joy.GetButton(int(e.Button))) 
+				println("State of button", e.Button, "->", joy.GetButton(int(e.Button)))
 
 			case sdl.ResizeEvent:
 				println("resize screen ", e.W, e.H)
@@ -209,7 +210,7 @@ func main() {
 	}
 
 	// Close if opened
-	if(sdl.JoystickOpened(0) > 0) {
+	if sdl.JoystickOpened(0) > 0 {
 		joy.Close()
 	}
 
