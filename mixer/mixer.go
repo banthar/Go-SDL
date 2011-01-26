@@ -56,7 +56,7 @@ func (m *Music) FadeInMusic(loops, ms int) int {
 }
 
 // Same as FadeInMusic, only with a specified position to start the music at.
-func (m *Music) FadeInMusicPos(loops, ms int, position float) int {
+func (m *Music) FadeInMusicPos(loops, ms int, position float32) int {
 	return int(C.Mix_FadeInMusicPos(m.cmusic, C.int(loops), C.int(ms),
 		C.double(position)))
 }
@@ -74,7 +74,7 @@ func ResumeMusic() { C.Mix_ResumeMusic() }
 func RewindMusic() { C.Mix_RewindMusic() }
 
 // Sets the position of the currently playing music.
-func SetMusicPosition(position float) int {
+func SetMusicPosition(position float32) int {
 	return int(C.Mix_SetMusicPosition(C.double(position)))
 }
 
