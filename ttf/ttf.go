@@ -118,7 +118,7 @@ func (f *Font) Close() {
 // rendering is quick, although not as smooth as the other rendering types.
 func RenderText_Solid(font *Font, text string, color sdl.Color) *sdl.Surface {
 	sdl.GlobalMutex.Lock() // Because 'C.TTF_Render*' uses 'C.SDL_CreateRGBSurface'
-	font.mutex.Lock()      // Use a write lock, because 'C.TTF_Render*' may update font's its internal caches
+	font.mutex.Lock()      // Use a write lock, because 'C.TTF_Render*' may update font's internal caches
 
 	ctext := C.CString(text)
 	ccol := C.SDL_Color{C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.Unused)}
@@ -135,7 +135,7 @@ func RenderText_Solid(font *Font, text string, color sdl.Color) *sdl.Surface {
 // rendering is quick, although not as smooth as the other rendering types.
 func RenderUTF8_Solid(font *Font, text string, color sdl.Color) *sdl.Surface {
 	sdl.GlobalMutex.Lock() // Because 'C.TTF_Render*' uses 'C.SDL_CreateRGBSurface'
-	font.mutex.Lock()      // Use a write lock, because 'C.TTF_Render*' may update font's its internal caches
+	font.mutex.Lock()      // Use a write lock, because 'C.TTF_Render*' may update font's internal caches
 
 	ctext := C.CString(text)
 	ccol := C.SDL_Color{C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.Unused)}
@@ -153,7 +153,7 @@ func RenderUTF8_Solid(font *Font, text string, color sdl.Color) *sdl.Surface {
 // rendering and the text is in a solid box, but it's better looking.
 func RenderText_Shaded(font *Font, text string, color, bgcolor sdl.Color) *sdl.Surface {
 	sdl.GlobalMutex.Lock() // Because 'C.TTF_Render*' uses 'C.SDL_CreateRGBSurface'
-	font.mutex.Lock()      // Use a write lock, because 'C.TTF_Render*' may update font's its internal caches
+	font.mutex.Lock()      // Use a write lock, because 'C.TTF_Render*' may update font's internal caches
 
 	ctext := C.CString(text)
 	ccol := C.SDL_Color{C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.Unused)}
@@ -172,7 +172,7 @@ func RenderText_Shaded(font *Font, text string, color, bgcolor sdl.Color) *sdl.S
 // rendering and the text is in a solid box, but it's better looking.
 func RenderUTF8_Shaded(font *Font, text string, color, bgcolor sdl.Color) *sdl.Surface {
 	sdl.GlobalMutex.Lock() // Because 'C.TTF_Render*' uses 'C.SDL_CreateRGBSurface'
-	font.mutex.Lock()      // Use a write lock, because 'C.TTF_Render*' may update font's its internal caches
+	font.mutex.Lock()      // Use a write lock, because 'C.TTF_Render*' may update font's internal caches
 
 	ctext := C.CString(text)
 	ccol := C.SDL_Color{C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.Unused)}
@@ -191,7 +191,7 @@ func RenderUTF8_Shaded(font *Font, text string, color, bgcolor sdl.Color) *sdl.S
 // the best results, especially when blitted over another image.
 func RenderText_Blended(font *Font, text string, color sdl.Color) *sdl.Surface {
 	sdl.GlobalMutex.Lock() // Because 'C.TTF_Render*' uses 'C.SDL_CreateRGBSurface'
-	font.mutex.Lock()      // Use a write lock, because 'C.TTF_Render*' may update font's its internal caches
+	font.mutex.Lock()      // Use a write lock, because 'C.TTF_Render*' may update font's internal caches
 
 	ctext := C.CString(text)
 	ccol := C.SDL_Color{C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.Unused)}
@@ -209,7 +209,7 @@ func RenderText_Blended(font *Font, text string, color sdl.Color) *sdl.Surface {
 // the best results, especially when blitted over another image.
 func RenderUTF8_Blended(font *Font, text string, color sdl.Color) *sdl.Surface {
 	sdl.GlobalMutex.Lock() // Because 'C.TTF_Render*' uses 'C.SDL_CreateRGBSurface'
-	font.mutex.Lock()      // Use a write lock, because 'C.TTF_Render*' may update font's its internal caches
+	font.mutex.Lock()      // Use a write lock, because 'C.TTF_Render*' may update font's internal caches
 
 	ctext := C.CString(text)
 	ccol := C.SDL_Color{C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.Unused)}
@@ -368,7 +368,7 @@ func (f *Font) GlyphMetrics(ch uint16) (int, int, int, int, int, int) {
 // Return values are (width, height, err) where err is 0 for success, -1 on any error.
 func (f *Font) SizeText(text string) (int, int, int) {
 	sdl.GlobalMutex.Lock() // Because the underlying C code is fairly complex
-	f.mutex.Lock()         // Use a write lock, because 'C.TTF_Size*' may update its internal cache
+	f.mutex.Lock()         // Use a write lock, because 'C.TTF_Size*' may update font's internal cache
 
 	w := C.int(0)
 	h := C.int(0)
