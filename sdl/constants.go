@@ -331,6 +331,15 @@ const (
 	KMOD_CAPS           = 0x2000
 	KMOD_MODE           = 0x4000
 	KMOD_RESERVED       = 0x8000
+	HAT_CENTERED        = 0
+	HAT_UP              = 0x1
+	HAT_RIGHT           = 0x2
+	HAT_DOWN            = 0x4
+	HAT_LEFT            = 0x8
+	HAT_RIGHTUP         = 0x3
+	HAT_RIGHTDOWN       = 0x6
+	HAT_LEFTUP          = 0x9
+	HAT_LEFTDOWN        = 0xc
 )
 
 // Types

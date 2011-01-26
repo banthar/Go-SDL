@@ -35,6 +35,12 @@ func pollEvents() {
 			case MOUSEMOTION:
 				events <- *(*MouseMotionEvent)(cast(event))
 
+			case JOYAXISMOTION:
+				events <- *(*JoyAxisEvent)(cast(event))
+
+			case JOYBUTTONDOWN, JOYBUTTONUP:
+				events <- *(*JoyButtonEvent)(cast(event))
+
 			case ACTIVEEVENT:
 				events <- *(*ActiveEvent)(cast(event))
 

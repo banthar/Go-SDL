@@ -41,13 +41,28 @@ func worm(in <-chan Point, out chan<- Point, draw chan<- Point) {
 }
 
 func main() {
-
+	var joy *sdl.Joystick
 	if sdl.Init(sdl.INIT_EVERYTHING) != 0 {
 		panic(sdl.GetError())
 	}
 
 	if ttf.Init() != 0 {
 		panic(sdl.GetError())
+	}
+
+	if sdl.NumJoysticks() > 0 {
+		// Open joystick
+		joy = sdl.JoystickOpen(0)
+		
+		if joy != nil {
+			println("Opened Joystick 0")
+			println("Name: ", sdl.JoystickName(0))
+			println("Number of Axes: ", joy.NumAxes())
+			println("Number of Buttons: ", joy.NumButtons())
+			println("Number of Balls: ", joy.NumBalls())
+		} else {
+			println("Couldn't open Joystick!");
+		}
 	}
 
 	if mixer.OpenAudio(mixer.DEFAULT_FREQUENCY, mixer.DEFAULT_FORMAT,
@@ -174,6 +189,13 @@ func main() {
 					go worm(in, out, draw)
 				}
 
+			case sdl.JoyAxisEvent:
+				println("Joystick Axis Event ->", "Type", e.Type, "Axis:", e.Axis, " Value:", e.Value, "Which:", e.Which)
+
+			case sdl.JoyButtonEvent:
+				println("Joystick Button Event ->", e.Button)
+				println("State of button", e.Button, "->", joy.GetButton(int(e.Button))) 
+
 			case sdl.ResizeEvent:
 				println("resize screen ", e.W, e.H)
 
@@ -184,6 +206,11 @@ func main() {
 				}
 			}
 		}
+	}
+
+	// Close if opened
+	if(sdl.JoystickOpened(0) > 0) {
+		joy.Close()
 	}
 
 	image.Free()
