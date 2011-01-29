@@ -533,3 +533,12 @@ func (rwops *RWops) WriteLE32(value uint32) int { return int( C.SDL_WriteLE32(rw
 func (rwops *RWops) WriteBE32(value uint32) int { return int( C.SDL_WriteBE32(rwops.ptr, C.Uint32(value)) ) }
 func (rwops *RWops) WriteLE64(value uint64) int { return int( C.SDL_WriteLE64(rwops.ptr, C.Uint64(value)) ) }
 func (rwops *RWops) WriteBE64(value uint64) int { return int( C.SDL_WriteBE64(rwops.ptr, C.Uint64(value)) ) }
+
+func HasRDTSC() bool { return C.SDL_HasRDTSC() != 0 }
+func HasMMX() bool { return C.SDL_HasMMX() != 0 }
+func HasMMXExt() bool { return C.SDL_HasMMXExt() != 0 }
+func Has3DNow() bool { return C.SDL_Has3DNow() != 0 }
+func Has3DNowExt() bool { return C.SDL_Has3DNowExt() != 0 }
+func HasSSE() bool { return C.SDL_HasSSE() != 0 }
+func HasSSE2() bool { return C.SDL_HasSSE2() != 0 }
+func HasAltiVec() bool { return C.SDL_HasAltiVec() != 0 }

@@ -11,6 +11,7 @@ install:
 	gomake -C ttf install
 	gomake -C mixer install
 	gomake -C gfx install
+	gomake -C transform install
 
 clean:
 	gomake -C sdl clean
@@ -19,3 +20,4 @@ clean:
 	gomake -C 4s clean
 	gomake -C test clean
 	gomake -C gfx clean
+	gomake -C transform clean

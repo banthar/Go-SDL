@@ -10,7 +10,7 @@ import (
 
 type FPSmanager struct {
   framecount uint32
-  rateticks float
+  rateticks float64
   lastticks uint32
   rate uint32
 }
@@ -19,7 +19,7 @@ func NewFramerate() *FPSmanager {
   return &FPSmanager{
     framecount: 0,
     rate: FPS_DEFAULT,
-    rateticks: (1000.0 / float(FPS_DEFAULT)),
+    rateticks: (1000.0 / float64(FPS_DEFAULT)),
     lastticks: sdl.GetTicks(),
   }
 }
@@ -28,7 +28,7 @@ func (manager *FPSmanager) SetFramerate(rate uint32) {
   if rate >= FPS_LOWER_LIMIT && rate <= FPS_UPPER_LIMIT {
     manager.framecount = 0
     manager.rate = rate
-    manager.rateticks = 1000.0 / float(rate)
+    manager.rateticks = 1000.0 / float64(rate)
   } else {
   }
 }
@@ -45,7 +45,7 @@ func (manager *FPSmanager) FramerateDelay() {
 
   // get/calc ticks
   current_ticks = sdl.GetTicks()
-  target_ticks = manager.lastticks + uint32(float(manager.framecount) * manager.rateticks)
+  target_ticks = manager.lastticks + uint32(float64(manager.framecount) * manager.rateticks)
 
   if current_ticks <= target_ticks {
     the_delay = target_ticks - current_ticks
