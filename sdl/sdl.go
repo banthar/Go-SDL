@@ -17,6 +17,7 @@ package sdl
 // static void SetError(const char* description){SDL_SetError("%s",description);}
 import "C"
 import "unsafe"
+import "image"
 
 type cast unsafe.Pointer
 
@@ -258,6 +259,28 @@ func Load(file string) *Surface {
 	var screen = C.IMG_Load(cfile)
 	C.free(unsafe.Pointer(cfile))
 	return (*Surface)(cast(screen))
+}
+
+// Create new sdl.Surface from image.NRGBA
+func CreateSurfaceFromImageNRGBA( img *image.NRGBA ) *Surface {
+
+    surface:=CreateRGBSurface(SWSURFACE, img.Rect.Dx(), img.Rect.Dy(), 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
+
+    C.memcpy(unsafe.Pointer(surface.Pixels), unsafe.Pointer(&img.Pix[0]), C.size_t(surface.W*surface.H*4))
+
+    return surface;
+}
+
+// Create new sdl.Surface from image.RGBA
+func CreateSurfaceFromImageRGBA( img *image.RGBA ) *Surface {
+
+    //TODO convert to NRGBA ?
+
+    surface:=CreateRGBSurface(SWSURFACE, img.Rect.Dx(), img.Rect.Dy(), 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
+
+    C.memcpy(unsafe.Pointer(surface.Pixels), unsafe.Pointer(&img.Pix[0]), C.size_t(surface.W*surface.H*4))
+
+    return surface;
 }
 
 // Creates an empty Surface.
