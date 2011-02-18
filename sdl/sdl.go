@@ -18,6 +18,9 @@ package sdl
 import "C"
 import "unsafe"
 import "image"
+import "io"
+import "io/ioutil"
+import "os"
 
 type cast unsafe.Pointer
 
@@ -261,6 +264,16 @@ func Load(file string) *Surface {
 	return (*Surface)(cast(screen))
 }
 
+// Loads Surface from RWOps (using IMG_Load_RW).
+func LoadRW(rw *RWOps, ac bool) *Surface {
+	acArg := C.int(0)
+	if ac {
+		acArg = 1
+	}
+
+	return (*Surface)(unsafe.Pointer(C.IMG_Load_RW((*C.SDL_RWops)(rw), acArg)))
+}
+
 // Create new sdl.Surface from image.NRGBA
 func CreateSurfaceFromImageNRGBA( img *image.NRGBA ) *Surface {
 
@@ -426,3 +439,18 @@ func GetTicks() uint32 { return uint32(C.SDL_GetTicks()) }
 
 // Waits a specified number of milliseconds before returning.
 func Delay(ms uint32) { C.SDL_Delay(C.Uint32(ms)) }
+
+type RWOps C.SDL_RWops
+
+func RWFromMem(m []byte) (*RWOps) {
+	return (*RWOps)(C.SDL_RWFromMem(unsafe.Pointer(&m[0]), C.int(len(m))))
+}
+
+func RWFromReader(r io.Reader) (*RWOps, os.Error) {
+	data, err := ioutil.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+
+	return RWFromMem(data), nil
+}
