@@ -447,15 +447,78 @@ func Delay(ms uint32) { C.SDL_Delay(C.Uint32(ms)) }
 
 type RWOps C.SDL_RWops
 
+func AllocRW() (*RWOps) {
+	return (*RWOps)(C.SDL_AllocRW())
+}
+
+func FreeRW(rw *RWOps) {
+	C.SDL_FreeRW((*C.SDL_RWops)(rw))
+}
+
 func RWFromMem(m []byte) (*RWOps) {
 	return (*RWOps)(C.SDL_RWFromMem(unsafe.Pointer(&m[0]), C.int(len(m))))
 }
 
-func RWFromReader(r io.Reader) (*RWOps, os.Error) {
+func RWFromConstMem(m []byte) (*RWOps) {
+	return (*RWOps)(C.SDL_RWFromConstMem(unsafe.Pointer(&m[0]), C.int(len(m))))
+}
+
+func RWFromReader(r io.Reader) (*RWOps) {
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
-		return nil, err
+		SetError(err.String())
+		return nil
 	}
 
-	return RWFromMem(data), nil
+	return RWFromConstMem(data)
+}
+
+func modeFromFlags(flag int) (*C.char) {
+	switch flag {
+		case os.O_RDONLY:
+			return C.CString("r")
+		case os.O_WRONLY | os.O_CREAT:
+			return C.CString("w")
+		case os.O_WRONLY | os.O_APPEND | os.O_CREAT:
+			return C.CString("a")
+		case os.O_RDWR:
+			return C.CString("r+")
+		case os.O_RDWR | os.O_CREAT:
+			return C.CString("w+")
+		case os.O_RDWR | os.O_APPEND | os.O_CREAT:
+			return C.CString("a+")
+		default:
+			SetError("Unkown mode.")
+			return nil
+	}
+
+	SetError("Congratulations on getting this error...")
+	return nil
+}
+
+func RWFromFile(file string, mode int) (*RWOps) {
+	cfile := C.CString(file)
+	defer C.free(unsafe.Pointer(cfile))
+
+	cmode := modeFromFlags(mode)
+	if cmode == nil {
+		return nil
+	}
+	defer C.free(unsafe.Pointer(cmode))
+
+	return (*RWOps)(C.SDL_RWFromFile(cfile, cmode))
+}
+
+// Causes 'SIGNONE: no trap'. Not sure why...
+func RWFromFP(fp *os.File, ac bool) (*RWOps) {
+	acArg := C.int(0)
+	if ac {
+		acArg = 1
+	}
+
+	cmode := C.CString("r+") // Doesn't really matter, anyways. I hope.
+	defer C.free(unsafe.Pointer(cmode))
+	cfp := C.fdopen(C.int(fp.Fd()), cmode)
+
+	return (*RWOps)(C.SDL_RWFromFP(cfp, acArg))
 }
