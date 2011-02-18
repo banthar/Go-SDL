@@ -4,9 +4,15 @@
 
 include $(GOROOT)/src/Make.inc
 
-all: install
+.PHONY: all install clean
 
-install:
+all:
+	gomake -C sdl
+	gomake -C ttf
+	gomake -C mixer
+	gomake -C gfx
+
+install: all
 	gomake -C sdl install
 	gomake -C ttf install
 	gomake -C mixer install

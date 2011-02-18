@@ -13,4 +13,7 @@ CGO_LDFLAGS:=-lSDL_ttf -L/usr/local/lib
 
 CLEANFILES+=ttf
 
+GC=${O}g -I../sdl/_obj
+LD=${O}l -L../sdl/_obj
+
 include $(GOROOT)/src/Make.pkg
