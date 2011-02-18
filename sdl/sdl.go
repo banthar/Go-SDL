@@ -15,6 +15,11 @@ package sdl
 // #include <SDL/SDL.h>
 // #include <SDL/SDL_image.h>
 // static void SetError(const char* description){SDL_SetError("%s",description);}
+//
+// static int RWseek(SDL_RWops *rw, int os, int w){return SDL_RWseek(rw, os, w);}
+// static int RWread(SDL_RWops *rw, void *d, int size, int max){return SDL_RWread(rw, d, size, max);}
+// static int RWwrite(SDL_RWops *rw, void *d, int size, int num){return SDL_RWwrite(rw, d, size, num);}
+// static int RWclose(SDL_RWops *rw){return SDL_RWclose(rw);}
 import "C"
 import "unsafe"
 import "image"
@@ -264,8 +269,8 @@ func Load(file string) *Surface {
 	return (*Surface)(cast(screen))
 }
 
-// Loads Surface from RWOps (using IMG_Load_RW).
-func LoadRW(rw *RWOps, ac bool) *Surface {
+// Loads Surface from RWops (using IMG_Load_RW).
+func LoadRW(rw *RWops, ac bool) *Surface {
 	acArg := C.int(0)
 	if ac {
 		acArg = 1
@@ -440,25 +445,25 @@ func GetTicks() uint32 { return uint32(C.SDL_GetTicks()) }
 // Waits a specified number of milliseconds before returning.
 func Delay(ms uint32) { C.SDL_Delay(C.Uint32(ms)) }
 
-type RWOps C.SDL_RWops
+type RWops C.SDL_RWops
 
-func AllocRW() (*RWOps) {
-	return (*RWOps)(C.SDL_AllocRW())
+func AllocRW() (*RWops) {
+	return (*RWops)(C.SDL_AllocRW())
 }
 
-func FreeRW(rw *RWOps) {
+func FreeRW(rw *RWops) {
 	C.SDL_FreeRW((*C.SDL_RWops)(rw))
 }
 
-func RWFromMem(m []byte) (*RWOps) {
-	return (*RWOps)(C.SDL_RWFromMem(unsafe.Pointer(&m[0]), C.int(len(m))))
+func RWFromMem(m []byte) (*RWops) {
+	return (*RWops)(C.SDL_RWFromMem(unsafe.Pointer(&m[0]), C.int(len(m))))
 }
 
-func RWFromConstMem(m []byte) (*RWOps) {
-	return (*RWOps)(C.SDL_RWFromConstMem(unsafe.Pointer(&m[0]), C.int(len(m))))
+func RWFromConstMem(m []byte) (*RWops) {
+	return (*RWops)(C.SDL_RWFromConstMem(unsafe.Pointer(&m[0]), C.int(len(m))))
 }
 
-func RWFromReader(r io.Reader) (*RWOps) {
+func RWFromReader(r io.Reader) (*RWops) {
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
 		SetError(err.String())
@@ -491,7 +496,7 @@ func modeFromFlags(flag int) (*C.char) {
 	return nil
 }
 
-func RWFromFile(file string, mode int) (*RWOps) {
+func RWFromFile(file string, mode int) (*RWops) {
 	cfile := C.CString(file)
 	defer C.free(unsafe.Pointer(cfile))
 
@@ -501,11 +506,11 @@ func RWFromFile(file string, mode int) (*RWOps) {
 	}
 	defer C.free(unsafe.Pointer(cmode))
 
-	return (*RWOps)(C.SDL_RWFromFile(cfile, cmode))
+	return (*RWops)(C.SDL_RWFromFile(cfile, cmode))
 }
 
 // Causes 'SIGNONE: no trap'. Not sure why...
-func RWFromFP(fp *os.File, ac bool) (*RWOps) {
+func RWFromFP(fp *os.File, ac bool) (*RWops) {
 	acArg := C.int(0)
 	if ac {
 		acArg = 1
@@ -515,5 +520,94 @@ func RWFromFP(fp *os.File, ac bool) (*RWOps) {
 	defer C.free(unsafe.Pointer(cmode))
 	cfp := C.fdopen(C.int(fp.Fd()), cmode)
 
-	return (*RWOps)(C.SDL_RWFromFP(cfp, acArg))
+	return (*RWops)(C.SDL_RWFromFP(cfp, acArg))
+}
+
+func (rw *RWops)Tell() (int64) {
+	cur, err := rw.Seek(0, 1)
+	if err != nil {
+		SetError(err.String())
+		return -1
+	}
+
+	return cur
+}
+
+func (rw *RWops)Length() (int64) {
+	cur := rw.Tell()
+	if cur < 0 {
+		return -1
+	}
+
+	eof, err := rw.Seek(0, 2)
+	if err != nil {
+		SetError(err.String())
+		return -1
+	}
+
+	rw.Seek(cur, 0)
+
+	return eof
+}
+
+func (rw *RWops)EOF() (bool) {
+	cur := rw.Tell()
+	eof := rw.Length()
+	if (cur < 0) || (eof < 0) {
+		panic(GetError())
+	}
+
+	if eof <= cur {
+		return true
+	}
+
+	return false
+}
+
+func (rw *RWops)Seek(offset int64, whence int) (int64, os.Error) {
+	var w C.int
+	switch whence {
+		case 0:
+			w = C.SEEK_SET
+		case 1:
+			w = C.SEEK_CUR
+		case 2:
+			w = C.SEEK_END
+		default:
+			return offset, os.NewError("Bad whence.")
+	}
+
+	return int64(C.RWseek((*C.SDL_RWops)(rw), C.int(offset), w)), nil
+}
+
+func (rw *RWops)Read(buf []byte) (n int, err os.Error) {
+	n = int(C.RWread((*C.SDL_RWops)(rw), unsafe.Pointer(&buf[0]), 1, C.int(len(buf))))
+
+	if rw.EOF() {
+		err = os.EOF
+	}
+
+	if n < 0 {
+		err = os.NewError(GetError())
+	}
+
+	return n, nil
+}
+
+func (rw *RWops)Write(buf []byte) (n int, err os.Error) {
+	n = int(C.RWwrite((*C.SDL_RWops)(rw), unsafe.Pointer(&buf[0]), 1, C.int(len(buf))))
+
+	if n < 0 {
+		err = os.NewError(GetError())
+	}
+
+	return n, err
+}
+
+func (rw *RWops)Close() (os.Error) {
+	if int(C.RWclose((*C.SDL_RWops)(rw))) != 0 {
+		return os.NewError(GetError())
+	}
+
+	return nil
 }
