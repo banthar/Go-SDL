@@ -270,13 +270,26 @@ func Load(file string) *Surface {
 }
 
 // Loads Surface from RWops (using IMG_Load_RW).
-func LoadRW(rw *RWops, ac bool) *Surface {
+func Load_RW(rw *RWops, ac bool) *Surface {
 	acArg := C.int(0)
 	if ac {
 		acArg = 1
 	}
 
 	return (*Surface)(unsafe.Pointer(C.IMG_Load_RW((*C.SDL_RWops)(rw), acArg)))
+}
+
+// Loads Surface of type t from RWops (using IMG_LoadTyped_RW).
+func LoadTyped_RW(rw *RWops, ac bool, t string) *Surface {
+	ct := C.CString(t)
+	defer C.free(unsafe.Pointer(ct))
+
+	acArg := C.int(0)
+	if ac {
+		acArg = 1
+	}
+
+	return (*Surface)(unsafe.Pointer(C.IMG_LoadTyped_RW((*C.SDL_RWops)(rw), acArg, ct)))
 }
 
 // Create new sdl.Surface from image.NRGBA
