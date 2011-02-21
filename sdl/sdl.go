@@ -422,18 +422,35 @@ func (screen *Surface) Unlock() {
 }
 
 func (dst *Surface) Blit(dstrect *Rect, src *Surface, srcrect *Rect) int {
-	src.mutex.RLock()
-	dst.mutex.Lock()
+	GlobalMutex.Lock()
+	global := true
+	if (src != currentVideoSurface) && (dst != currentVideoSurface) {
+		GlobalMutex.Unlock()
+		global = false
+	}
+	
+	// At this point: GlobalMutex is locked only if at least one of 'src' or 'dst'
+	//                was identical to 'currentVideoSurface'
+	
+	var ret C.int
+	{
+		src.mutex.RLock()
+		dst.mutex.Lock()
+	
+		ret = C.SDL_UpperBlit(
+			src.cSurface,
+			(*C.SDL_Rect)(cast(srcrect)),
+			dst.cSurface,
+			(*C.SDL_Rect)(cast(dstrect)))
 
-	var ret = C.SDL_UpperBlit(
-		src.cSurface,
-		(*C.SDL_Rect)(cast(srcrect)),
-		dst.cSurface,
-		(*C.SDL_Rect)(cast(dstrect)))
+		dst.mutex.Unlock()
+		src.mutex.RUnlock()
+	}
 
-	dst.mutex.Unlock()
-	src.mutex.RUnlock()
-
+	if global {
+		GlobalMutex.Unlock()
+	}
+	
 	return int(ret)
 }
 
