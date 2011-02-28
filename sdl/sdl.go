@@ -20,6 +20,7 @@ package sdl
 // static int RWread(SDL_RWops *rw, void *d, int size, int max){return SDL_RWread(rw, d, size, max);}
 // static int RWwrite(SDL_RWops *rw, void *d, int size, int num){return SDL_RWwrite(rw, d, size, num);}
 // static int RWclose(SDL_RWops *rw){return SDL_RWclose(rw);}
+// static int __SDL_SaveBMP(SDL_Surface *surface, const char *file) { return SDL_SaveBMP(surface, file); }
 import "C"
 import "unsafe"
 import "image"
@@ -487,6 +488,10 @@ func GetTicks() uint32 { return uint32(C.SDL_GetTicks()) }
 // Waits a specified number of milliseconds before returning.
 func Delay(ms uint32) { C.SDL_Delay(C.Uint32(ms)) }
 
+func ShowCursor(toggle int) int {
+	return int(C.SDL_ShowCursor(C.int(toggle)))
+}
+
 type RWops C.SDL_RWops
 
 func AllocRW() (*RWops) {
@@ -495,8 +500,6 @@ func AllocRW() (*RWops) {
 
 func FreeRW(rw *RWops) {
 	C.SDL_FreeRW((*C.SDL_RWops)(rw))
-func ShowCursor(toggle int) int {
-	return int(C.SDL_ShowCursor(C.int(toggle)))
 }
 
 type RWops struct {
