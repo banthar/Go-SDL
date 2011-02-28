@@ -282,7 +282,7 @@ func Load(file string) *Surface {
 
 func (src *Surface) SaveBMP(file string) int {
 	cfile := C.CString(file)
-	res := C.__SDL_SaveBMP( (*C.SDL_Surface)(cast(src)), cfile)
+	res := C.__SDL_SaveBMP((*C.SDL_Surface)(cast(src)), cfile)
 	C.free(unsafe.Pointer(cfile))
 	return int(res)
 }
@@ -311,29 +311,29 @@ func LoadTyped_RW(rw *RWops, ac bool, t string) *Surface {
 }
 
 // Create new sdl.Surface from image.NRGBA
-func CreateSurfaceFromImageNRGBA( img *image.NRGBA ) *Surface {
+func CreateSurfaceFromImageNRGBA(img *image.NRGBA) *Surface {
 
-    surface:=CreateRGBSurface(SWSURFACE, img.Rect.Dx(), img.Rect.Dy(), 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
+	surface := CreateRGBSurface(SWSURFACE, img.Rect.Dx(), img.Rect.Dy(), 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
 
-    surface.Lock();
-    C.memcpy(unsafe.Pointer(surface.Pixels), unsafe.Pointer(&img.Pix[0]), C.size_t(surface.W*surface.H*4))
-    surface.Unlock();
+	surface.Lock()
+	C.memcpy(unsafe.Pointer(surface.Pixels), unsafe.Pointer(&img.Pix[0]), C.size_t(surface.W*surface.H*4))
+	surface.Unlock()
 
-    return surface;
+	return surface
 }
 
 // Create new sdl.Surface from image.RGBA
-func CreateSurfaceFromImageRGBA( img *image.RGBA ) *Surface {
+func CreateSurfaceFromImageRGBA(img *image.RGBA) *Surface {
 
-    //TODO convert to NRGBA ?
+	//TODO convert to NRGBA ?
 
-    surface:=CreateRGBSurface(SWSURFACE, img.Rect.Dx(), img.Rect.Dy(), 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
+	surface := CreateRGBSurface(SWSURFACE, img.Rect.Dx(), img.Rect.Dy(), 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
 
-    surface.Lock();
-    C.memcpy(unsafe.Pointer(surface.Pixels), unsafe.Pointer(&img.Pix[0]), C.size_t(surface.W*surface.H*4))
-    surface.Unlock();
+	surface.Lock()
+	C.memcpy(unsafe.Pointer(surface.Pixels), unsafe.Pointer(&img.Pix[0]), C.size_t(surface.W*surface.H*4))
+	surface.Unlock()
 
-    return surface;
+	return surface
 }
 
 // Creates an empty Surface.
@@ -345,7 +345,7 @@ func CreateRGBSurface(flags uint32, width int, height int, bpp int, Rmask uint32
 
 // Converts a surface to the display format
 func DisplayFormat(src *Surface) *Surface {
-	p := C.SDL_DisplayFormat( (*C.SDL_Surface)(cast(src)) )
+	p := C.SDL_DisplayFormat((*C.SDL_Surface)(cast(src)))
 	return (*Surface)(cast(p))
 }
 
@@ -494,7 +494,7 @@ func ShowCursor(toggle int) int {
 
 type RWops C.SDL_RWops
 
-func AllocRW() (*RWops) {
+func AllocRW() *RWops {
 	return (*RWops)(C.SDL_AllocRW())
 }
 
@@ -502,19 +502,15 @@ func FreeRW(rw *RWops) {
 	C.SDL_FreeRW((*C.SDL_RWops)(rw))
 }
 
-type RWops struct {
-	ptr *C.SDL_RWops
-}
-
-func RWFromMem(m []byte) (*RWops) {
+func RWFromMem(m []byte) *RWops {
 	return (*RWops)(C.SDL_RWFromMem(unsafe.Pointer(&m[0]), C.int(len(m))))
 }
 
-func RWFromConstMem(m []byte) (*RWops) {
+func RWFromConstMem(m []byte) *RWops {
 	return (*RWops)(C.SDL_RWFromConstMem(unsafe.Pointer(&m[0]), C.int(len(m))))
 }
 
-func RWFromReader(r io.Reader) (*RWops) {
+func RWFromReader(r io.Reader) *RWops {
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
 		SetError(err.String())
@@ -524,30 +520,30 @@ func RWFromReader(r io.Reader) (*RWops) {
 	return RWFromConstMem(data)
 }
 
-func modeFromFlags(flag int) (*C.char) {
+func modeFromFlags(flag int) *C.char {
 	switch flag {
-		case os.O_RDONLY:
-			return C.CString("r")
-		case os.O_WRONLY | os.O_CREAT:
-			return C.CString("w")
-		case os.O_WRONLY | os.O_APPEND | os.O_CREAT:
-			return C.CString("a")
-		case os.O_RDWR:
-			return C.CString("r+")
-		case os.O_RDWR | os.O_CREAT:
-			return C.CString("w+")
-		case os.O_RDWR | os.O_APPEND | os.O_CREAT:
-			return C.CString("a+")
-		default:
-			SetError("Unkown mode.")
-			return nil
+	case os.O_RDONLY:
+		return C.CString("r")
+	case os.O_WRONLY | os.O_CREAT:
+		return C.CString("w")
+	case os.O_WRONLY | os.O_APPEND | os.O_CREAT:
+		return C.CString("a")
+	case os.O_RDWR:
+		return C.CString("r+")
+	case os.O_RDWR | os.O_CREAT:
+		return C.CString("w+")
+	case os.O_RDWR | os.O_APPEND | os.O_CREAT:
+		return C.CString("a+")
+	default:
+		SetError("Unkown mode.")
+		return nil
 	}
 
 	SetError("Congratulations on getting this error...")
 	return nil
 }
 
-func RWFromFile(file string, mode int) (*RWops) {
+func RWFromFile(file string, mode int) *RWops {
 	cfile := C.CString(file)
 	defer C.free(unsafe.Pointer(cfile))
 
@@ -561,7 +557,7 @@ func RWFromFile(file string, mode int) (*RWops) {
 }
 
 // Causes 'SIGNONE: no trap'. Not sure why...
-func RWFromFP(fp *os.File, ac bool) (*RWops) {
+func RWFromFP(fp *os.File, ac bool) *RWops {
 	acArg := C.int(0)
 	if ac {
 		acArg = 1
@@ -574,7 +570,7 @@ func RWFromFP(fp *os.File, ac bool) (*RWops) {
 	return (*RWops)(C.SDL_RWFromFP(cfp, acArg))
 }
 
-func (rw *RWops)Tell() (int64) {
+func (rw *RWops) Tell() int64 {
 	cur, err := rw.Seek(0, 1)
 	if err != nil {
 		SetError(err.String())
@@ -584,7 +580,7 @@ func (rw *RWops)Tell() (int64) {
 	return cur
 }
 
-func (rw *RWops)Length() (int64) {
+func (rw *RWops) Length() int64 {
 	cur := rw.Tell()
 	if cur < 0 {
 		return -1
@@ -601,7 +597,7 @@ func (rw *RWops)Length() (int64) {
 	return eof
 }
 
-func (rw *RWops)EOF() (bool) {
+func (rw *RWops) EOF() bool {
 	cur := rw.Tell()
 	eof := rw.Length()
 	if (cur < 0) || (eof < 0) {
@@ -615,23 +611,23 @@ func (rw *RWops)EOF() (bool) {
 	return false
 }
 
-func (rw *RWops)Seek(offset int64, whence int) (int64, os.Error) {
+func (rw *RWops) Seek(offset int64, whence int) (int64, os.Error) {
 	var w C.int
 	switch whence {
-		case 0:
-			w = C.SEEK_SET
-		case 1:
-			w = C.SEEK_CUR
-		case 2:
-			w = C.SEEK_END
-		default:
-			return offset, os.NewError("Bad whence.")
+	case 0:
+		w = C.SEEK_SET
+	case 1:
+		w = C.SEEK_CUR
+	case 2:
+		w = C.SEEK_END
+	default:
+		return offset, os.NewError("Bad whence.")
 	}
 
 	return int64(C.RWseek((*C.SDL_RWops)(rw), C.int(offset), w)), nil
 }
 
-func (rw *RWops)Read(buf []byte) (n int, err os.Error) {
+func (rw *RWops) Read(buf []byte) (n int, err os.Error) {
 	n = int(C.RWread((*C.SDL_RWops)(rw), unsafe.Pointer(&buf[0]), 1, C.int(len(buf))))
 
 	if rw.EOF() {
@@ -645,7 +641,7 @@ func (rw *RWops)Read(buf []byte) (n int, err os.Error) {
 	return n, nil
 }
 
-func (rw *RWops)Write(buf []byte) (n int, err os.Error) {
+func (rw *RWops) Write(buf []byte) (n int, err os.Error) {
 	n = int(C.RWwrite((*C.SDL_RWops)(rw), unsafe.Pointer(&buf[0]), 1, C.int(len(buf))))
 
 	if n < 0 {
@@ -655,7 +651,7 @@ func (rw *RWops)Write(buf []byte) (n int, err os.Error) {
 	return n, err
 }
 
-func (rw *RWops)Close() (os.Error) {
+func (rw *RWops) Close() os.Error {
 	if int(C.RWclose((*C.SDL_RWops)(rw))) != 0 {
 		return os.NewError(GetError())
 	}
