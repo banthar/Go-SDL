@@ -345,6 +345,19 @@ const (
 	GL_MULTISAMPLESAMPLES = 0xe
 	GL_ACCELERATED_VISUAL = 0xf
 	GL_SWAP_CONTROL       = 0x10
+	ALPHA_TRANSPARENT     = 0
+	ALPHA_OPAQUE          = 0xff
+	ENABLE                = 1
+	DISABLE               = 0
+	IGNORE                = 0
+	QUERY                 = -1
+	BUTTON_LEFT           = 1
+	BUTTON_MIDDLE         = 2
+	BUTTON_RIGHT          = 3
+	BUTTON_WHEELUP        = 4
+	BUTTON_WHEELDOWN      = 5
+	BUTTON_X1             = 6
+	BUTTON_X2             = 7
 )
 
 // Types
