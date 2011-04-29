@@ -498,7 +498,7 @@ func AllocRW() *RWops {
 	return (*RWops)(C.SDL_AllocRW())
 }
 
-func FreeRW(rw *RWops) {
+func (rw *RWops) Free() {
 	C.SDL_FreeRW((*C.SDL_RWops)(rw))
 }
 
@@ -524,15 +524,15 @@ func modeFromFlags(flag int) *C.char {
 	switch flag {
 	case os.O_RDONLY:
 		return C.CString("r")
-	case os.O_WRONLY | os.O_CREAT:
+	case os.O_WRONLY | os.O_CREATE:
 		return C.CString("w")
-	case os.O_WRONLY | os.O_APPEND | os.O_CREAT:
+	case os.O_WRONLY | os.O_APPEND | os.O_CREATE:
 		return C.CString("a")
 	case os.O_RDWR:
 		return C.CString("r+")
-	case os.O_RDWR | os.O_CREAT:
+	case os.O_RDWR | os.O_CREATE:
 		return C.CString("w+")
-	case os.O_RDWR | os.O_APPEND | os.O_CREAT:
+	case os.O_RDWR | os.O_APPEND | os.O_CREATE:
 		return C.CString("a+")
 	default:
 		SetError("Unkown mode.")
