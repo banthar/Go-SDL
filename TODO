@@ -1,25 +1,5 @@
-* permanently fix KeyboardEvent issue
-
-    Go, unlike C, adds pading before nested structures.
-
-    struct A {uint8 n=0x11}
-    struct B {uint8 n=0x22, A a}
-
-    in c this will result in raw data:
-	22 11
-    in Go
-	22 00 00 00 11
-
-    This results in misaligned Keysym field.
-
-    This is currently fixed by adding or removing some fields.
-    Accessor function in C would probably be better solution.
-
-	// static SDL_keysym* KeyboardEvent_GetKeySym(SDL_KeyboardEvent *e){return &(e->keysym);}
-	import "C"
-	
-	func (event *KeyboardEvent) Keysym() *Keysym { return (*Keysym)(cast(C.KeyboardEvent_GetKeySym((*C.SDL_KeyboardEvent)(cast(event))))); }
-
+* Windows support. Since Go supports GUI applications now, this should be possible.
+* Mac support. Go-SDL has been reported to work with X11 video driver (SDL_VIDEODRIVER=x11). Default (Quartz) driver doesn't work.
 * missing functions, threads and file access are useless in Go, but there are probably some usefull functions left
 * add joystick support
 * other SDL libraries: SGE, gfx ...

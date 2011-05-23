@@ -498,7 +498,7 @@ func AllocRW() *RWops {
 	return (*RWops)(C.SDL_AllocRW())
 }
 
-func FreeRW(rw *RWops) {
+func (rw *RWops) Free() {
 	C.SDL_FreeRW((*C.SDL_RWops)(rw))
 }
 
