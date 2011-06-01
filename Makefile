@@ -4,7 +4,7 @@
 
 include $(GOROOT)/src/Make.inc
 
-.PHONY: all install clean
+.PHONY: all install clean nuke
 
 all:
 	gomake -C sdl
@@ -24,3 +24,9 @@ clean:
 	gomake -C mixer clean
 	gomake -C test clean
 	gomake -C gfx clean
+
+nuke:
+	gomake -C sdl nuke
+	gomake -C ttf nuke
+	gomake -C mixer nuke
+	gomake -C gfx nuke
