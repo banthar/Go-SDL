@@ -7,7 +7,7 @@ include $(GOROOT)/src/Make.inc
 TARG=test
 GOFILES=test.go
 
-GC=${O}g -I../sdl/_obj -I../mixer/_obj -I../ttf/obj -I../gfx/_obj
-LD=${O}l -L../sdl/_obj -I../mixer/_obj -I../ttf/obj -I../gfx/_obj
+GC=${O}g -I../sdl/_obj -I../mixer/_obj -I../ttf/_obj -I../gfx/_obj
+LD=${O}l -L../sdl/_obj -L../mixer/_obj -L../ttf/_obj -L../gfx/_obj
 
 include $(GOROOT)/src/Make.cmd

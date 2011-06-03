@@ -206,7 +206,7 @@ func (screen *Surface) Lock() int {
 }
 
 // Unlocks a previously locked surface.
-func (screen *Surface) Unlock() int { return int(C.SDL_Flip((*C.SDL_Surface)(cast(screen)))) }
+func (screen *Surface) Unlock() { C.SDL_UnlockSurface((*C.SDL_Surface)(cast(screen))) }
 
 func (dst *Surface) Blit(dstrect *Rect, src *Surface, srcrect *Rect) int {
 	var ret = C.SDL_UpperBlit(
