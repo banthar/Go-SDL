@@ -8,8 +8,6 @@ TARG=sdl/mixer
 
 GOFILES:=constants.go
 CGOFILES:=mixer.go
-CGO_CFLAGS:=-I/usr/local/include
-CGO_LDFLAGS:=-lSDL_mixer -L/usr/local/lib
 
 CLEANFILES+=mixer
 

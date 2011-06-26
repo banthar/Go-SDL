@@ -7,7 +7,8 @@ flavor (eg. Rather than sdl.Flip(surface) it's surface.Flip() )
 */
 package sdl
 
-
+// #cgo pkg-config: sdl
+// #cgo LDFLAGS: -lSDL_image
 // struct private_hwdata{};
 // struct SDL_BlitMap{};
 // #define map _map
@@ -97,7 +98,7 @@ func ListModes(format *PixelFormat, flags uint32) []Rect {
 	var count int
 	ptr := *modes //first element in the list
 	for count = 0; ptr != nil; count++ {
-		ptr = *(**C.SDL_Rect)(unsafe.Pointer(uintptr(unsafe.Pointer(modes)) + uintptr(count*unsafe.Sizeof(ptr))))
+		ptr = *(**C.SDL_Rect)(unsafe.Pointer(uintptr(unsafe.Pointer(modes)) + uintptr(uintptr(count)*unsafe.Sizeof(ptr))))
 	}
 	var ret = make([]Rect, count-1)
 
