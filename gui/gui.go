@@ -89,7 +89,7 @@ var initnum uint
 
 func initinc() os.Error {
 	if initnum == 0 {
-		errn := sdl.Init(sdl.INIT_EVERYTHING)
+		errn := sdl.Init(sdl.INIT_VIDEO)
 		if errn < 0 {
 			return os.NewError(sdl.GetError())
 		}
