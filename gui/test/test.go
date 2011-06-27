@@ -1,6 +1,6 @@
 package main
 
-import(
+import (
 	"os"
 	"fmt"
 	"sdl"
@@ -17,8 +17,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	//img := image.NewColorImage(image.RGBAColor{255, 0, 255, 255})
-	img := sdlgui.SurfaceToImage(sdl.Load("test.png"))
+	img := image.NewColorImage(image.RGBAColor{255, 0, 255, 255})
+	//img := sdlgui.SurfaceToImage(sdl.Load("test.png"))
 	draw.Draw(win.Screen(),
 		image.Rect(10, 10, 20, 20),
 		img,
@@ -27,13 +27,23 @@ func main() {
 	)
 	win.FlushImage()
 
-	for ev := range(win.EventChan()) {
+	for ev := range win.EventChan() {
 		switch e := ev.(type) {
-			case gui.KeyEvent:
-				fmt.Println(e.Key)
-				if e.Key == 'q' {
-					win.Close()
-				}
+		case gui.KeyEvent:
+			fmt.Println(e.Key)
+			if e.Key == 'q' {
+				win.Close()
+			}
+		case gui.MouseEvent:
+			if e.Buttons&(1<<0) > 0 {
+				fmt.Println("The left mouse button is pressed.")
+			}
+			if e.Buttons&(1<<1) > 0 {
+				fmt.Println("The middle mouse button is pressed.")
+			}
+			if e.Buttons&(1<<2) > 0 {
+				fmt.Println("The right mouse button is pressed.")
+			}
 		}
 	}
 }

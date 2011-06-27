@@ -1,8 +1,10 @@
 package sdlgui
 
-import(
+import (
 	"os"
 	"sdl"
+	"time"
+	"image"
 	"runtime"
 	"exp/gui"
 	"image/draw"
@@ -11,27 +13,49 @@ import(
 type window struct {
 	screen *surfimg
 
-	ec chan interface{}
+	ec     chan interface{}
 	events bool
 }
 
-func (win *window)eventLoop() {
+func (win *window) eventLoop() {
 	if win.ec == nil {
 		win.ec = make(chan interface{})
 	}
 
-	eloop: for win.events {
+eloop:
+	for win.events {
 		var ev sdl.Event
 		for ev.Poll() {
 			switch ev.Type {
-				case sdl.KEYUP:
-					key := ev.Keyboard().Keysym.Sym
-					win.ec <- gui.KeyEvent{int(-key)}
-				case sdl.KEYDOWN:
-					key := ev.Keyboard().Keysym.Sym
-					win.ec <- gui.KeyEvent{int(key)}
-				case sdl.QUIT:
-					break eloop
+			case sdl.KEYUP:
+				key := ev.Keyboard().Keysym.Sym
+				win.ec <- gui.KeyEvent{int(-key)}
+			case sdl.KEYDOWN:
+				key := ev.Keyboard().Keysym.Sym
+				win.ec <- gui.KeyEvent{int(key)}
+			case sdl.MOUSEMOTION:
+				m := ev.MouseMotion()
+				win.ec <- gui.MouseEvent{
+					Buttons: int(m.State),
+					Loc:     image.Pt(int(m.X), int(m.Y)),
+					Nsec:    time.Nanoseconds(),
+				}
+			case sdl.MOUSEBUTTONUP:
+				m := ev.MouseButton()
+				win.ec <- gui.MouseEvent{
+					Buttons: int(sdl.GetMouseState(nil, nil)),
+					Loc:     image.Pt(int(m.X), int(m.Y)),
+					Nsec:    time.Nanoseconds(),
+				}
+			case sdl.MOUSEBUTTONDOWN:
+				m := ev.MouseButton()
+				win.ec <- gui.MouseEvent{
+					Buttons: int(sdl.GetMouseState(nil, nil)),
+					Loc:     image.Pt(int(m.X), int(m.Y)),
+					Nsec:    time.Nanoseconds(),
+				}
+			case sdl.QUIT:
+				break eloop
 			}
 		}
 	}
@@ -39,19 +63,19 @@ func (win *window)eventLoop() {
 	close(win.ec)
 }
 
-func (win *window)Screen() (draw.Image) {
+func (win *window) Screen() draw.Image {
 	return win.screen
 }
 
-func (win *window)FlushImage() {
+func (win *window) FlushImage() {
 	win.screen.Flip()
 }
 
-func (win *window)EventChan() (<-chan interface{}) {
+func (win *window) EventChan() <-chan interface{} {
 	return win.ec
 }
 
-func (win *window)Close() (os.Error) {
+func (win *window) Close() os.Error {
 	win.events = false
 
 	win.screen.Free()
@@ -63,7 +87,7 @@ func (win *window)Close() (os.Error) {
 
 var initnum uint
 
-func initinc() (os.Error) {
+func initinc() os.Error {
 	if initnum == 0 {
 		errn := sdl.Init(sdl.INIT_EVERYTHING)
 		if errn < 0 {
