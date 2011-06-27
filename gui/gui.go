@@ -108,6 +108,9 @@ func initdec() {
 	}
 }
 
+// TODO: Add SetVideoMode flags into this package so that sdl doesn't need to be
+// imported.
+
 func NewWindow(w, h, bpp int, flags uint32) (gui.Window, os.Error) {
 	win := new(window)
 
