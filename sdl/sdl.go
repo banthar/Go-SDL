@@ -13,8 +13,8 @@ package sdl
 // struct SDL_BlitMap{};
 // #define map _map
 //
-// #include <SDL/SDL.h>
-// #include <SDL/SDL_image.h>
+// #include "SDL.h"
+// #include "SDL_image.h"
 // static void SetError(const char* description){SDL_SetError("%s",description);}
 //
 // static int RWseek(SDL_RWops *rw, int os, int w){return SDL_RWseek(rw, os, w);}
