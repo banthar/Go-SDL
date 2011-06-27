@@ -23,17 +23,17 @@ func (img *surfimg) pixPtr(x, y int) reflect.Value {
 
 	switch img.Format.BitsPerPixel {
 	case 8:
-		pix := (*(*[]uint8)(unsafe.Pointer(&h)))[(y*int(img.W))+x]
-		return reflect.ValueOf(&pix).Elem()
+		pix := &(*(*[]uint8)(unsafe.Pointer(&h)))[(y*int(img.W))+x]
+		return reflect.ValueOf(pix).Elem()
 	case 16:
-		pix := (*(*[]uint16)(unsafe.Pointer(&h)))[(y*int(img.W))+x]
-		return reflect.ValueOf(&pix).Elem()
+		pix := &(*(*[]uint16)(unsafe.Pointer(&h)))[(y*int(img.W))+x]
+		return reflect.ValueOf(pix).Elem()
 	case 32:
-		pix := (*(*[]uint32)(unsafe.Pointer(&h)))[(y*int(img.W))+x]
-		return reflect.ValueOf(&pix).Elem()
+		pix := &(*(*[]uint32)(unsafe.Pointer(&h)))[(y*int(img.W))+x]
+		return reflect.ValueOf(pix).Elem()
 	case 64:
-		pix := (*(*[]uint64)(unsafe.Pointer(&h)))[(y*int(img.W))+x]
-		return reflect.ValueOf(&pix).Elem()
+		pix := &(*(*[]uint64)(unsafe.Pointer(&h)))[(y*int(img.W))+x]
+		return reflect.ValueOf(pix).Elem()
 	}
 
 	panic(fmt.Errorf("Image has unexpected BPP: %v", img.Format.BitsPerPixel))

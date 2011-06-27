@@ -17,14 +17,24 @@ func main() {
 		os.Exit(1)
 	}
 
-	img := image.NewColorImage(image.RGBAColor{255, 0, 255, 255})
-	//img := sdlgui.SurfaceToImage(sdl.Load("test.png"))
-	draw.Draw(win.Screen(),
-		image.Rect(10, 10, 20, 20),
-		img,
-		image.Pt(0, 0),
+	screen := win.Screen()
+
+	cimg := image.NewColorImage(image.RGBAColor{255, 0, 255, 255})
+	draw.Draw(screen,
+		image.Rect(10, 10, 200, 200),
+		cimg,
+		image.ZP,
 		draw.Over,
 	)
+
+	timg := sdlgui.SurfaceToImage(sdl.Load("test.png"))
+	draw.Draw(screen,
+		image.Rect(50, 50, 100, 100),
+		timg,
+		image.ZP,
+		draw.Over,
+	)
+
 	win.FlushImage()
 
 	for ev := range win.EventChan() {
