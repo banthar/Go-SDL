@@ -40,20 +40,20 @@ eloop:
 					Loc:     image.Pt(int(m.X), int(m.Y)),
 					Nsec:    time.Nanoseconds(),
 				}
-			case sdl.MOUSEBUTTONUP:
+			case sdl.MOUSEBUTTONUP, sdl.MOUSEBUTTONDOWN:
 				m := ev.MouseButton()
 				win.ec <- gui.MouseEvent{
 					Buttons: int(sdl.GetMouseState(nil, nil)),
 					Loc:     image.Pt(int(m.X), int(m.Y)),
 					Nsec:    time.Nanoseconds(),
 				}
-			case sdl.MOUSEBUTTONDOWN:
-				m := ev.MouseButton()
-				win.ec <- gui.MouseEvent{
-					Buttons: int(sdl.GetMouseState(nil, nil)),
-					Loc:     image.Pt(int(m.X), int(m.Y)),
-					Nsec:    time.Nanoseconds(),
-				}
+			case sdl.VIDEORESIZE:
+				r := ev.Resize()
+				win.ec <- gui.ConfigEvent{image.Config{
+					win.Screen().ColorModel(),
+					int(r.W),
+					int(r.H),
+				}}
 			case sdl.QUIT:
 				break eloop
 			}

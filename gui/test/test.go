@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	win, err := sdlgui.NewWindow(320, 240, 32, sdl.DOUBLEBUF)
+	win, err := sdlgui.NewWindow(320, 240, 32, sdl.DOUBLEBUF | sdl.RESIZABLE)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -39,20 +39,22 @@ func main() {
 
 	for ev := range win.EventChan() {
 		switch e := ev.(type) {
+		case gui.ConfigEvent:
+			fmt.Printf("Window size: (%v, %v)\n", e.Config.Width, e.Config.Height)
 		case gui.KeyEvent:
-			fmt.Println(e.Key)
+			fmt.Printf("Key pressed: %v\n", e.Key)
 			if e.Key == 'q' {
 				win.Close()
 			}
 		case gui.MouseEvent:
 			if e.Buttons&(1<<0) > 0 {
-				fmt.Println("The left mouse button is pressed.")
+				fmt.Println("The left mouse button has been pressed.")
 			}
 			if e.Buttons&(1<<1) > 0 {
-				fmt.Println("The middle mouse button is pressed.")
+				fmt.Println("The middle mouse button has been pressed.")
 			}
 			if e.Buttons&(1<<2) > 0 {
-				fmt.Println("The right mouse button is pressed.")
+				fmt.Println("The right mouse button has been pressed.")
 			}
 		}
 	}
