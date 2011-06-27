@@ -40,6 +40,7 @@ func (img *surfimg) pixPtr(x, y int) reflect.Value {
 }
 
 func (img *surfimg) ColorModel() image.ColorModel {
+	// TODO: Properly handle various colormodels.
 	return image.RGBAColorModel
 }
 
