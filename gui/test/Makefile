@@ -4,11 +4,10 @@
 
 include $(GOROOT)/src/Make.inc
 
-TARG=sdl/mixer
+TARG=test
+GOFILES=test.go
 
-GOFILES:=constants.go
-CGOFILES:=mixer.go
+GC=${O}g -I../_obj
+LD=${O}l -L../_obj
 
-CLEANFILES+=mixer
-
-include $(GOROOT)/src/Make.pkg
+include $(GOROOT)/src/Make.cmd
