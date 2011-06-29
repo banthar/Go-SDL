@@ -28,6 +28,8 @@ import "image"
 import "io"
 import "io/ioutil"
 import "os"
+import "fmt"
+import "reflect"
 
 type cast unsafe.Pointer
 
@@ -419,66 +421,70 @@ func GetKeyName(key Key) string { return C.GoString(C.SDL_GetKeyName(C.SDLKey(ke
 // Events
 
 // Waits indefinitely for the next available event
-func (event *Event) Wait() bool {
-	var ret = C.SDL_WaitEvent((*C.SDL_Event)(cast(event)))
-	return ret != 0
+func WaitEvent() Event {
+	var cev C.SDL_Event
+	ret := C.SDL_WaitEvent(&cev)
+	if ret == 0 {
+		return nil
+	}
+
+	return goEvent((*cevent)(cast(&cev)))
 }
 
 // Push the event onto the event queue
-func (event *Event) Push() bool {
-	var ret = C.SDL_PushEvent((*C.SDL_Event)(cast(event)))
+func PushEvent(event Event) bool {
+	ret := C.SDL_PushEvent((*C.SDL_Event)(cast(cEvent(event))))
+
 	return ret != 0
 }
 
 // Polls for currently pending events
-func (event *Event) Poll() bool {
-	var ret = C.SDL_PollEvent((*C.SDL_Event)(cast(event)))
-	return ret != 0
-}
-
-// Returns KeyboardEvent or nil if event has other type
-func (event *Event) Keyboard() *KeyboardEvent {
-	if event.Type == KEYUP || event.Type == KEYDOWN {
-		return (*KeyboardEvent)(cast(event))
+func PollEvent() Event {
+	var cev C.SDL_Event
+	ret := C.SDL_PollEvent(&cev)
+	if ret == 0 {
+		return nil
 	}
 
-	return nil
+	return goEvent((*cevent)(cast(&cev)))
 }
 
-// Returns MouseButtonEvent or nil if event has other type
-func (event *Event) MouseButton() *MouseButtonEvent {
-	if event.Type == MOUSEBUTTONDOWN || event.Type == MOUSEBUTTONUP {
-		return (*MouseButtonEvent)(cast(event))
+func goEvent(cev *cevent) Event {
+	switch cev.Type {
+	case ACTIVEEVENT:
+		return (*ActiveEvent)(cast(cev))
+	case KEYUP, KEYDOWN:
+		return (*KeyboardEvent)(cast(cev))
+	case MOUSEMOTION:
+		return (*MouseMotionEvent)(cast(cev))
+	case MOUSEBUTTONUP, MOUSEBUTTONDOWN:
+		return (*MouseButtonEvent)(cast(cev))
+	case JOYAXISMOTION:
+		return (*JoyAxisEvent)(cast(cev))
+	case JOYBALLMOTION:
+		return (*JoyBallEvent)(cast(cev))
+	case JOYHATMOTION:
+		return (*JoyHatEvent)(cast(cev))
+	case JOYBUTTONUP, JOYBUTTONDOWN:
+		return (*JoyButtonEvent)(cast(cev))
+	case VIDEORESIZE:
+		return (*ResizeEvent)(cast(cev))
+	case VIDEOEXPOSE:
+		return (*ExposeEvent)(cast(cev))
+	case QUIT:
+		return (*QuitEvent)(cast(cev))
+	case USEREVENT:
+		return (*UserEvent)(cast(cev))
+	case SYSWMEVENT:
+		return (*SysWMEvent)(cast(cev))
 	}
 
-	return nil
+	panic(fmt.Errorf("Unknown event type: %v", cev.Type))
 }
 
-// Returns MouseMotion or nil if event has other type
-func (event *Event) MouseMotion() *MouseMotionEvent {
-	if event.Type == MOUSEMOTION {
-		return (*MouseMotionEvent)(cast(event))
-	}
-
-	return nil
-}
-
-// Returns ActiveEvent or nil if event has other type
-func (event *Event) Active() *ActiveEvent {
-	if event.Type == ACTIVEEVENT {
-		return (*ActiveEvent)(cast(event))
-	}
-
-	return nil
-}
-
-// Returns ResizeEvent or nil if event has other type
-func (event *Event) Resize() *ResizeEvent {
-	if event.Type == VIDEORESIZE {
-		return (*ResizeEvent)(cast(event))
-	}
-
-	return nil
+func cEvent(ev Event) *cevent {
+	evv := reflect.ValueOf(ev)
+	return (*cevent)(cast(evv.UnsafeAddr()))
 }
 
 // Time

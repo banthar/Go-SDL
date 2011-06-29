@@ -24,37 +24,34 @@ func (win *window) eventLoop() {
 
 eloop:
 	for win.events {
-		var ev sdl.Event
-		for ev.Poll() {
-			switch ev.Type {
-			case sdl.KEYUP:
-				key := ev.Keyboard().Keysym.Sym
-				win.ec <- gui.KeyEvent{int(-key)}
-			case sdl.KEYDOWN:
-				key := ev.Keyboard().Keysym.Sym
-				win.ec <- gui.KeyEvent{int(key)}
-			case sdl.MOUSEMOTION:
-				m := ev.MouseMotion()
+		for ev := sdl.PollEvent(); ev != nil; ev = sdl.PollEvent() {
+			switch e := ev.(type) {
+			case *sdl.KeyboardEvent:
+				switch e.Type {
+				case sdl.KEYUP:
+					win.ec <- gui.KeyEvent{int(-e.Keysym.Sym)}
+				case sdl.KEYDOWN:
+					win.ec <- gui.KeyEvent{int(e.Keysym.Sym)}
+				}
+			case *sdl.MouseMotionEvent:
 				win.ec <- gui.MouseEvent{
-					Buttons: int(m.State),
-					Loc:     image.Pt(int(m.X), int(m.Y)),
+					Buttons: int(e.State),
+					Loc:     image.Pt(int(e.X), int(e.Y)),
 					Nsec:    time.Nanoseconds(),
 				}
-			case sdl.MOUSEBUTTONUP, sdl.MOUSEBUTTONDOWN:
-				m := ev.MouseButton()
+			case *sdl.MouseButtonEvent:
 				win.ec <- gui.MouseEvent{
 					Buttons: int(sdl.GetMouseState(nil, nil)),
-					Loc:     image.Pt(int(m.X), int(m.Y)),
+					Loc:     image.Pt(int(e.X), int(e.Y)),
 					Nsec:    time.Nanoseconds(),
 				}
-			case sdl.VIDEORESIZE:
-				r := ev.Resize()
+			case *sdl.ResizeEvent:
 				win.ec <- gui.ConfigEvent{image.Config{
 					win.Screen().ColorModel(),
-					int(r.W),
-					int(r.H),
+					int(e.W),
+					int(e.H),
 				}}
-			case sdl.QUIT:
+			case *sdl.QuitEvent:
 				break eloop
 			}
 		}

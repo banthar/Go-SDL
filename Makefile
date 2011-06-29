@@ -24,6 +24,7 @@ clean:
 	gomake -C mixer clean
 	gomake -C test clean
 	gomake -C gfx clean
+	gomake -C gui clean
 
 nuke:
 	gomake -C sdl nuke
