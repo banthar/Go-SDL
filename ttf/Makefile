@@ -9,6 +9,11 @@ TARG=sdl/ttf
 GOFILES:=constants.go
 CGOFILES:=ttf.go
 
+ifeq ($(GOOS),freebsd)
+CGO_CFLAGS:=-I/usr/local/include
+CGO_LDFLAGS:=-lSDL_ttf -L/usr/local/lib
+endif
+
 CLEANFILES+=ttf
 
 GC=${O}g -I../sdl/_obj
