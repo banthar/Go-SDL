@@ -43,7 +43,7 @@ func main() {
 			fmt.Printf("Window size: (%v, %v)\n", e.Config.Width, e.Config.Height)
 		case gui.KeyEvent:
 			fmt.Printf("Key pressed: %v\n", e.Key)
-			if e.Key == 'q' {
+			if e.Key == sdl.K_ESCAPE {
 				win.Close()
 			}
 		case gui.MouseEvent:
