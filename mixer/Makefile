@@ -9,6 +9,11 @@ TARG=sdl/mixer
 GOFILES:=constants.go
 CGOFILES:=mixer.go
 
+ifeq ($(GOOS),freebsd)
+CGO_CFLAGS:=-I/usr/local/include
+CGO_LDFLAGS:=-lSDL_mixer -L/usr/local/lib
+endif
+
 CLEANFILES+=mixer
 
 include $(GOROOT)/src/Make.pkg
