@@ -27,7 +27,7 @@ func main() {
 		draw.Over,
 	)
 
-	timg := sdlgui.SurfaceToImage(sdl.Load("test.png"))
+	timg := sdl.Load("test.png")
 	draw.Draw(screen,
 		image.Rect(50, 50, 100, 100),
 		timg,

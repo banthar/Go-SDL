@@ -4,3 +4,4 @@
 * add joystick support
 * other SDL libraries: SGE, gfx ...
 * more/better test/example apps
+* Add real ColorModel support to Surfaces.
