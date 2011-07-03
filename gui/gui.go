@@ -11,7 +11,7 @@ import (
 )
 
 type window struct {
-	screen *surfimg
+	screen *sdl.Surface
 
 	ec     chan interface{}
 	events bool
@@ -105,9 +105,6 @@ func initdec() {
 	}
 }
 
-// TODO: Add SetVideoMode flags into this package so that sdl doesn't need to be
-// imported.
-
 func NewWindow(w, h, bpp int, flags uint32) (gui.Window, os.Error) {
 	win := new(window)
 
@@ -116,7 +113,7 @@ func NewWindow(w, h, bpp int, flags uint32) (gui.Window, os.Error) {
 		return nil, err
 	}
 
-	win.screen = &surfimg{sdl.SetVideoMode(w, h, bpp, flags)}
+	win.screen = sdl.SetVideoMode(w, h, bpp, flags)
 	if win.screen == nil {
 		return nil, os.NewError(sdl.GetError())
 	}
