@@ -7,7 +7,7 @@ include $(GOROOT)/src/Make.inc
 TARG=sdl/mixer
 
 GOFILES:=constants.go
-CGOFILES:=mixer.go
+CGOFILES:=mixer.go chunks.go
 
 ifeq ($(GOOS),freebsd)
 CGO_CFLAGS:=-I/usr/local/include
