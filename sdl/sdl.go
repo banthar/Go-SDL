@@ -17,6 +17,14 @@ package sdl
 // #include "SDL_image.h"
 // static void SetError(const char* description){SDL_SetError("%s",description);}
 //
+// static int vectorLength(void** start)
+// {
+//     void **ptr=start;
+//     for(;*ptr!=NULL;ptr++);
+//
+//     return ptr-start;
+// }
+//
 // static int RWseek(SDL_RWops *rw, int os, int w){return SDL_RWseek(rw, os, w);}
 // static int RWread(SDL_RWops *rw, void *d, int size, int max){return SDL_RWread(rw, d, size, max);}
 // static int RWwrite(SDL_RWops *rw, void *d, int size, int num){return SDL_RWwrite(rw, d, size, num);}
@@ -86,26 +94,23 @@ func VideoModeOK(width int, height int, bpp int, flags uint32) int {
 	return int(C.SDL_VideoModeOK(C.int(width), C.int(height), C.int(bpp), C.Uint32(flags)))
 }
 
-func ListModes(format *PixelFormat, flags uint32) []Rect {
+func ListModes(format *PixelFormat, flags uint32) []*Rect {
+
 	modes := C.SDL_ListModes((*C.SDL_PixelFormat)(cast(format)), C.Uint32(flags))
-	if modes == nil { //no modes available
-		return make([]Rect, 0)
+
+	if modes == nil { //modes == 0, no modes available
+		return make([]*Rect, 0)
 	}
-	var any int
-	*((***C.SDL_Rect)(unsafe.Pointer(&any))) = modes
-	if any == -1 { //any dimension is ok
+
+	if ^uintptr(unsafe.Pointer(modes)) == 0 { //modes == -1, any dimension is ok
 		return nil
 	}
 
-	var count int
-	ptr := *modes //first element in the list
-	for count = 0; ptr != nil; count++ {
-		ptr = *(**C.SDL_Rect)(unsafe.Pointer(uintptr(unsafe.Pointer(modes)) + uintptr(uintptr(count)*unsafe.Sizeof(ptr))))
-	}
-	var ret = make([]Rect, count-1)
-
+	var ret = make([]*Rect, C.vectorLength((*unsafe.Pointer)(unsafe.Pointer(modes))))
 	*((***C.SDL_Rect)(unsafe.Pointer(&ret))) = modes // TODO
+
 	return ret
+
 }
 
 type VideoInfo struct {
