@@ -91,8 +91,9 @@ func main() {
 	white := sdl.Color{255, 255, 255, 0}
 	text := ttf.RenderText_Blended(font, "Test (with music)", white)
 	music := mixer.LoadMUS("test.ogg")
+	sound := mixer.LoadWAV("sound.ogg")
 
-	if music == nil {
+	if music == nil || sound == nil {
 		panic(sdl.GetError())
 	}
 
@@ -143,6 +144,7 @@ func main() {
 					in = out
 					out = make(chan Point)
 					go worm(in, out, draw)
+					sound.PlayChannel(-1, 0)
 				}
 			case *sdl.ResizeEvent:
 				println("resize screen ", e.W, e.H)
