@@ -7,8 +7,9 @@ functions have been changed to be in a more object-oriented style
 */
 package mixer
 
+// #cgo pkg-config: SDL_mixer
 // #cgo LDFLAGS: -lSDL_mixer
-// #include <SDL/SDL_mixer.h>
+// #include "SDL_mixer.h"
 import "C"
 import "unsafe"
 
