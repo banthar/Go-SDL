@@ -17,3 +17,6 @@ endif
 CLEANFILES+=mixer
 
 include $(GOROOT)/src/Make.pkg
+
+fmt:
+	gofmt -w $(CGOFILES) constants.go

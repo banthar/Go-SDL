@@ -11,3 +11,6 @@ GC=${O}g -I../_obj
 LD=${O}l -L../_obj
 
 include $(GOROOT)/src/Make.cmd
+
+fmt:
+	gofmt -w $(wildcard *.go)

@@ -1,4 +1,3 @@
-
 package main
 
 import "sdl"
@@ -10,11 +9,11 @@ func listModes(flags uint32) {
 
 	if modes == nil {
 		fmt.Printf("\tany mode\n")
-		return;
+		return
 	}
 
 	for _, mode := range modes {
-		fmt.Printf("\t%dx%d\n",mode.W,mode.H)
+		fmt.Printf("\t%dx%d\n", mode.W, mode.H)
 	}
 }
 
@@ -22,7 +21,7 @@ func main() {
 
 	sdl.Init(sdl.INIT_VIDEO)
 
-	fmt.Printf("fullscreen modes:\n");
-	listModes(sdl.FULLSCREEN);
+	fmt.Printf("fullscreen modes:\n")
+	listModes(sdl.FULLSCREEN)
 
 }
