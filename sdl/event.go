@@ -7,7 +7,8 @@ var events chan interface{} = make(chan interface{})
 // This channel delivers SDL events. Each object received from this channel
 // has one of the following types: sdl.QuitEvent, sdl.KeyboardEvent,
 // sdl.MouseButtonEvent, sdl.MouseMotionEvent, sdl.ActiveEvent,
-// sdl.ResizeEvent.
+// sdl.ResizeEvent, sdl.JoyAxisEvent, sdl.JoyButtonEvent, sdl.JoyHatEvent,
+// sdl.JoyBallEvent
 var Events <-chan interface{} = events
 
 // Polling interval, in milliseconds
@@ -40,6 +41,12 @@ func pollEvents() {
 
 			case JOYBUTTONDOWN, JOYBUTTONUP:
 				events <- *(*JoyButtonEvent)(cast(event))
+
+			case JOYHATMOTION:
+				events <- *(*JoyHatEvent)(cast(event))
+
+			case JOYBALLMOTION:
+				events <- *(*JoyBallEvent)(cast(event))
 
 			case ACTIVEEVENT:
 				events <- *(*ActiveEvent)(cast(event))

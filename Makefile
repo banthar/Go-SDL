@@ -7,6 +7,7 @@ include $(GOROOT)/src/Make.inc
 all: install
 
 install:
+	make clean
 	make -C sdl install
 	make -C sdl/audio install
 	make -C ttf install

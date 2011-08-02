@@ -171,7 +171,7 @@ func UnlockAudio() {
 // This function blocks until all the samples are consumed by the SDL audio thread.
 func SendAudio_int16(data []int16) {
 	if len(data) > 0 {
-		sendAudio((*C.Uint8)(unsafe.Pointer(&data[0])), C.size_t(unsafe.Sizeof(data[0])*len(data)))
+		sendAudio((*C.Uint8)(unsafe.Pointer(&data[0])), C.size_t(int(unsafe.Sizeof(data[0]))*len(data)))
 	}
 }
 
@@ -179,7 +179,7 @@ func SendAudio_int16(data []int16) {
 // This function blocks until all the samples are consumed by the SDL audio thread.
 func SendAudio_uint16(data []uint16) {
 	if len(data) > 0 {
-		sendAudio((*C.Uint8)(unsafe.Pointer(&data[0])), C.size_t(unsafe.Sizeof(data[0])*len(data)))
+		sendAudio((*C.Uint8)(unsafe.Pointer(&data[0])), C.size_t(int(unsafe.Sizeof(data[0]))*len(data)))
 	}
 }
 
@@ -187,7 +187,7 @@ func SendAudio_uint16(data []uint16) {
 // This function blocks until all the samples are consumed by the SDL audio thread.
 func SendAudio_int8(data []int8) {
 	if len(data) > 0 {
-		sendAudio((*C.Uint8)(unsafe.Pointer(&data[0])), C.size_t(unsafe.Sizeof(data[0])*len(data)))
+		sendAudio((*C.Uint8)(unsafe.Pointer(&data[0])), C.size_t(int(unsafe.Sizeof(data[0]))*len(data)))
 	}
 }
 
@@ -195,7 +195,7 @@ func SendAudio_int8(data []int8) {
 // This function blocks until all the samples are consumed by the SDL audio thread.
 func SendAudio_uint8(data []uint8) {
 	if len(data) > 0 {
-		sendAudio((*C.Uint8)(unsafe.Pointer(&data[0])), C.size_t(unsafe.Sizeof(data[0])*len(data)))
+		sendAudio((*C.Uint8)(unsafe.Pointer(&data[0])), C.size_t(int(unsafe.Sizeof(data[0]))*len(data)))
 	}
 }
 
