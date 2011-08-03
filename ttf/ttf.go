@@ -7,7 +7,7 @@ that work with loaded fonts are changed to have a more object-oriented feel.
 */
 package ttf
 
-// #cgo pkg-config: SDL_ttf
+// #cgo pkg-config: sdl
 // #cgo LDFLAGS: -lSDL_ttf
 // #include "SDL_ttf.h"
 import "C"
