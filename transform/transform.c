@@ -47,6 +47,8 @@ void filter_shrink_Y_ONLYC(Uint8 *, Uint8 *, int, int, int, int, int);
 void filter_expand_X_ONLYC(Uint8 *, Uint8 *, int, int, int, int, int);
 void filter_expand_Y_ONLYC(Uint8 *, Uint8 *, int, int, int, int, int);
 
+static SDL_Surface* newsurf_fromsurf (SDL_Surface* surf, int width, int height);
+
 static void convert_24_32(Uint8 *srcpix, int srcpitch, Uint8 *dstpix, int dstpitch, int width, int height)
 {
     int srcdiff = srcpitch - (width * 3);
@@ -120,8 +122,7 @@ const char* get_smoothscale_backend() {
 	return st->filter_type;
 }
 
-void
-scalesmooth(SDL_Surface *src, SDL_Surface *dst)
+static void _scalesmooth(SDL_Surface *src, SDL_Surface *dst)
 {
 	if (st == NULL) { st = &g_st; smoothscale_init(); }
 
@@ -225,6 +226,66 @@ scalesmooth(SDL_Surface *src, SDL_Surface *dst)
         free(temppix);
 
 }
+
+SDL_Surface* scalesmooth(SDL_Surface *surfobj2, SDL_Surface *surf, int width, int height)
+{
+	int bpp;
+	SDL_Surface *newsurf;
+
+    if (width < 0 || height < 0)
+        return NULL;
+
+
+    bpp = surf->format->BytesPerPixel;
+    if(bpp < 3 || bpp > 4)
+		return NULL;
+
+	
+    if (!surfobj2)
+    {
+        newsurf = newsurf_fromsurf (surf, width, height); //FIXME: Free this surface on failure.
+        if (!newsurf)
+            return NULL;
+    } else {
+		newsurf = surfobj2;
+	}
+
+    if (newsurf->w != width || newsurf->h != height)
+		return NULL;
+
+
+    if(((width * bpp + 3) >> 2) > newsurf->pitch)
+        return NULL;
+
+
+    if(width && height)
+    {
+        SDL_LockSurface(newsurf);
+
+        /* handle trivial case */
+        if (surf->w == width && surf->h == height) {
+            int y;
+            for (y = 0; y < height; y++) {
+                memcpy((Uint8*)newsurf->pixels + y * newsurf->pitch, 
+                       (Uint8*)surf->pixels + y * surf->pitch, width * bpp);
+            }
+        }
+        else {
+           _scalesmooth(surf, newsurf);
+        }
+
+        SDL_UnlockSurface(newsurf);
+    }
+
+    if (surfobj2)
+    {
+        return surfobj2;
+    }
+    else
+        return newsurf;
+
+}
+
 
 static SDL_Surface*
 newsurf_fromsurf (SDL_Surface* surf, int width, int height)

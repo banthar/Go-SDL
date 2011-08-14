@@ -94,7 +94,7 @@ func ListModes(format *PixelFormat, flags uint32) []Rect {
 	var count int
 	ptr := *modes //first element in the list
 	for count = 0; ptr != nil; count++ {
-		ptr = *(**C.SDL_Rect)(unsafe.Pointer(uintptr(unsafe.Pointer(modes)) + uintptr(count*unsafe.Sizeof(ptr))))
+		ptr = *(**C.SDL_Rect)(unsafe.Pointer(uintptr(unsafe.Pointer(modes)) + uintptr(count * int(unsafe.Sizeof(ptr)) )))
 	}
 	var ret = make([]Rect, count-1)
 

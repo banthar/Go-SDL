@@ -1,5 +1,7 @@
-Make sure you have SDL, SDL_image, SDL_mixer, and SDL_ttf (all in -dev version).
+This wrapper is a fork of banthar's Go-SDL. It adds a lot of missing functions, plus a port of pygame's transform package.
 
-If the bindings fail to compile, run 'hg pull -u' in $GOROOT and rebuild Go.  The release version of Go doesn't have some changes necessary to build the ttf and mixer bindings last I checked.
+Make sure you have SDL, SDL_image, SDL_mixer, and SDL_ttf.
+
+If the bindings fail to compile, run 'hg pull -u' in $GOROOT and rebuild Go.
 
 Music to test SDL_mixer is by Kevin MacLeod.

@@ -31,7 +31,7 @@
 #include <SDL/SDL.h>
 #define SCALE_MMX_SUPPORT
 
-void scalesmooth(SDL_Surface *src, SDL_Surface *dst);
+SDL_Surface* scalesmooth(SDL_Surface *surfobj2, SDL_Surface *surf, int width, int height);
 const char* get_smoothscale_backend();
 SDL_Surface * surf_flip (SDL_Surface* surf, int xaxis, int yaxis);
 
