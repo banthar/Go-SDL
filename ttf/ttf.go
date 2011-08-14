@@ -7,7 +7,9 @@ that work with loaded fonts are changed to have a more object-oriented feel.
 */
 package ttf
 
-// #include <SDL/SDL_ttf.h>
+// #cgo pkg-config: sdl
+// #cgo LDFLAGS: -lSDL_ttf
+// #include "SDL_ttf.h"
 import "C"
 import "sdl"
 import "unsafe"
@@ -39,6 +41,21 @@ func OpenFont(file string, ptsize int) *Font {
 	return &Font{cfont}
 }
 
+// Loads a font from an RWops at the specified point size.
+func OpenFontRW(rw *sdl.RWops, ac bool, ptsize int) *Font {
+	acArg := C.int(0)
+	if ac {
+		acArg = 1
+	}
+
+	cfont := C.TTF_OpenFontRW((*C.SDL_RWops)(unsafe.Pointer(rw)), acArg, C.int(ptsize))
+	if cfont == nil {
+		return nil
+	}
+
+	return &Font{cfont}
+}
+
 // Loads a font from a file containing multiple font faces at the specified
 // point size.
 func OpenFontIndex(file string, ptsize, index int) *Font {
@@ -46,6 +63,22 @@ func OpenFontIndex(file string, ptsize, index int) *Font {
 	cfont := C.TTF_OpenFontIndex(cfile, C.int(ptsize), C.long(index))
 	C.free(unsafe.Pointer(cfile))
 
+	if cfont == nil {
+		return nil
+	}
+
+	return &Font{cfont}
+}
+
+// Loads a font from an RWops containing multiple font faces at the specified
+// point size.
+func OpenFontIndexRW(rw *sdl.RWops, ac bool, ptsize int, i int64) *Font {
+	acArg := C.int(0)
+	if ac {
+		acArg = 1
+	}
+
+	cfont := C.TTF_OpenFontIndexRW((*C.SDL_RWops)(unsafe.Pointer(rw)), acArg, C.int(ptsize), C.long(i))
 	if cfont == nil {
 		return nil
 	}

@@ -91,8 +91,9 @@ func main() {
 	white := sdl.Color{255, 255, 255, 0}
 	text := ttf.RenderText_Blended(font, "Test (with music)", white)
 	music := mixer.LoadMUS("test.ogg")
+	sound := mixer.LoadWAV("sound.ogg")
 
-	if music == nil {
+	if music == nil || sound == nil {
 		panic(sdl.GetError())
 	}
 
@@ -115,19 +116,16 @@ func main() {
 	go worm(in, out, draw)
 
 	for running {
-
-		e := &sdl.Event{}
-
-		for e.Poll() {
-			switch e.Type {
-			case sdl.QUIT:
+		for ev := sdl.PollEvent(); ev != nil; ev = sdl.PollEvent() {
+			switch e := ev.(type) {
+			case *sdl.QuitEvent:
 				running = false
 				break
-			case sdl.KEYDOWN, sdl.KEYUP:
+			case *sdl.KeyboardEvent:
 				println("")
-				println(e.Keyboard().Keysym.Sym, ": ", sdl.GetKeyName(sdl.Key(e.Keyboard().Keysym.Sym)))
+				println(e.Keysym.Sym, ": ", sdl.GetKeyName(sdl.Key(e.Keysym.Sym)))
 
-				if e.Keyboard().Keysym.Sym == 27 {
+				if e.Keysym.Sym == 27 {
 					running = false
 				}
 
@@ -138,24 +136,24 @@ func main() {
 				}
 				println()
 
-				k := e.Keyboard()
+				fmt.Printf("Type: %02x Which: %02x State: %02x Pad: %02x\n", e.Type, e.Which, e.State, e.Pad0[0])
+				fmt.Printf("Scancode: %02x Sym: %08x Mod: %04x Unicode: %04x\n", e.Keysym.Scancode, e.Keysym.Sym, e.Keysym.Mod, e.Keysym.Unicode)
+			case *sdl.MouseButtonEvent:
+				if e.Type == sdl.MOUSEBUTTONDOWN {
+					println("Click:", e.X, e.Y)
+					in = out
+					out = make(chan Point)
+					go worm(in, out, draw)
+					sound.PlayChannel(-1, 0)
+				}
+			case *sdl.ResizeEvent:
+				println("resize screen ", e.W, e.H)
 
-				fmt.Printf("Type: %02x Which: %02x State: %02x Pad: %02x\n", k.Type, k.Which, k.State, k.Pad0[0])
-				fmt.Printf("Scancode: %02x Sym: %08x Mod: %04x Unicode: %04x\n", k.Keysym.Scancode, k.Keysym.Sym, k.Keysym.Mod, k.Keysym.Unicode)
-			case sdl.MOUSEBUTTONDOWN:
-				println("Click:", e.MouseButton().X, e.MouseButton().Y)
-				in = out
-				out = make(chan Point)
-				go worm(in, out, draw)
-			case sdl.VIDEORESIZE:
-				println("resize screen ", e.Resize().W, e.Resize().H)
-
-				screen = sdl.SetVideoMode(int(e.Resize().W), int(e.Resize().H), 32, sdl.RESIZABLE)
+				screen = sdl.SetVideoMode(int(e.W), int(e.H), 32, sdl.RESIZABLE)
 
 				if screen == nil {
 					panic(sdl.GetError())
 				}
-			default:
 			}
 		}
 

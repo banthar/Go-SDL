@@ -8,9 +8,15 @@ TARG=sdl/ttf
 
 GOFILES:=constants.go
 CGOFILES:=ttf.go
-CGO_CFLAGS:=-I /usr/local/include
+
+ifeq ($(GOOS),freebsd)
+CGO_CFLAGS:=-I/usr/local/include
 CGO_LDFLAGS:=-lSDL_ttf -L/usr/local/lib
+endif
 
 CLEANFILES+=ttf
+
+GC=${O}g -I../sdl/_obj
+LD=${O}l -L../sdl/_obj
 
 include $(GOROOT)/src/Make.pkg

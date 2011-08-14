@@ -175,7 +175,9 @@ type SysWMEvent struct {
 	Msg  *SysWMmsg
 }
 
-type Event struct {
+type Event interface{}
+
+type cevent struct {
 	Type uint8
 	Pad0 [19]byte
 }

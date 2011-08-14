@@ -7,7 +7,9 @@ functions have been changed to be in a more object-oriented style
 */
 package mixer
 
-// #include <SDL/SDL_mixer.h>
+// #cgo pkg-config: sdl
+// #cgo LDFLAGS: -lSDL_mixer
+// #include "SDL_mixer.h"
 import "C"
 import "unsafe"
 
@@ -56,7 +58,11 @@ func (m *Music) FadeInMusic(loops, ms int) int {
 }
 
 // Same as FadeInMusic, only with a specified position to start the music at.
+<<<<<<< HEAD
 func (m *Music) FadeInMusicPos(loops, ms int, position float64) int {
+=======
+func (m *Music) FadeInMusicPos(loops, ms int, position float32) int {
+>>>>>>> 431cd07b5149e29b97c9315b845a1108ee3af468
 	return int(C.Mix_FadeInMusicPos(m.cmusic, C.int(loops), C.int(ms),
 		C.double(position)))
 }
@@ -74,7 +80,11 @@ func ResumeMusic() { C.Mix_ResumeMusic() }
 func RewindMusic() { C.Mix_RewindMusic() }
 
 // Sets the position of the currently playing music.
+<<<<<<< HEAD
 func SetMusicPosition(position float64) int {
+=======
+func SetMusicPosition(position float32) int {
+>>>>>>> 431cd07b5149e29b97c9315b845a1108ee3af468
 	return int(C.Mix_SetMusicPosition(C.double(position)))
 }
 

@@ -13,4 +13,7 @@ CGO_LDFLAGS:=-lSDL_gfx -L/usr/local/lib
 CGO_CFLAGS+=-I/usr/include/SDL
 CLEANFILES+=gfx
 
+GC=${O}g -I../sdl/_obj
+LD=${O}l -L../sdl/_obj
+
 include $(GOROOT)/src/Make.pkg

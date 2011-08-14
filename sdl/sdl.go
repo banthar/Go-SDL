@@ -7,14 +7,16 @@ flavor (eg. Rather than sdl.Flip(surface) it's surface.Flip() )
 */
 package sdl
 
-
+// #cgo pkg-config: sdl
+// #cgo LDFLAGS: -lSDL_image
 // struct private_hwdata{};
 // struct SDL_BlitMap{};
 // #define map _map
 //
-// #include <SDL/SDL.h>
-// #include <SDL/SDL_image.h>
+// #include "SDL.h"
+// #include "SDL_image.h"
 // static void SetError(const char* description){SDL_SetError("%s",description);}
+<<<<<<< HEAD
 // static int __SDL_RWseek(SDL_RWops *ctx, int offset, int whence) { return SDL_RWseek(ctx, offset, whence); }
 // static int __SDL_RWtell(SDL_RWops *ctx) { return SDL_RWseek(ctx, 0, RW_SEEK_CUR); }
 // static int __SDL_RWread(SDL_RWops *ctx, void *ptr, int size, int n) { return SDL_RWread(ctx, ptr, size, n); }
@@ -24,6 +26,30 @@ package sdl
 import "C"
 import "unsafe"
 import "os"
+=======
+//
+// static int vectorLength(void** start)
+// {
+//     void **ptr=start;
+//     for(;*ptr!=NULL;ptr++);
+//
+//     return ptr-start;
+// }
+//
+// static int RWseek(SDL_RWops *rw, int os, int w){return SDL_RWseek(rw, os, w);}
+// static int RWread(SDL_RWops *rw, void *d, int size, int max){return SDL_RWread(rw, d, size, max);}
+// static int RWwrite(SDL_RWops *rw, void *d, int size, int num){return SDL_RWwrite(rw, d, size, num);}
+// static int RWclose(SDL_RWops *rw){return SDL_RWclose(rw);}
+// static int __SDL_SaveBMP(SDL_Surface *surface, const char *file) { return SDL_SaveBMP(surface, file); }
+import "C"
+import "unsafe"
+import "image"
+import "io"
+import "io/ioutil"
+import "os"
+import "fmt"
+import "reflect"
+>>>>>>> 431cd07b5149e29b97c9315b845a1108ee3af468
 
 type cast unsafe.Pointer
 
@@ -80,26 +106,30 @@ func VideoModeOK(width int, height int, bpp int, flags uint32) int {
 	return int(C.SDL_VideoModeOK(C.int(width), C.int(height), C.int(bpp), C.Uint32(flags)))
 }
 
-func ListModes(format *PixelFormat, flags uint32) []Rect {
+func ListModes(format *PixelFormat, flags uint32) []*Rect {
+
 	modes := C.SDL_ListModes((*C.SDL_PixelFormat)(cast(format)), C.Uint32(flags))
-	if modes == nil { //no modes available
-		return make([]Rect, 0)
-	}
-	var any int
-	*((***C.SDL_Rect)(unsafe.Pointer(&any))) = modes
-	if any == -1 { //any dimension is ok
-		return nil
+
+	if modes == nil { //modes == 0, no modes available
+		return make([]*Rect, 0)
 	}
 
+<<<<<<< HEAD
 	var count int
 	ptr := *modes //first element in the list
 	for count = 0; ptr != nil; count++ {
 		ptr = *(**C.SDL_Rect)(unsafe.Pointer(uintptr(unsafe.Pointer(modes)) + uintptr(count * int(unsafe.Sizeof(ptr)) )))
+=======
+	if ^uintptr(unsafe.Pointer(modes)) == 0 { //modes == -1, any dimension is ok
+		return nil
+>>>>>>> 431cd07b5149e29b97c9315b845a1108ee3af468
 	}
-	var ret = make([]Rect, count-1)
 
+	var ret = make([]*Rect, C.vectorLength((*unsafe.Pointer)(unsafe.Pointer(modes))))
 	*((***C.SDL_Rect)(unsafe.Pointer(&ret))) = modes // TODO
+
 	return ret
+
 }
 
 type VideoInfo struct {
@@ -203,7 +233,7 @@ func (screen *Surface) Lock() int {
 }
 
 // Unlocks a previously locked surface.
-func (screen *Surface) Unlock() int { return int(C.SDL_Flip((*C.SDL_Surface)(cast(screen)))) }
+func (screen *Surface) Unlock() { C.SDL_UnlockSurface((*C.SDL_Surface)(cast(screen))) }
 
 func (dst *Surface) Blit(dstrect *Rect, src *Surface, srcrect *Rect) int {
 	var ret = C.SDL_UpperBlit(
@@ -249,6 +279,61 @@ func (s *Surface) SetClipRect(r *Rect) {
 	return
 }
 
+<<<<<<< HEAD
+=======
+func (img *Surface) pixPtr(x, y int) reflect.Value {
+	imglen := int(img.W * img.H)
+	h := reflect.SliceHeader{
+		uintptr(unsafe.Pointer(img.Pixels)),
+		imglen,
+		imglen,
+	}
+
+	switch img.Format.BitsPerPixel {
+	case 8:
+		pix := &(*(*[]uint8)(unsafe.Pointer(&h)))[(y*int(img.W))+x]
+		return reflect.ValueOf(pix).Elem()
+	case 16:
+		pix := &(*(*[]uint16)(unsafe.Pointer(&h)))[(y*int(img.W))+x]
+		return reflect.ValueOf(pix).Elem()
+	case 32:
+		pix := &(*(*[]uint32)(unsafe.Pointer(&h)))[(y*int(img.W))+x]
+		return reflect.ValueOf(pix).Elem()
+	case 64:
+		pix := &(*(*[]uint64)(unsafe.Pointer(&h)))[(y*int(img.W))+x]
+		return reflect.ValueOf(pix).Elem()
+	}
+
+	panic(fmt.Errorf("Image has unexpected BPP: %v", img.Format.BitsPerPixel))
+}
+
+func (img *Surface) ColorModel() image.ColorModel {
+	// TODO: Properly handle various colormodels.
+	return image.RGBAColorModel
+}
+
+func (img *Surface) Bounds() image.Rectangle {
+	return image.Rect(0, 0, int(img.W), int(img.H))
+}
+
+func (img *Surface) At(x, y int) image.Color {
+	var r, g, b, a uint8
+	GetRGBA(uint32(img.pixPtr(x, y).Uint()), img.Format, &r, &g, &b, &a)
+
+	return img.ColorModel().Convert(image.RGBAColor{r, g, b, a})
+}
+
+func (img *Surface) Set(x, y int, c image.Color) {
+	img.Lock()
+	defer img.Unlock()
+
+	r, g, b, a := c.RGBA()
+
+	pix := img.pixPtr(x, y)
+	pix.SetUint(uint64(MapRGBA(img.Format, uint8(r), uint8(g), uint8(b), uint8(a))))
+}
+
+>>>>>>> 431cd07b5149e29b97c9315b845a1108ee3af468
 // Map a RGB color value to a pixel format.
 func MapRGB(format *PixelFormat, r, g, b uint8) uint32 {
 	return (uint32)(C.SDL_MapRGB((*C.SDL_PixelFormat)(cast(format)), (C.Uint8)(r), (C.Uint8)(g), (C.Uint8)(b)))
@@ -279,11 +364,67 @@ func Load(file string) *Surface {
 
 func (src *Surface) SaveBMP(file string) int {
 	cfile := C.CString(file)
+<<<<<<< HEAD
 	res := C.__SDL_SaveBMP( (*C.SDL_Surface)(cast(src)), cfile)
+=======
+	res := C.__SDL_SaveBMP((*C.SDL_Surface)(cast(src)), cfile)
+>>>>>>> 431cd07b5149e29b97c9315b845a1108ee3af468
 	C.free(unsafe.Pointer(cfile))
 	return int(res)
 }
 
+<<<<<<< HEAD
+=======
+// Loads Surface from RWops (using IMG_Load_RW).
+func Load_RW(rw *RWops, ac bool) *Surface {
+	acArg := C.int(0)
+	if ac {
+		acArg = 1
+	}
+
+	return (*Surface)(unsafe.Pointer(C.IMG_Load_RW((*C.SDL_RWops)(rw), acArg)))
+}
+
+// Loads Surface of type t from RWops (using IMG_LoadTyped_RW).
+func LoadTyped_RW(rw *RWops, ac bool, t string) *Surface {
+	ct := C.CString(t)
+	defer C.free(unsafe.Pointer(ct))
+
+	acArg := C.int(0)
+	if ac {
+		acArg = 1
+	}
+
+	return (*Surface)(unsafe.Pointer(C.IMG_LoadTyped_RW((*C.SDL_RWops)(rw), acArg, ct)))
+}
+
+// Create new sdl.Surface from image.NRGBA
+func CreateSurfaceFromImageNRGBA(img *image.NRGBA) *Surface {
+
+	surface := CreateRGBSurface(SWSURFACE, img.Rect.Dx(), img.Rect.Dy(), 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
+
+	surface.Lock()
+	C.memcpy(unsafe.Pointer(surface.Pixels), unsafe.Pointer(&img.Pix[0]), C.size_t(surface.W*surface.H*4))
+	surface.Unlock()
+
+	return surface
+}
+
+// Create new sdl.Surface from image.RGBA
+func CreateSurfaceFromImageRGBA(img *image.RGBA) *Surface {
+
+	//TODO convert to NRGBA ?
+
+	surface := CreateRGBSurface(SWSURFACE, img.Rect.Dx(), img.Rect.Dy(), 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
+
+	surface.Lock()
+	C.memcpy(unsafe.Pointer(surface.Pixels), unsafe.Pointer(&img.Pix[0]), C.size_t(surface.W*surface.H*4))
+	surface.Unlock()
+
+	return surface
+}
+
+>>>>>>> 431cd07b5149e29b97c9315b845a1108ee3af468
 // Creates an empty Surface.
 func CreateRGBSurface(flags uint32, width int, height int, bpp int, Rmask uint32, Gmask uint32, Bmask uint32, Amask uint32) *Surface {
 	p := C.SDL_CreateRGBSurface(C.Uint32(flags), C.int(width), C.int(height), C.int(bpp),
@@ -294,6 +435,12 @@ func CreateRGBSurface(flags uint32, width int, height int, bpp int, Rmask uint32
 // Converts a surface to the display format
 func DisplayFormat(src *Surface) *Surface {
 	p := C.SDL_DisplayFormat( (*C.SDL_Surface)(cast(src)) )
+	return (*Surface)(cast(p))
+}
+
+// Converts a surface to the display format with alpha
+func DisplayFormatAlpha(src *Surface) *Surface {
+	p := C.SDL_DisplayFormatAlpha((*C.SDL_Surface)(cast(src)))
 	return (*Surface)(cast(p))
 }
 
@@ -366,8 +513,20 @@ func GetKeyName(key Key) string { return C.GoString(C.SDL_GetKeyName(C.SDLKey(ke
 // Events
 
 // Waits indefinitely for the next available event
-func (event *Event) Wait() bool {
-	var ret = C.SDL_WaitEvent((*C.SDL_Event)(cast(event)))
+func WaitEvent() Event {
+	var cev C.SDL_Event
+	ret := C.SDL_WaitEvent(&cev)
+	if ret == 0 {
+		return nil
+	}
+
+	return goEvent((*cevent)(cast(&cev)))
+}
+
+// Push the event onto the event queue
+func PushEvent(event Event) bool {
+	ret := C.SDL_PushEvent((*C.SDL_Event)(cast(cEvent(event))))
+
 	return ret != 0
 }
 
@@ -378,54 +537,52 @@ func (event *Event) Push() bool {
 }
 
 // Polls for currently pending events
-func (event *Event) Poll() bool {
-	var ret = C.SDL_PollEvent((*C.SDL_Event)(cast(event)))
-	return ret != 0
-}
-
-// Returns KeyboardEvent or nil if event has other type
-func (event *Event) Keyboard() *KeyboardEvent {
-	if event.Type == KEYUP || event.Type == KEYDOWN {
-		return (*KeyboardEvent)(cast(event))
+func PollEvent() Event {
+	var cev C.SDL_Event
+	ret := C.SDL_PollEvent(&cev)
+	if ret == 0 {
+		return nil
 	}
 
-	return nil
+	return goEvent((*cevent)(cast(&cev)))
 }
 
-// Returns MouseButtonEvent or nil if event has other type
-func (event *Event) MouseButton() *MouseButtonEvent {
-	if event.Type == MOUSEBUTTONDOWN || event.Type == MOUSEBUTTONUP {
-		return (*MouseButtonEvent)(cast(event))
+func goEvent(cev *cevent) Event {
+	switch cev.Type {
+	case ACTIVEEVENT:
+		return (*ActiveEvent)(cast(cev))
+	case KEYUP, KEYDOWN:
+		return (*KeyboardEvent)(cast(cev))
+	case MOUSEMOTION:
+		return (*MouseMotionEvent)(cast(cev))
+	case MOUSEBUTTONUP, MOUSEBUTTONDOWN:
+		return (*MouseButtonEvent)(cast(cev))
+	case JOYAXISMOTION:
+		return (*JoyAxisEvent)(cast(cev))
+	case JOYBALLMOTION:
+		return (*JoyBallEvent)(cast(cev))
+	case JOYHATMOTION:
+		return (*JoyHatEvent)(cast(cev))
+	case JOYBUTTONUP, JOYBUTTONDOWN:
+		return (*JoyButtonEvent)(cast(cev))
+	case VIDEORESIZE:
+		return (*ResizeEvent)(cast(cev))
+	case VIDEOEXPOSE:
+		return (*ExposeEvent)(cast(cev))
+	case QUIT:
+		return (*QuitEvent)(cast(cev))
+	case USEREVENT:
+		return (*UserEvent)(cast(cev))
+	case SYSWMEVENT:
+		return (*SysWMEvent)(cast(cev))
 	}
 
-	return nil
+	panic(fmt.Errorf("Unknown event type: %v", cev.Type))
 }
 
-// Returns MouseMotion or nil if event has other type
-func (event *Event) MouseMotion() *MouseMotionEvent {
-	if event.Type == MOUSEMOTION {
-		return (*MouseMotionEvent)(cast(event))
-	}
-
-	return nil
-}
-
-// Returns ActiveEvent or nil if event has other type
-func (event *Event) Active() *ActiveEvent {
-	if event.Type == ACTIVEEVENT {
-		return (*ActiveEvent)(cast(event))
-	}
-
-	return nil
-}
-
-// Returns ResizeEvent or nil if event has other type
-func (event *Event) Resize() *ResizeEvent {
-	if event.Type == VIDEORESIZE {
-		return (*ResizeEvent)(cast(event))
-	}
-
-	return nil
+func cEvent(ev Event) *cevent {
+	evv := reflect.ValueOf(ev)
+	return (*cevent)(cast(evv.UnsafeAddr()))
 }
 
 // Time
@@ -433,6 +590,130 @@ func (event *Event) Resize() *ResizeEvent {
 // Gets the number of milliseconds since the SDL library initialization.
 func GetTicks() uint32 { return uint32(C.SDL_GetTicks()) }
 
+// Waits a specified number of milliseconds before returning.
+func Delay(ms uint32) { C.SDL_Delay(C.Uint32(ms)) }
+
+func ShowCursor(toggle int) int {
+	return int(C.SDL_ShowCursor(C.int(toggle)))
+}
+
+type RWops C.SDL_RWops
+
+func AllocRW() *RWops {
+	return (*RWops)(C.SDL_AllocRW())
+}
+
+func (rw *RWops) Free() {
+	C.SDL_FreeRW((*C.SDL_RWops)(rw))
+}
+
+func RWFromMem(m []byte) *RWops {
+	return (*RWops)(C.SDL_RWFromMem(unsafe.Pointer(&m[0]), C.int(len(m))))
+}
+
+func RWFromConstMem(m []byte) *RWops {
+	return (*RWops)(C.SDL_RWFromConstMem(unsafe.Pointer(&m[0]), C.int(len(m))))
+}
+
+func RWFromReader(r io.Reader) *RWops {
+	data, err := ioutil.ReadAll(r)
+	if err != nil {
+		SetError(err.String())
+		return nil
+	}
+
+	return RWFromConstMem(data)
+}
+
+func modeFromFlags(flag int) *C.char {
+	switch flag {
+	case os.O_RDONLY:
+		return C.CString("r")
+	case os.O_WRONLY | os.O_CREATE:
+		return C.CString("w")
+	case os.O_WRONLY | os.O_APPEND | os.O_CREATE:
+		return C.CString("a")
+	case os.O_RDWR:
+		return C.CString("r+")
+	case os.O_RDWR | os.O_CREATE:
+		return C.CString("w+")
+	case os.O_RDWR | os.O_APPEND | os.O_CREATE:
+		return C.CString("a+")
+	default:
+		SetError("Unkown mode.")
+		return nil
+	}
+
+	SetError("Congratulations on getting this error...")
+	return nil
+}
+
+func RWFromFile(file string, mode int) *RWops {
+	cfile := C.CString(file)
+	defer C.free(unsafe.Pointer(cfile))
+
+	cmode := modeFromFlags(mode)
+	if cmode == nil {
+		return nil
+	}
+	defer C.free(unsafe.Pointer(cmode))
+
+	return (*RWops)(C.SDL_RWFromFile(cfile, cmode))
+}
+
+// Causes 'SIGNONE: no trap'. Not sure why...
+func RWFromFP(fp *os.File, ac bool) *RWops {
+	acArg := C.int(0)
+	if ac {
+		acArg = 1
+	}
+
+	cmode := C.CString("r+") // Doesn't really matter, anyways. I hope.
+	defer C.free(unsafe.Pointer(cmode))
+	cfp := C.fdopen(C.int(fp.Fd()), cmode)
+
+	return (*RWops)(C.SDL_RWFromFP(cfp, acArg))
+}
+
+func (rw *RWops) Tell() int64 {
+	cur, err := rw.Seek(0, 1)
+	if err != nil {
+		SetError(err.String())
+		return -1
+	}
+
+	return cur
+}
+
+func (rw *RWops) Length() int64 {
+	cur := rw.Tell()
+	if cur < 0 {
+		return -1
+	}
+
+	eof, err := rw.Seek(0, 2)
+	if err != nil {
+		SetError(err.String())
+		return -1
+	}
+
+	rw.Seek(cur, 0)
+
+	return eof
+}
+
+func (rw *RWops) EOF() bool {
+	cur := rw.Tell()
+	eof := rw.Length()
+	if (cur < 0) || (eof < 0) {
+		panic(GetError())
+	}
+
+	if eof <= cur {
+		return true
+	}
+
+<<<<<<< HEAD
 // Waits a specified number of milliseconds before returning.
 func Delay(ms uint32) { C.SDL_Delay(C.Uint32(ms)) }
 
@@ -542,3 +823,55 @@ func Has3DNowExt() bool { return C.SDL_Has3DNowExt() != 0 }
 func HasSSE() bool { return C.SDL_HasSSE() != 0 }
 func HasSSE2() bool { return C.SDL_HasSSE2() != 0 }
 func HasAltiVec() bool { return C.SDL_HasAltiVec() != 0 }
+=======
+	return false
+}
+
+func (rw *RWops) Seek(offset int64, whence int) (int64, os.Error) {
+	var w C.int
+	switch whence {
+	case 0:
+		w = C.SEEK_SET
+	case 1:
+		w = C.SEEK_CUR
+	case 2:
+		w = C.SEEK_END
+	default:
+		return offset, os.NewError("Bad whence.")
+	}
+
+	return int64(C.RWseek((*C.SDL_RWops)(rw), C.int(offset), w)), nil
+}
+
+func (rw *RWops) Read(buf []byte) (n int, err os.Error) {
+	n = int(C.RWread((*C.SDL_RWops)(rw), unsafe.Pointer(&buf[0]), 1, C.int(len(buf))))
+
+	if rw.EOF() {
+		err = os.EOF
+	}
+
+	if n < 0 {
+		err = os.NewError(GetError())
+	}
+
+	return n, nil
+}
+
+func (rw *RWops) Write(buf []byte) (n int, err os.Error) {
+	n = int(C.RWwrite((*C.SDL_RWops)(rw), unsafe.Pointer(&buf[0]), 1, C.int(len(buf))))
+
+	if n < 0 {
+		err = os.NewError(GetError())
+	}
+
+	return n, err
+}
+
+func (rw *RWops) Close() os.Error {
+	if int(C.RWclose((*C.SDL_RWops)(rw))) != 0 {
+		return os.NewError(GetError())
+	}
+
+	return nil
+}
+>>>>>>> 431cd07b5149e29b97c9315b845a1108ee3af468
