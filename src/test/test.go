@@ -6,6 +6,8 @@ import (
 	"sdl/mixer"
 	"math"
 	"fmt"
+	"path/filepath"
+	"os"
 )
 
 type Point struct {
@@ -40,6 +42,12 @@ func worm(in <-chan Point, out chan<- Point, draw chan<- Point) {
 	}
 }
 
+func data_path(file string) string {
+
+    dir, _ := filepath.Split(os.Args[0])
+    println(dir)
+    return filepath.Join(dir, "..", "src", "test", file)
+}
 func main() {
 
 	if sdl.Init(sdl.INIT_EVERYTHING) != 0 {
@@ -71,7 +79,7 @@ func main() {
 
 	sdl.WM_SetCaption("Go-SDL SDL Test", "")
 
-	image := sdl.Load("test.png")
+	image := sdl.Load(data_path("test.png"))
 
 	if image == nil {
 		panic(sdl.GetError())
@@ -81,7 +89,7 @@ func main() {
 
 	running := true
 
-	font := ttf.OpenFont("Fontin Sans.otf", 72)
+	font := ttf.OpenFont(data_path("Fontin Sans.otf"), 72)
 
 	if font == nil {
 		panic(sdl.GetError())
@@ -90,8 +98,8 @@ func main() {
 	font.SetStyle(ttf.STYLE_UNDERLINE)
 	white := sdl.Color{255, 255, 255, 0}
 	text := ttf.RenderText_Blended(font, "Test (with music)", white)
-	music := mixer.LoadMUS("test.ogg")
-	sound := mixer.LoadWAV("sound.ogg")
+	music := mixer.LoadMUS(data_path("test.ogg"))
+	sound := mixer.LoadWAV(data_path("sound.ogg"))
 
 	if music == nil || sound == nil {
 		panic(sdl.GetError())
