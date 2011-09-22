@@ -403,6 +403,23 @@ func CreateRGBSurface(flags uint32, width int, height int, bpp int, Rmask uint32
 	return (*Surface)(cast(p))
 }
 
+// Creates a Surface from existing pixel data. It expects pix to be a slice, array, or pointer.
+func CreateRGBSurfaceFrom(pix interface{}, w, h, d, p int, rm, gm, bm, am uint32) *Surface {
+	var ptr unsafe.Pointer
+	switch v := reflect.ValueOf(pix); v.Kind() {
+		case reflect.Array:
+			ptr = unsafe.Pointer(v.Index(0).UnsafeAddr())
+		case reflect.Ptr, reflect.UnsafePointer, reflect.Slice:
+			ptr = unsafe.Pointer(v.Pointer())
+		default:
+			panic("Don't know how to handle type: " + v.Kind().String())
+	}
+
+	s := C.SDL_CreateRGBSurfaceFrom(ptr, C.int(w), C.int(h), C.int(d), C.int(p), C.Uint32(rm), C.Uint32(gm), C.Uint32(bm), C.Uint32(am))
+
+	return (*Surface)(cast(s))
+}
+
 // Converts a surface to the display format
 func DisplayFormat(src *Surface) *Surface {
 	p := C.SDL_DisplayFormat((*C.SDL_Surface)(cast(src)))
