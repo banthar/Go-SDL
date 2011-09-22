@@ -33,6 +33,7 @@ package sdl
 import "C"
 import "unsafe"
 import "image"
+import "image/draw"
 import "io"
 import "io/ioutil"
 import "os"
@@ -370,30 +371,29 @@ func LoadTyped_RW(rw *RWops, ac bool, t string) *Surface {
 	return (*Surface)(unsafe.Pointer(C.IMG_LoadTyped_RW((*C.SDL_RWops)(rw), acArg, ct)))
 }
 
-// Create new sdl.Surface from image.NRGBA
-func CreateSurfaceFromImageNRGBA(img *image.NRGBA) *Surface {
+// Create new sdl.Surface from image.Image
+func CreateSurfaceFromImage(img image.Image) *Surface {
+	r := img.Bounds()
 
-	surface := CreateRGBSurface(SWSURFACE, img.Rect.Dx(), img.Rect.Dy(), 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
+	var pix []uint8
+	switch c := img.(type) {
+	case *image.NRGBA:
+		pix = c.Pix
+	case *image.RGBA:
+		pix = c.Pix
+	default:
+		nrgba := image.NewNRGBA(r)
+		draw.Draw(nrgba, r, img, image.ZP, draw.Over)
+		pix = nrgba.Pix
+	}
 
-	surface.Lock()
-	C.memcpy(unsafe.Pointer(surface.Pixels), unsafe.Pointer(&img.Pix[0]), C.size_t(surface.W*surface.H*4))
-	surface.Unlock()
+	s := CreateRGBSurface(SWSURFACE, r.Dx(), r.Dy(), 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
 
-	return surface
-}
+	s.Lock()
+	defer s.Unlock()
+	C.memcpy(unsafe.Pointer(s.Pixels), unsafe.Pointer(&pix[0]), C.size_t(len(pix) * 4))
 
-// Create new sdl.Surface from image.RGBA
-func CreateSurfaceFromImageRGBA(img *image.RGBA) *Surface {
-
-	//TODO convert to NRGBA ?
-
-	surface := CreateRGBSurface(SWSURFACE, img.Rect.Dx(), img.Rect.Dy(), 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
-
-	surface.Lock()
-	C.memcpy(unsafe.Pointer(surface.Pixels), unsafe.Pointer(&img.Pix[0]), C.size_t(surface.W*surface.H*4))
-	surface.Unlock()
-
-	return surface
+	return s
 }
 
 // Creates an empty Surface.
