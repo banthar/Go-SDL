@@ -51,7 +51,6 @@ func (c *Chunk) PlayChannel(channel, loops int) int {
 	return c.PlayChannelTimed(channel, loops, -1)
 }
 
-
 //If the sample is long enough and has enough loops then the sample will stop after ticks milliseconds. 
 //Otherwise this function is the same as chunk.PlayChannel()
 //Returns: the channel the sample is played on. On any errors, -1 is returned
@@ -74,7 +73,6 @@ func (c *Chunk) FadeInChannel(channel, loops, ms int) int {
 func (c *Chunk) FadeInChannelTimed(channel, loops, ms, ticks int) int {
 	return int(C.Mix_FadeInChannelTimed(C.int(channel), c.cchunk, C.int(loops), C.int(ms), C.int(ticks)))
 }
-
 
 //Returns: Pointer to the Mix Chunk. nil is returned if the channel is not allocated, or
 //if the channel has not played any samples yet
