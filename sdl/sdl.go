@@ -33,6 +33,7 @@ package sdl
 import "C"
 import "unsafe"
 import "image"
+import "image/draw"
 import "io"
 import "io/ioutil"
 import "os"
@@ -370,30 +371,25 @@ func LoadTyped_RW(rw *RWops, ac bool, t string) *Surface {
 	return (*Surface)(unsafe.Pointer(C.IMG_LoadTyped_RW((*C.SDL_RWops)(rw), acArg, ct)))
 }
 
-// Create new sdl.Surface from image.NRGBA
-func CreateSurfaceFromImageNRGBA(img *image.NRGBA) *Surface {
+// Create new sdl.Surface from image.Image
+func CreateSurfaceFromImage(img image.Image) *Surface {
+	r := img.Bounds()
 
-	surface := CreateRGBSurface(SWSURFACE, img.Rect.Dx(), img.Rect.Dy(), 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
+	var pix []uint8
+	switch c := img.(type) {
+	case *image.NRGBA:
+		pix = c.Pix
+	case *image.RGBA:
+		pix = c.Pix
+	default:
+		nrgba := image.NewNRGBA(r)
+		draw.Draw(nrgba, r, img, image.ZP, draw.Over)
+		pix = nrgba.Pix
+	}
 
-	surface.Lock()
-	C.memcpy(unsafe.Pointer(surface.Pixels), unsafe.Pointer(&img.Pix[0]), C.size_t(surface.W*surface.H*4))
-	surface.Unlock()
+	s := CreateRGBSurfaceFrom(&pix[0], r.Dx(), r.Dy(), 32, r.Dx()*4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
 
-	return surface
-}
-
-// Create new sdl.Surface from image.RGBA
-func CreateSurfaceFromImageRGBA(img *image.RGBA) *Surface {
-
-	//TODO convert to NRGBA ?
-
-	surface := CreateRGBSurface(SWSURFACE, img.Rect.Dx(), img.Rect.Dy(), 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
-
-	surface.Lock()
-	C.memcpy(unsafe.Pointer(surface.Pixels), unsafe.Pointer(&img.Pix[0]), C.size_t(surface.W*surface.H*4))
-	surface.Unlock()
-
-	return surface
+	return s
 }
 
 // Creates an empty Surface.
@@ -401,6 +397,21 @@ func CreateRGBSurface(flags uint32, width int, height int, bpp int, Rmask uint32
 	p := C.SDL_CreateRGBSurface(C.Uint32(flags), C.int(width), C.int(height), C.int(bpp),
 		C.Uint32(Rmask), C.Uint32(Gmask), C.Uint32(Bmask), C.Uint32(Amask))
 	return (*Surface)(cast(p))
+}
+
+// Creates a Surface from existing pixel data. It expects pix to be a slice, array, or pointer.
+func CreateRGBSurfaceFrom(pix interface{}, w, h, d, p int, rm, gm, bm, am uint32) *Surface {
+	var ptr unsafe.Pointer
+	switch v := reflect.ValueOf(pix); v.Kind() {
+	case reflect.Ptr, reflect.UnsafePointer, reflect.Slice:
+		ptr = unsafe.Pointer(v.Pointer())
+	default:
+		panic("Don't know how to handle type: " + v.Kind().String())
+	}
+
+	s := C.SDL_CreateRGBSurfaceFrom(ptr, C.int(w), C.int(h), C.int(d), C.int(p), C.Uint32(rm), C.Uint32(gm), C.Uint32(bm), C.Uint32(am))
+
+	return (*Surface)(cast(s))
 }
 
 // Converts a surface to the display format

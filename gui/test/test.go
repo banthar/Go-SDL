@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	win, err := sdlgui.NewWindow(320, 240, 32, sdl.DOUBLEBUF | sdl.RESIZABLE)
+	win, err := sdlgui.NewWindow(320, 240, 32, sdl.DOUBLEBUF|sdl.RESIZABLE)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
