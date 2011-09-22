@@ -87,7 +87,6 @@ func HaltMusic() { C.Mix_HaltMusic() }
 // the fade out is completed.
 func FadeOutMusic(ms int) int { return int(C.Mix_FadeOutMusic(C.int(ms))) }
 
-
 // Returns the type of the currently playing music.
 func GetMusicType() int { return int(C.Mix_GetMusicType(nil)) }
 

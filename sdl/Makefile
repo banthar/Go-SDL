@@ -14,3 +14,6 @@ include $(GOROOT)/src/Make.pkg
 constants.go: constants.c
 	godefs -g sdl constants.c > constants.go
 	gofmt -w constants.go
+
+fmt:
+	gofmt -w $(wildcard *.go)

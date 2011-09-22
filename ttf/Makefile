@@ -20,3 +20,6 @@ GC=${O}g -I../sdl/_obj
 LD=${O}l -L../sdl/_obj
 
 include $(GOROOT)/src/Make.pkg
+
+fmt:
+	gofmt -w $(wildcard *.go)
