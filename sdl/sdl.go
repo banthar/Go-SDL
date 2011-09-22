@@ -402,9 +402,7 @@ func CreateRGBSurface(flags uint32, width int, height int, bpp int, Rmask uint32
 // Creates a Surface from existing pixel data. It expects pix to be a slice, array, or pointer.
 func CreateRGBSurfaceFrom(pix interface{}, w, h, d, p int, rm, gm, bm, am uint32) *Surface {
 	var ptr unsafe.Pointer
-	switch v := reflect.Indirect(reflect.ValueOf(pix)); v.Kind() {
-	case reflect.Array:
-		ptr = unsafe.Pointer(v.Index(0).UnsafeAddr())
+	switch v := reflect.ValueOf(pix); v.Kind() {
 	case reflect.Ptr, reflect.UnsafePointer, reflect.Slice:
 		ptr = unsafe.Pointer(v.Pointer())
 	default:
