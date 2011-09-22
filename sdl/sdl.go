@@ -387,7 +387,7 @@ func CreateSurfaceFromImage(img image.Image) *Surface {
 		pix = nrgba.Pix
 	}
 
-	s := CreateRGBSurfaceFrom(&pix[0], r.Dx(), r.Dy(), 32, r.Dx() * 4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
+	s := CreateRGBSurfaceFrom(&pix[0], r.Dx(), r.Dy(), 32, r.Dx()*4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
 
 	return s
 }
@@ -403,12 +403,12 @@ func CreateRGBSurface(flags uint32, width int, height int, bpp int, Rmask uint32
 func CreateRGBSurfaceFrom(pix interface{}, w, h, d, p int, rm, gm, bm, am uint32) *Surface {
 	var ptr unsafe.Pointer
 	switch v := reflect.ValueOf(pix); v.Kind() {
-		case reflect.Array:
-			ptr = unsafe.Pointer(v.Index(0).UnsafeAddr())
-		case reflect.Ptr, reflect.UnsafePointer, reflect.Slice:
-			ptr = unsafe.Pointer(v.Pointer())
-		default:
-			panic("Don't know how to handle type: " + v.Kind().String())
+	case reflect.Array:
+		ptr = unsafe.Pointer(v.Index(0).UnsafeAddr())
+	case reflect.Ptr, reflect.UnsafePointer, reflect.Slice:
+		ptr = unsafe.Pointer(v.Pointer())
+	default:
+		panic("Don't know how to handle type: " + v.Kind().String())
 	}
 
 	s := C.SDL_CreateRGBSurfaceFrom(ptr, C.int(w), C.int(h), C.int(d), C.int(p), C.Uint32(rm), C.Uint32(gm), C.Uint32(bm), C.Uint32(am))
