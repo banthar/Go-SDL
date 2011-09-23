@@ -387,7 +387,11 @@ func CreateSurfaceFromImage(img image.Image) *Surface {
 		pix = nrgba.Pix
 	}
 
-	s := CreateRGBSurfaceFrom(&pix[0], r.Dx(), r.Dy(), 32, r.Dx()*4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
+	s := CreateRGBSurface(SWSURFACE, r.Dx(), r.Dy(), 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
+
+	s.Lock()
+	defer s.Unlock()
+	C.memcpy(unsafe.Pointer(s.Pixels), unsafe.Pointer(&pix[0]), C.size_t(len(pix)))
 
 	return s
 }
