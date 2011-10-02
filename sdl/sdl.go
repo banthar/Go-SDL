@@ -383,7 +383,7 @@ func CreateSurfaceFromImage(img image.Image) *Surface {
 		pix = c.Pix
 	default:
 		nrgba := image.NewNRGBA(r)
-		draw.Draw(nrgba, r, img, image.ZP, draw.Over)
+		draw.Draw(nrgba, r, img, image.ZP, draw.Src)
 		pix = nrgba.Pix
 	}
 
