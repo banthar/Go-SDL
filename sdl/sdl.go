@@ -62,13 +62,13 @@ func WasInit(flags uint32) int { return int(C.SDL_WasInit(C.Uint32(flags))) }
 // Error Handling
 
 // Gets SDL error string
-func GetError() string { return C.GoString(C.SDL_GetError()) }
+func GetError() os.Error { return os.NewError(C.GoString(C.SDL_GetError())) }
 
 // Set a string describing an error to be submitted to the SDL Error system.
-func SetError(description string) {
-	cdescription := C.CString(description)
+func SetError(description os.Error) {
+	cdescription := C.CString(description.String())
+	defer C.free(unsafe.Pointer(cdescription))
 	C.SetError(cdescription)
-	C.free(unsafe.Pointer(cdescription))
 }
 
 // TODO SDL_Error
@@ -592,7 +592,7 @@ func RWFromConstMem(m []byte) *RWops {
 func RWFromReader(r io.Reader) *RWops {
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
-		SetError(err.String())
+		SetError(err)
 		return nil
 	}
 
@@ -614,11 +614,11 @@ func modeFromFlags(flag int) *C.char {
 	case os.O_RDWR | os.O_APPEND | os.O_CREATE:
 		return C.CString("a+")
 	default:
-		SetError("Unkown mode.")
+		SetError(os.NewError("Unknown mode."))
 		return nil
 	}
 
-	SetError("Congratulations on getting this error...")
+	SetError(os.NewError("Congratulations on getting this error..."))
 	return nil
 }
 
@@ -652,7 +652,7 @@ func RWFromFP(fp *os.File, ac bool) *RWops {
 func (rw *RWops) Tell() int64 {
 	cur, err := rw.Seek(0, 1)
 	if err != nil {
-		SetError(err.String())
+		SetError(err)
 		return -1
 	}
 
@@ -667,7 +667,7 @@ func (rw *RWops) Length() int64 {
 
 	eof, err := rw.Seek(0, 2)
 	if err != nil {
-		SetError(err.String())
+		SetError(err)
 		return -1
 	}
 
@@ -714,7 +714,7 @@ func (rw *RWops) Read(buf []byte) (n int, err os.Error) {
 	}
 
 	if n < 0 {
-		err = os.NewError(GetError())
+		err = GetError()
 	}
 
 	return n, nil
@@ -724,7 +724,7 @@ func (rw *RWops) Write(buf []byte) (n int, err os.Error) {
 	n = int(C.RWwrite((*C.SDL_RWops)(rw), unsafe.Pointer(&buf[0]), 1, C.int(len(buf))))
 
 	if n < 0 {
-		err = os.NewError(GetError())
+		err = GetError()
 	}
 
 	return n, err
@@ -732,7 +732,7 @@ func (rw *RWops) Write(buf []byte) (n int, err os.Error) {
 
 func (rw *RWops) Close() os.Error {
 	if int(C.RWclose((*C.SDL_RWops)(rw))) != 0 {
-		return os.NewError(GetError())
+		return GetError()
 	}
 
 	return nil
