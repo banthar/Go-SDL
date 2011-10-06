@@ -191,3 +191,5 @@ type Keysym struct {
 	Mod      uint32
 	Unicode  uint16
 }
+
+type Joystick [0]byte

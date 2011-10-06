@@ -490,6 +490,82 @@ func SetModState(modstate Mod) { C.SDL_SetModState(C.SDLMod(modstate)) }
 // Gets the name of an SDL virtual keysym
 func GetKeyName(key Key) string { return C.GoString(C.SDL_GetKeyName(C.SDLKey(key))) }
 
+func JoystickEventState(flag int) int {
+	return int(C.SDL_JoystickEventState(C.int(flag)))
+}
+
+func NumJoysticks() int {
+	return int(C.SDL_NumJoysticks())
+}
+
+func JoystickName(n int) string {
+	return C.GoString(C.SDL_JoystickName(C.int(n)))
+}
+
+func JoystickOpen(n int) *Joystick {
+	return (*Joystick)(unsafe.Pointer(C.SDL_JoystickOpen(C.int(n))))
+}
+
+func JoystickOpened(n int) bool {
+	return C.SDL_JoystickOpened(C.int(n)) != 0
+}
+
+func (j *Joystick)Index() int {
+	return int(C.SDL_JoystickIndex((*C.SDL_Joystick)(unsafe.Pointer(j))))
+}
+
+func (j *Joystick)NumAxes() int {
+	return int(C.SDL_JoystickNumAxes((*C.SDL_Joystick)(unsafe.Pointer(j))))
+}
+
+func (j *Joystick)NumBalls() int {
+	return int(C.SDL_JoystickNumBalls((*C.SDL_Joystick)(unsafe.Pointer(j))))
+}
+
+func (j *Joystick)NumHats() int {
+	return int(C.SDL_JoystickNumHats((*C.SDL_Joystick)(unsafe.Pointer(j))))
+}
+
+func (j *Joystick)NumButtons() int {
+	return int(C.SDL_JoystickNumButtons((*C.SDL_Joystick)(unsafe.Pointer(j))))
+}
+
+func JoystickUpdate() {
+	C.SDL_JoystickUpdate()
+}
+
+func (j *Joystick)GetAxis(n int) int16 {
+	return int16(C.SDL_JoystickGetAxis((*C.SDL_Joystick)(unsafe.Pointer(j)), C.int(n)))
+}
+
+func (j *Joystick)GetHat(n int) int8 {
+	return int8(C.SDL_JoystickGetHat((*C.SDL_Joystick)(unsafe.Pointer(j)), C.int(n)))
+}
+
+func (j *Joystick)GetButton(n int) bool {
+	return C.SDL_JoystickGetButton((*C.SDL_Joystick)(unsafe.Pointer(j)), C.int(n)) != 0
+}
+
+func (j *Joystick)GetBall(n int) (dx, dy int) {
+	ret := C.SDL_JoystickGetBall((*C.SDL_Joystick)(unsafe.Pointer(j)),
+		C.int(n),
+		(*C.int)(unsafe.Pointer(&dx)),
+		(*C.int)(unsafe.Pointer(&dy)),
+	)
+
+	if ret < 0 {
+		dx, dy = -1, -1
+	}
+
+	return
+}
+
+func (j *Joystick)Close() os.Error {
+	C.SDL_JoystickClose((*C.SDL_Joystick)(unsafe.Pointer(j)))
+
+	return nil
+}
+
 // Events
 
 // Waits indefinitely for the next available event
