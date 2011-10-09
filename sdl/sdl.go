@@ -62,11 +62,11 @@ func WasInit(flags uint32) int { return int(C.SDL_WasInit(C.Uint32(flags))) }
 // Error Handling
 
 // Gets SDL error string
-func GetError() os.Error { return os.NewError(C.GoString(C.SDL_GetError())) }
+func GetError() string { return C.GoString(C.SDL_GetError()) }
 
 // Set a string describing an error to be submitted to the SDL Error system.
-func SetError(description os.Error) {
-	cdescription := C.CString(description.String())
+func SetError(description string) {
+	cdescription := C.CString(description)
 	defer C.free(unsafe.Pointer(cdescription))
 	C.SetError(cdescription)
 }
@@ -668,7 +668,7 @@ func RWFromConstMem(m []byte) *RWops {
 func RWFromReader(r io.Reader) *RWops {
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
-		SetError(err)
+		SetError(err.String())
 		return nil
 	}
 
@@ -689,12 +689,9 @@ func modeFromFlags(flag int) *C.char {
 		return C.CString("w+")
 	case os.O_RDWR | os.O_APPEND | os.O_CREATE:
 		return C.CString("a+")
-	default:
-		SetError(os.NewError("Unknown mode."))
-		return nil
 	}
 
-	SetError(os.NewError("Congratulations on getting this error..."))
+	SetError("Unknown mode.")
 	return nil
 }
 
@@ -728,7 +725,7 @@ func RWFromFP(fp *os.File, ac bool) *RWops {
 func (rw *RWops) Tell() int64 {
 	cur, err := rw.Seek(0, 1)
 	if err != nil {
-		SetError(err)
+		SetError(err.String())
 		return -1
 	}
 
@@ -743,7 +740,7 @@ func (rw *RWops) Length() int64 {
 
 	eof, err := rw.Seek(0, 2)
 	if err != nil {
-		SetError(err)
+		SetError(err.String())
 		return -1
 	}
 
@@ -790,25 +787,27 @@ func (rw *RWops) Read(buf []byte) (n int, err os.Error) {
 	}
 
 	if n < 0 {
-		err = GetError()
+		n = 0
+		err = os.NewError(GetError())
 	}
 
-	return n, nil
+	return
 }
 
 func (rw *RWops) Write(buf []byte) (n int, err os.Error) {
 	n = int(C.RWwrite((*C.SDL_RWops)(rw), unsafe.Pointer(&buf[0]), 1, C.int(len(buf))))
 
 	if n < 0 {
-		err = GetError()
+		n = 0
+		err = os.NewError(GetError())
 	}
 
-	return n, err
+	return
 }
 
 func (rw *RWops) Close() os.Error {
 	if int(C.RWclose((*C.SDL_RWops)(rw))) != 0 {
-		return GetError()
+		return os.NewError(GetError())
 	}
 
 	return nil
