@@ -510,23 +510,23 @@ func JoystickOpened(n int) bool {
 	return C.SDL_JoystickOpened(C.int(n)) != 0
 }
 
-func (j *Joystick)Index() int {
+func (j *Joystick) Index() int {
 	return int(C.SDL_JoystickIndex((*C.SDL_Joystick)(unsafe.Pointer(j))))
 }
 
-func (j *Joystick)NumAxes() int {
+func (j *Joystick) NumAxes() int {
 	return int(C.SDL_JoystickNumAxes((*C.SDL_Joystick)(unsafe.Pointer(j))))
 }
 
-func (j *Joystick)NumBalls() int {
+func (j *Joystick) NumBalls() int {
 	return int(C.SDL_JoystickNumBalls((*C.SDL_Joystick)(unsafe.Pointer(j))))
 }
 
-func (j *Joystick)NumHats() int {
+func (j *Joystick) NumHats() int {
 	return int(C.SDL_JoystickNumHats((*C.SDL_Joystick)(unsafe.Pointer(j))))
 }
 
-func (j *Joystick)NumButtons() int {
+func (j *Joystick) NumButtons() int {
 	return int(C.SDL_JoystickNumButtons((*C.SDL_Joystick)(unsafe.Pointer(j))))
 }
 
@@ -534,19 +534,19 @@ func JoystickUpdate() {
 	C.SDL_JoystickUpdate()
 }
 
-func (j *Joystick)GetAxis(n int) int16 {
+func (j *Joystick) GetAxis(n int) int16 {
 	return int16(C.SDL_JoystickGetAxis((*C.SDL_Joystick)(unsafe.Pointer(j)), C.int(n)))
 }
 
-func (j *Joystick)GetHat(n int) int8 {
+func (j *Joystick) GetHat(n int) int8 {
 	return int8(C.SDL_JoystickGetHat((*C.SDL_Joystick)(unsafe.Pointer(j)), C.int(n)))
 }
 
-func (j *Joystick)GetButton(n int) bool {
+func (j *Joystick) GetButton(n int) bool {
 	return C.SDL_JoystickGetButton((*C.SDL_Joystick)(unsafe.Pointer(j)), C.int(n)) != 0
 }
 
-func (j *Joystick)GetBall(n int) (dx, dy int) {
+func (j *Joystick) GetBall(n int) (dx, dy int) {
 	ret := C.SDL_JoystickGetBall((*C.SDL_Joystick)(unsafe.Pointer(j)),
 		C.int(n),
 		(*C.int)(unsafe.Pointer(&dx)),
@@ -560,7 +560,7 @@ func (j *Joystick)GetBall(n int) (dx, dy int) {
 	return
 }
 
-func (j *Joystick)Close() os.Error {
+func (j *Joystick) Close() os.Error {
 	C.SDL_JoystickClose((*C.SDL_Joystick)(unsafe.Pointer(j)))
 
 	return nil
