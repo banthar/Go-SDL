@@ -289,7 +289,7 @@ func (img *Surface) pixPtr(x, y int) reflect.Value {
 
 func (img *Surface) ColorModel() image.ColorModel {
 	// TODO: Properly handle various colormodels.
-	return image.RGBAColorModel
+	return image.NRGBAColorModel
 }
 
 func (img *Surface) Bounds() image.Rectangle {
@@ -300,7 +300,7 @@ func (img *Surface) At(x, y int) image.Color {
 	var r, g, b, a uint8
 	GetRGBA(uint32(img.pixPtr(x, y).Uint()), img.Format, &r, &g, &b, &a)
 
-	return img.ColorModel().Convert(image.RGBAColor{r, g, b, a})
+	return img.ColorModel().Convert(image.NRGBAColor{r, g, b, a})
 }
 
 func (img *Surface) Set(x, y int, c image.Color) {
@@ -311,6 +311,59 @@ func (img *Surface) Set(x, y int, c image.Color) {
 
 	pix := img.pixPtr(x, y)
 	pix.SetUint(uint64(MapRGBA(img.Format, uint8(r), uint8(g), uint8(b), uint8(a))))
+}
+
+func ColorFromImageColor(in image.Color) Color {
+	r, g, b, _ := in.RGBA()
+
+	return Color{
+		R: uint8(r),
+		G: uint8(g),
+		B: uint8(b),
+	}
+}
+
+func (c Color)RGBA() (r, g, b, a uint32) {
+	r = uint32(c.R)
+	r |= r << 8
+	g = uint32(c.G)
+	g |= g << 8
+	b = uint32(c.B)
+	b |= b << 8
+	a = 255
+
+	return
+}
+
+func PaletteFromImagePalette(in image.PalettedColorModel) *Palette {
+	col := make([]Color, len(in))
+	for i := range(in) {
+		col[i] = ColorFromImageColor(in[i])
+	}
+
+	return &Palette{
+		Ncolors: int32(len(in)),
+		Colors: &col[0],
+	}
+}
+
+func (pal *Palette)ImagePalette() image.PalettedColorModel {
+	if pal == nil {
+		return nil
+	}
+
+	s := *(*[]Color)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: uintptr(unsafe.Pointer(pal.Colors)),
+		Len: int(pal.Ncolors),
+		Cap: int(pal.Ncolors),
+	}))
+
+	out := make(image.PalettedColorModel, pal.Ncolors)
+	for i := range(out) {
+		out[i] = s[i]
+	}
+
+	return out
 }
 
 // Map a RGB color value to a pixel format.
@@ -375,19 +428,32 @@ func LoadTyped_RW(rw *RWops, ac bool, t string) *Surface {
 func CreateSurfaceFromImage(img image.Image) *Surface {
 	r := img.Bounds()
 
+	var bpp int
 	var pix []uint8
+	var pal *Palette
 	switch c := img.(type) {
 	case *image.NRGBA:
 		pix = c.Pix
+		bpp = 32
 	case *image.RGBA:
 		pix = c.Pix
+		bpp = 32
+	case *image.Paletted:
+		pix = c.Pix
+		bpp = 8
+		pal = PaletteFromImagePalette(c.Palette)
 	default:
 		nrgba := image.NewNRGBA(r)
 		draw.Draw(nrgba, r, img, image.ZP, draw.Src)
 		pix = nrgba.Pix
+		bpp = 32
 	}
 
-	s := CreateRGBSurface(SWSURFACE, r.Dx(), r.Dy(), 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
+	s := CreateRGBSurface(SWSURFACE, r.Dx(), r.Dy(), bpp, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
+
+	if pal != nil {
+		s.Format.Palette = pal
+	}
 
 	s.Lock()
 	defer s.Unlock()
