@@ -332,7 +332,7 @@ func ColorFromGoColor(in color.Color) Color {
 	}
 }
 
-func (c Color)RGBA() (r, g, b, a uint32) {
+func (c Color) RGBA() (r, g, b, a uint32) {
 	r = uint32(c.R)
 	r |= r << 8
 	g = uint32(c.G)
@@ -346,7 +346,7 @@ func (c Color)RGBA() (r, g, b, a uint32) {
 
 func PaletteFromGoPalette(in color.Palette) *Palette {
 	col := make([]Color, len(in))
-	for i := range(col) {
+	for i := range col {
 		col[i] = ColorFromGoColor(in[i])
 	}
 
@@ -359,19 +359,19 @@ func PaletteFromGoPalette(in color.Palette) *Palette {
 	return pal
 }
 
-func (pal *Palette)GoPalette() color.Palette {
+func (pal *Palette) GoPalette() color.Palette {
 	if (pal == nil) || (pal.Ncolors == 0) {
 		return nil
 	}
 
 	s := *(*[]Color)(unsafe.Pointer(&reflect.SliceHeader{
 		Data: uintptr(unsafe.Pointer(pal.Colors)),
-		Len: int(pal.Ncolors),
-		Cap: int(pal.Ncolors),
+		Len:  int(pal.Ncolors),
+		Cap:  int(pal.Ncolors),
 	}))
 
 	out := make(color.Palette, pal.Ncolors)
-	for i := range(out) {
+	for i := range out {
 		out[i] = s[i]
 	}
 
