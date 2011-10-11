@@ -34,6 +34,7 @@ import "C"
 import "unsafe"
 import "image"
 import "image/draw"
+import "image/color"
 import "io"
 import "io/ioutil"
 import "os"
@@ -287,31 +288,31 @@ func (img *Surface) pixPtr(x, y int) reflect.Value {
 	panic(fmt.Errorf("Image has unexpected BPP: %v", img.Format.BitsPerPixel))
 }
 
-func (img *Surface) ColorModel() image.ColorModel {
+func (img *Surface) ColorModel() color.Model {
 	switch img.Format.BitsPerPixel {
 	case 8:
-		return img.Format.Palette.ImagePalette()
+		return img.Format.Palette.GoPalette()
 	case 32:
-		return image.NRGBAColorModel
+		return color.NRGBAModel
 	case 64:
-		return image.NRGBA64ColorModel
-	default:
-		return image.NRGBAColorModel
+		return color.NRGBA64Model
 	}
+
+	return color.NRGBAModel
 }
 
 func (img *Surface) Bounds() image.Rectangle {
 	return image.Rect(0, 0, int(img.W), int(img.H))
 }
 
-func (img *Surface) At(x, y int) image.Color {
+func (img *Surface) At(x, y int) color.Color {
 	var r, g, b, a uint8
 	GetRGBA(uint32(img.pixPtr(x, y).Uint()), img.Format, &r, &g, &b, &a)
 
-	return img.ColorModel().Convert(image.NRGBAColor{r, g, b, a})
+	return img.ColorModel().Convert(color.NRGBA{r, g, b, a})
 }
 
-func (img *Surface) Set(x, y int, c image.Color) {
+func (img *Surface) Set(x, y int, c color.Color) {
 	img.Lock()
 	defer img.Unlock()
 
@@ -321,7 +322,7 @@ func (img *Surface) Set(x, y int, c image.Color) {
 	pix.SetUint(uint64(MapRGBA(img.Format, uint8(r), uint8(g), uint8(b), uint8(a))))
 }
 
-func ColorFromImageColor(in image.Color) Color {
+func ColorFromGoColor(in color.Color) Color {
 	r, g, b, _ := in.RGBA()
 
 	return Color{
@@ -343,19 +344,22 @@ func (c Color)RGBA() (r, g, b, a uint32) {
 	return
 }
 
-func PaletteFromImagePalette(in image.PalettedColorModel) *Palette {
+func PaletteFromGoPalette(in color.Palette) *Palette {
 	col := make([]Color, len(in))
-	for i := range(in) {
-		col[i] = ColorFromImageColor(in[i])
+	for i := range(col) {
+		col[i] = ColorFromGoColor(in[i])
 	}
 
-	return &Palette{
-		Ncolors: int32(len(in)),
-		Colors: &col[0],
-	}
+	pal := &Palette{Ncolors: int32(len(in))}
+
+	size := C.size_t(len(in) * 4)
+	pal.Colors = (*Color)(C.malloc(size))
+	C.memcpy(unsafe.Pointer(pal.Colors), unsafe.Pointer(&col[0]), size)
+
+	return pal
 }
 
-func (pal *Palette)ImagePalette() image.PalettedColorModel {
+func (pal *Palette)GoPalette() color.Palette {
 	if (pal == nil) || (pal.Ncolors == 0) {
 		return nil
 	}
@@ -366,7 +370,7 @@ func (pal *Palette)ImagePalette() image.PalettedColorModel {
 		Cap: int(pal.Ncolors),
 	}))
 
-	out := make(image.PalettedColorModel, pal.Ncolors)
+	out := make(color.Palette, pal.Ncolors)
 	for i := range(out) {
 		out[i] = s[i]
 	}
@@ -449,7 +453,7 @@ func CreateSurfaceFromImage(img image.Image) *Surface {
 	case *image.Paletted:
 		pix = c.Pix
 		bpp = 8
-		pal = PaletteFromImagePalette(c.Palette)
+		pal = PaletteFromGoPalette(c.Palette)
 	default:
 		nrgba := image.NewNRGBA(r)
 		draw.Draw(nrgba, r, img, image.ZP, draw.Src)
