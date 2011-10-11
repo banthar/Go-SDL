@@ -288,8 +288,16 @@ func (img *Surface) pixPtr(x, y int) reflect.Value {
 }
 
 func (img *Surface) ColorModel() image.ColorModel {
-	// TODO: Properly handle various colormodels.
-	return image.NRGBAColorModel
+	switch img.Format.BitsPerPixel {
+	case 8:
+		return img.Format.Palette.ImagePalette()
+	case 32:
+		return image.NRGBAColorModel
+	case 64:
+		return image.NRGBA64ColorModel
+	default:
+		return image.NRGBAColorModel
+	}
 }
 
 func (img *Surface) Bounds() image.Rectangle {
@@ -348,7 +356,7 @@ func PaletteFromImagePalette(in image.PalettedColorModel) *Palette {
 }
 
 func (pal *Palette)ImagePalette() image.PalettedColorModel {
-	if pal == nil {
+	if (pal == nil) || (pal.Ncolors == 0) {
 		return nil
 	}
 
