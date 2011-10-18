@@ -291,7 +291,7 @@ func (img *Surface) pixPtr(x, y int) reflect.Value {
 func (img *Surface) ColorModel() color.Model {
 	switch img.Format.BitsPerPixel {
 	case 8:
-		return img.Format.Palette.GoPalette()
+		return img.Format.Palette
 	case 32:
 		return color.NRGBAModel
 	case 64:
@@ -306,6 +306,24 @@ func (img *Surface) Bounds() image.Rectangle {
 }
 
 func (img *Surface) At(x, y int) color.Color {
+	if img == nil {
+		return nil
+	}
+
+	if img.Format.BitsPerPixel == 8 {
+		if (img.Format.Palette == nil) || (img.Format.Palette.Ncolors == 0) {
+			return nil
+		}
+
+		pal := *(*[]color.Color)(unsafe.Pointer(&reflect.SliceHeader{
+			Data: uintptr(unsafe.Pointer(img.Format.Palette.Colors)),
+			Len: int(img.Format.Palette.Ncolors),
+			Cap: int(img.Format.Palette.Ncolors),
+		}))
+
+		return pal[int(img.pixPtr(x, y).Uint())]
+	}
+
 	var r, g, b, a uint8
 	GetRGBA(uint32(img.pixPtr(x, y).Uint()), img.Format, &r, &g, &b, &a)
 
@@ -316,10 +334,15 @@ func (img *Surface) Set(x, y int, c color.Color) {
 	img.Lock()
 	defer img.Unlock()
 
-	r, g, b, a := c.RGBA()
+	if img.Format.BitsPerPixel == 8 {
+		pix := img.pixPtr(x, y)
+		pix.SetUint(uint64(img.Format.Palette.Index(c)))
+	} else {
+		r, g, b, a := img.ColorModel().Convert(c).RGBA()
 
-	pix := img.pixPtr(x, y)
-	pix.SetUint(uint64(MapRGBA(img.Format, uint8(r), uint8(g), uint8(b), uint8(a))))
+		pix := img.pixPtr(x, y)
+		pix.SetUint(uint64(MapRGBA(img.Format, uint8(r), uint8(g), uint8(b), uint8(a))))
+	}
 }
 
 func ColorFromGoColor(in color.Color) Color {
@@ -339,7 +362,7 @@ func (c Color) RGBA() (r, g, b, a uint32) {
 	g |= g << 8
 	b = uint32(c.B)
 	b |= b << 8
-	a = 255
+	a = 0xffff
 
 	return
 }
@@ -359,23 +382,62 @@ func PaletteFromGoPalette(in color.Palette) *Palette {
 	return pal
 }
 
-func (pal *Palette) GoPalette() color.Palette {
+func (pal *Palette)Convert(c color.Color) color.Color {
 	if (pal == nil) || (pal.Ncolors == 0) {
 		return nil
 	}
 
-	s := *(*[]Color)(unsafe.Pointer(&reflect.SliceHeader{
+	p := *(*[]color.Color)(unsafe.Pointer(&reflect.SliceHeader{
 		Data: uintptr(unsafe.Pointer(pal.Colors)),
-		Len:  int(pal.Ncolors),
-		Cap:  int(pal.Ncolors),
+		Len: int(pal.Ncolors),
+		Cap: int(pal.Ncolors),
 	}))
 
-	out := make(color.Palette, pal.Ncolors)
-	for i := range out {
-		out[i] = s[i]
+	return p[pal.Index(c)]
+}
+
+func (pal *Palette)Index(c color.Color) int {
+	// Code mostly copied from image/color.
+
+	if pal == nil {
+		return 0
 	}
 
-	return out
+	p := *(*[]color.Color)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: uintptr(unsafe.Pointer(pal.Colors)),
+		Len: int(pal.Ncolors),
+		Cap: int(pal.Ncolors),
+	}))
+
+	diff := func(a, b uint32) uint32 {
+		if a > b {
+			return a - b
+		}
+		return b - a
+	}
+
+	cr, cg, cb, _ := c.RGBA()
+	// Shift by 1 bit to avoid potential uint32 overflow in sum-squared-difference.
+	cr >>= 1
+	cg >>= 1
+	cb >>= 1
+	ret, bestSSD := 0, uint32(1<<32-1)
+	for i, v := range p {
+		vr, vg, vb, _ := v.RGBA()
+		vr >>= 1
+		vg >>= 1
+		vb >>= 1
+		dr, dg, db := diff(cr, vr), diff(cg, vg), diff(cb, vb)
+		ssd := (dr * dr) + (dg * dg) + (db * db)
+		if ssd < bestSSD {
+			if ssd == 0 {
+				return i
+			}
+			ret, bestSSD = i, ssd
+		}
+	}
+
+	return ret
 }
 
 // Map a RGB color value to a pixel format.
