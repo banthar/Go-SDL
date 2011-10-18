@@ -317,8 +317,8 @@ func (img *Surface) At(x, y int) color.Color {
 
 		pal := *(*[]color.Color)(unsafe.Pointer(&reflect.SliceHeader{
 			Data: uintptr(unsafe.Pointer(img.Format.Palette.Colors)),
-			Len: int(img.Format.Palette.Ncolors),
-			Cap: int(img.Format.Palette.Ncolors),
+			Len:  int(img.Format.Palette.Ncolors),
+			Cap:  int(img.Format.Palette.Ncolors),
 		}))
 
 		return pal[int(img.pixPtr(x, y).Uint())]
@@ -382,21 +382,21 @@ func PaletteFromGoPalette(in color.Palette) *Palette {
 	return pal
 }
 
-func (pal *Palette)Convert(c color.Color) color.Color {
+func (pal *Palette) Convert(c color.Color) color.Color {
 	if (pal == nil) || (pal.Ncolors == 0) {
 		return nil
 	}
 
 	p := *(*[]color.Color)(unsafe.Pointer(&reflect.SliceHeader{
 		Data: uintptr(unsafe.Pointer(pal.Colors)),
-		Len: int(pal.Ncolors),
-		Cap: int(pal.Ncolors),
+		Len:  int(pal.Ncolors),
+		Cap:  int(pal.Ncolors),
 	}))
 
 	return p[pal.Index(c)]
 }
 
-func (pal *Palette)Index(c color.Color) int {
+func (pal *Palette) Index(c color.Color) int {
 	// Code mostly copied from image/color.
 
 	if pal == nil {
@@ -405,8 +405,8 @@ func (pal *Palette)Index(c color.Color) int {
 
 	p := *(*[]color.Color)(unsafe.Pointer(&reflect.SliceHeader{
 		Data: uintptr(unsafe.Pointer(pal.Colors)),
-		Len: int(pal.Ncolors),
-		Cap: int(pal.Ncolors),
+		Len:  int(pal.Ncolors),
+		Cap:  int(pal.Ncolors),
 	}))
 
 	diff := func(a, b uint32) uint32 {
