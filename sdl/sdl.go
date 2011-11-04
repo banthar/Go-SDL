@@ -31,7 +31,11 @@ package sdl
 // static int RWclose(SDL_RWops *rw){return SDL_RWclose(rw);}
 // static int __SDL_SaveBMP(SDL_Surface *surface, const char *file) { return SDL_SaveBMP(surface, file); }
 import "C"
-import "unsafe"
+import (
+	"errors"
+	"image/color"
+	"unsafe"
+)
 import "image"
 import "image/draw"
 import "io"
@@ -287,23 +291,23 @@ func (img *Surface) pixPtr(x, y int) reflect.Value {
 	panic(fmt.Errorf("Image has unexpected BPP: %v", img.Format.BitsPerPixel))
 }
 
-func (img *Surface) ColorModel() image.ColorModel {
+func (img *Surface) ColorModel() color.Model {
 	// TODO: Properly handle various colormodels.
-	return image.RGBAColorModel
+	return color.RGBAModel
 }
 
 func (img *Surface) Bounds() image.Rectangle {
 	return image.Rect(0, 0, int(img.W), int(img.H))
 }
 
-func (img *Surface) At(x, y int) image.Color {
+func (img *Surface) At(x, y int) color.Color {
 	var r, g, b, a uint8
 	GetRGBA(uint32(img.pixPtr(x, y).Uint()), img.Format, &r, &g, &b, &a)
 
-	return img.ColorModel().Convert(image.RGBAColor{r, g, b, a})
+	return img.ColorModel().Convert(color.RGBA{r, g, b, a})
 }
 
-func (img *Surface) Set(x, y int, c image.Color) {
+func (img *Surface) Set(x, y int, c color.Color) {
 	img.Lock()
 	defer img.Unlock()
 
@@ -510,23 +514,23 @@ func JoystickOpened(n int) bool {
 	return C.SDL_JoystickOpened(C.int(n)) != 0
 }
 
-func (j *Joystick)Index() int {
+func (j *Joystick) Index() int {
 	return int(C.SDL_JoystickIndex((*C.SDL_Joystick)(unsafe.Pointer(j))))
 }
 
-func (j *Joystick)NumAxes() int {
+func (j *Joystick) NumAxes() int {
 	return int(C.SDL_JoystickNumAxes((*C.SDL_Joystick)(unsafe.Pointer(j))))
 }
 
-func (j *Joystick)NumBalls() int {
+func (j *Joystick) NumBalls() int {
 	return int(C.SDL_JoystickNumBalls((*C.SDL_Joystick)(unsafe.Pointer(j))))
 }
 
-func (j *Joystick)NumHats() int {
+func (j *Joystick) NumHats() int {
 	return int(C.SDL_JoystickNumHats((*C.SDL_Joystick)(unsafe.Pointer(j))))
 }
 
-func (j *Joystick)NumButtons() int {
+func (j *Joystick) NumButtons() int {
 	return int(C.SDL_JoystickNumButtons((*C.SDL_Joystick)(unsafe.Pointer(j))))
 }
 
@@ -534,19 +538,19 @@ func JoystickUpdate() {
 	C.SDL_JoystickUpdate()
 }
 
-func (j *Joystick)GetAxis(n int) int16 {
+func (j *Joystick) GetAxis(n int) int16 {
 	return int16(C.SDL_JoystickGetAxis((*C.SDL_Joystick)(unsafe.Pointer(j)), C.int(n)))
 }
 
-func (j *Joystick)GetHat(n int) int8 {
+func (j *Joystick) GetHat(n int) int8 {
 	return int8(C.SDL_JoystickGetHat((*C.SDL_Joystick)(unsafe.Pointer(j)), C.int(n)))
 }
 
-func (j *Joystick)GetButton(n int) bool {
+func (j *Joystick) GetButton(n int) bool {
 	return C.SDL_JoystickGetButton((*C.SDL_Joystick)(unsafe.Pointer(j)), C.int(n)) != 0
 }
 
-func (j *Joystick)GetBall(n int) (dx, dy int) {
+func (j *Joystick) GetBall(n int) (dx, dy int) {
 	ret := C.SDL_JoystickGetBall((*C.SDL_Joystick)(unsafe.Pointer(j)),
 		C.int(n),
 		(*C.int)(unsafe.Pointer(&dx)),
@@ -560,7 +564,7 @@ func (j *Joystick)GetBall(n int) (dx, dy int) {
 	return
 }
 
-func (j *Joystick)Close() os.Error {
+func (j *Joystick) Close() error {
 	C.SDL_JoystickClose((*C.SDL_Joystick)(unsafe.Pointer(j)))
 
 	return nil
@@ -668,7 +672,7 @@ func RWFromConstMem(m []byte) *RWops {
 func RWFromReader(r io.Reader) *RWops {
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
-		SetError(err.String())
+		SetError(err.Error())
 		return nil
 	}
 
@@ -728,7 +732,7 @@ func RWFromFP(fp *os.File, ac bool) *RWops {
 func (rw *RWops) Tell() int64 {
 	cur, err := rw.Seek(0, 1)
 	if err != nil {
-		SetError(err.String())
+		SetError(err.Error())
 		return -1
 	}
 
@@ -743,7 +747,7 @@ func (rw *RWops) Length() int64 {
 
 	eof, err := rw.Seek(0, 2)
 	if err != nil {
-		SetError(err.String())
+		SetError(err.Error())
 		return -1
 	}
 
@@ -766,7 +770,7 @@ func (rw *RWops) EOF() bool {
 	return false
 }
 
-func (rw *RWops) Seek(offset int64, whence int) (int64, os.Error) {
+func (rw *RWops) Seek(offset int64, whence int) (int64, error) {
 	var w C.int
 	switch whence {
 	case 0:
@@ -776,39 +780,39 @@ func (rw *RWops) Seek(offset int64, whence int) (int64, os.Error) {
 	case 2:
 		w = C.SEEK_END
 	default:
-		return offset, os.NewError("Bad whence.")
+		return offset, errors.New("Bad whence.")
 	}
 
 	return int64(C.RWseek((*C.SDL_RWops)(rw), C.int(offset), w)), nil
 }
 
-func (rw *RWops) Read(buf []byte) (n int, err os.Error) {
+func (rw *RWops) Read(buf []byte) (n int, err error) {
 	n = int(C.RWread((*C.SDL_RWops)(rw), unsafe.Pointer(&buf[0]), 1, C.int(len(buf))))
 
 	if rw.EOF() {
-		err = os.EOF
+		err = io.EOF
 	}
 
 	if n < 0 {
-		err = os.NewError(GetError())
+		err = errors.New(GetError())
 	}
 
 	return n, nil
 }
 
-func (rw *RWops) Write(buf []byte) (n int, err os.Error) {
+func (rw *RWops) Write(buf []byte) (n int, err error) {
 	n = int(C.RWwrite((*C.SDL_RWops)(rw), unsafe.Pointer(&buf[0]), 1, C.int(len(buf))))
 
 	if n < 0 {
-		err = os.NewError(GetError())
+		err = errors.New(GetError())
 	}
 
 	return n, err
 }
 
-func (rw *RWops) Close() os.Error {
+func (rw *RWops) Close() error {
 	if int(C.RWclose((*C.SDL_RWops)(rw))) != 0 {
-		return os.NewError(GetError())
+		return errors.New(GetError())
 	}
 
 	return nil
