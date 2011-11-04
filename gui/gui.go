@@ -1,7 +1,7 @@
 package sdlgui
 
 import (
-	"os"
+	"errors"
 	"sdl"
 	"time"
 	"image"
@@ -72,7 +72,7 @@ func (win *window) EventChan() <-chan interface{} {
 	return win.ec
 }
 
-func (win *window) Close() os.Error {
+func (win *window) Close() error {
 	win.events = false
 
 	win.screen.Free()
@@ -84,11 +84,11 @@ func (win *window) Close() os.Error {
 
 var initnum uint
 
-func initinc() os.Error {
+func initinc() error {
 	if initnum == 0 {
 		errn := sdl.Init(sdl.INIT_VIDEO)
 		if errn < 0 {
-			return os.NewError(sdl.GetError())
+			return errors.New(sdl.GetError())
 		}
 	}
 
@@ -105,7 +105,7 @@ func initdec() {
 	}
 }
 
-func NewWindow(w, h, bpp int, flags uint32) (gui.Window, os.Error) {
+func NewWindow(w, h, bpp int, flags uint32) (gui.Window, error) {
 	win := new(window)
 
 	err := initinc()
@@ -115,7 +115,7 @@ func NewWindow(w, h, bpp int, flags uint32) (gui.Window, os.Error) {
 
 	win.screen = sdl.SetVideoMode(w, h, bpp, flags)
 	if win.screen == nil {
-		return nil, os.NewError(sdl.GetError())
+		return nil, errors.New(sdl.GetError())
 	}
 
 	win.ec = make(chan interface{})

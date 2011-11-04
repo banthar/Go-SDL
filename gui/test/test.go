@@ -1,6 +1,7 @@
 package main
 
 import (
+	"image/color"
 	"os"
 	"fmt"
 	"sdl"
@@ -19,7 +20,7 @@ func main() {
 
 	screen := win.Screen()
 
-	cimg := image.NewColorImage(image.RGBAColor{255, 0, 255, 255})
+	cimg := image.NewUniform(color.RGBA{255, 0, 255, 255})
 	draw.Draw(screen,
 		image.Rect(10, 10, 200, 200),
 		cimg,
