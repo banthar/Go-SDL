@@ -32,6 +32,7 @@ package sdl
 // static int __SDL_SaveBMP(SDL_Surface *surface, const char *file) { return SDL_SaveBMP(surface, file); }
 import "C"
 import "unsafe"
+import "errors"
 import "image"
 import "image/draw"
 import "image/color"
@@ -700,7 +701,7 @@ func (j *Joystick) GetBall(n int) (dx, dy int) {
 	return
 }
 
-func (j *Joystick) Close() os.Error {
+func (j *Joystick) Close() error {
 	C.SDL_JoystickClose((*C.SDL_Joystick)(unsafe.Pointer(j)))
 
 	return nil
@@ -808,7 +809,7 @@ func RWFromConstMem(m []byte) *RWops {
 func RWFromReader(r io.Reader) *RWops {
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
-		SetError(err.String())
+		SetError(err.Error())
 		return nil
 	}
 
@@ -865,7 +866,7 @@ func RWFromFP(fp *os.File, ac bool) *RWops {
 func (rw *RWops) Tell() int64 {
 	cur, err := rw.Seek(0, 1)
 	if err != nil {
-		SetError(err.String())
+		SetError(err.Error())
 		return -1
 	}
 
@@ -880,7 +881,7 @@ func (rw *RWops) Length() int64 {
 
 	eof, err := rw.Seek(0, 2)
 	if err != nil {
-		SetError(err.String())
+		SetError(err.Error())
 		return -1
 	}
 
@@ -903,7 +904,7 @@ func (rw *RWops) EOF() bool {
 	return false
 }
 
-func (rw *RWops) Seek(offset int64, whence int) (int64, os.Error) {
+func (rw *RWops) Seek(offset int64, whence int) (int64, error) {
 	var w C.int
 	switch whence {
 	case 0:
@@ -913,41 +914,39 @@ func (rw *RWops) Seek(offset int64, whence int) (int64, os.Error) {
 	case 2:
 		w = C.SEEK_END
 	default:
-		return offset, os.NewError("Bad whence.")
+		return offset, errors.New("Bad whence.")
 	}
 
 	return int64(C.RWseek((*C.SDL_RWops)(rw), C.int(offset), w)), nil
 }
 
-func (rw *RWops) Read(buf []byte) (n int, err os.Error) {
+func (rw *RWops) Read(buf []byte) (n int, err error) {
 	n = int(C.RWread((*C.SDL_RWops)(rw), unsafe.Pointer(&buf[0]), 1, C.int(len(buf))))
 
 	if rw.EOF() {
-		err = os.EOF
+		err = io.EOF
 	}
 
 	if n < 0 {
-		n = 0
-		err = os.NewError(GetError())
+		err = errors.New(GetError())
 	}
 
 	return
 }
 
-func (rw *RWops) Write(buf []byte) (n int, err os.Error) {
+func (rw *RWops) Write(buf []byte) (n int, err error) {
 	n = int(C.RWwrite((*C.SDL_RWops)(rw), unsafe.Pointer(&buf[0]), 1, C.int(len(buf))))
 
 	if n < 0 {
-		n = 0
-		err = os.NewError(GetError())
+		err = errors.New(GetError())
 	}
 
 	return
 }
 
-func (rw *RWops) Close() os.Error {
+func (rw *RWops) Close() error {
 	if int(C.RWclose((*C.SDL_RWops)(rw))) != 0 {
-		return os.NewError(GetError())
+		return errors.New(GetError())
 	}
 
 	return nil
