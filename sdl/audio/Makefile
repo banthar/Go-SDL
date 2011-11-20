@@ -1,6 +1,6 @@
 include $(GOROOT)/src/Make.inc
 
-TARG=⚛sdl/audio
+TARG=atom/sdl/audio
 
 CGOFILES=audio.go
 CGO_LDFLAGS=`pkg-config --libs sdl` -lrt

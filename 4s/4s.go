@@ -8,7 +8,7 @@
 package main
 
 import (
-	"⚛sdl"
+	"atom/sdl"
 	"log"
 	"os"
 	"runtime"

@@ -4,7 +4,7 @@
 
 include $(GOROOT)/src/Make.inc
 
-TARG=⚛sdl/mixer
+TARG=atom/sdl/mixer
 
 GOFILES:=constants.go
 CGOFILES:=mixer.go

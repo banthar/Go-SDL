@@ -1,6 +1,6 @@
 include $(GOROOT)/src/Make.inc
 
-TARG=⚛sdl
+TARG=atom/sdl
 
 GOFILES:=constants.go event.go structs.$(O).go
 

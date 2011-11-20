@@ -9,7 +9,7 @@ The improvements/differences are:
 * Support for low-level SDL sound functions
 
 * Can be installed in parallel to Banthar's Go-SDL
-* The import path is "⚛sdl", instead of "sdl"
+* The import path is "atom/sdl", instead of "sdl"
 
 
 # Installation

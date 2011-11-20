@@ -1,7 +1,7 @@
 package main
 
 import (
-	"⚛sdl"
+	"atom/sdl"
 	"fmt"
 	"rand"
 	"time"

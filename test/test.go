@@ -1,9 +1,9 @@
 package main
 
 import (
-	"⚛sdl"
-	"⚛sdl/ttf"
-	"⚛sdl/mixer"
+	"atom/sdl"
+	"atom/sdl/ttf"
+	"atom/sdl/mixer"
 	"math"
 	"fmt"
 	"time"

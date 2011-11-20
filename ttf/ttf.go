@@ -9,7 +9,7 @@ package ttf
 
 // #include <SDL/SDL_ttf.h>
 import "C"
-import "⚛sdl"
+import "atom/sdl"
 import "sync"
 import "unsafe"
 

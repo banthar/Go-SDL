@@ -4,7 +4,7 @@
 
 include $(GOROOT)/src/Make.inc
 
-TARG=⚛sdl/gfx
+TARG=atom/sdl/gfx
 
 GOFILES:=constants.go\
 	framerate.go
