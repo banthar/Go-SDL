@@ -10,10 +10,12 @@
 #include <pthread.h>
 #include <assert.h>
 #include <string.h>
-#include <time.h>
 
 #define TRUE  1
 #define FALSE 0
+
+// Uncomment the next line to enable debugging messages
+//#define DEBUG
 
 static pthread_mutex_t m         = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t  need      = PTHREAD_COND_INITIALIZER;
@@ -23,6 +25,8 @@ static size_t          available = 0;	// Number of bytes available (from the pro
 
 static Uint8 *stream;	// Communication buffer between the consumer and the producer
 
+#ifdef DEBUG
+#include <time.h>
 static int64_t get_time() {
 	struct timespec ts;
 	if(clock_gettime(CLOCK_MONOTONIC, &ts) == 0)
@@ -30,9 +34,12 @@ static int64_t get_time() {
 	else
 		return -1;
 }
+#endif
 
+#ifdef DEBUG
 static uint64_t cummulativeLatency = 0;
 static unsigned numCallbacks = 0;
+#endif
 
 static void SDLCALL callback(void *userdata, Uint8 *_stream, int _len) {
 	assert(_len > 0);
@@ -45,34 +52,43 @@ static void SDLCALL callback(void *userdata, Uint8 *_stream, int _len) {
 		stream = _stream;
 
 		{
-			int64_t t1 = get_time();
-			//printf("consumer: t1=%lld µs\n", (long long)t1/1000);
+			#ifdef DEBUG
+				int64_t t1 = get_time();
+				printf("consumer: t1=%lld µs\n", (long long)t1/1000);
+			#endif
 
 			assert(needed == 0);
-			//printf("consumer: needed <- %zu\n", len);
+			#ifdef DEBUG
+				printf("consumer: needed <- %zu\n", len);
+			#endif
 			needed = len;
 			pthread_cond_signal(&need);
 
-			//printf("consumer: waiting for data\n");
+			#ifdef DEBUG
+				printf("consumer: waiting for data\n");
+			#endif
 			pthread_cond_wait(&avail, &m);
 			assert(needed == 0);
 			assert(available == len);
 
-			int64_t t2 = get_time();
-			//printf("consumer: t2=%lld µs\n", (long long)t2/1000);
-			if(t1>0 && t2>0) {
-				uint64_t latency = t2-t1;
-				cummulativeLatency += latency;
-				numCallbacks++;
-				/*printf("consumer: latency=%lld µs, avg=%u µs\n",
-				       (long long)(latency/1000),
-				       (unsigned)(cummulativeLatency/numCallbacks/1000));*/
-			}
+			#ifdef DEBUG
+				int64_t t2 = get_time();
+				printf("consumer: t2=%lld µs\n", (long long)t2/1000);
+				if(t1>0 && t2>0) {
+					uint64_t latency = t2-t1;
+					cummulativeLatency += latency;
+					numCallbacks++;
+					printf("consumer: latency=%lld µs, avg=%u µs\n",
+					       (long long)(latency/1000),
+					       (unsigned)(cummulativeLatency/numCallbacks/1000));
+				}
+			#endif
 		}
 
-		//printf("consumer: received %zu bytes of data\n", available);
-
-		//printf("consumer: available <- 0\n");
+		#ifdef DEBUG
+			printf("consumer: received %zu bytes of data\n", available);
+			printf("consumer: available <- 0\n");
+		#endif
 		available = 0;
 		stream = NULL;
 	}
@@ -89,16 +105,22 @@ void callback_fillBuffer(Uint8 *data, size_t numBytes) {
 	pthread_mutex_lock(&m);
 
 	while(sent < numBytes) {
-		//int64_t t = get_time();
-		//printf("producer: t=%lld µs\n", (long long)t1/1000);
+		#ifdef DEBUG
+			int64_t t = get_time();
+			printf("producer: t=%lld µs\n", (long long)t/1000);
+		#endif
 
 		if(needed == 0) {
-			//printf("producer: waiting until data is needed (1)\n");
+			#ifdef DEBUG
+				printf("producer: waiting until data is needed (1)\n");
+			#endif
 			pthread_cond_wait(&need, &m);
 
 			// Interrupted from 'callback_unblock' ?
 			if(needed == 0) {
-				//printf("producer: interrupted (1)\n");
+				#ifdef DEBUG
+					printf("producer: interrupted (1)\n");
+				#endif
 				break;
 			}
 		}
@@ -113,17 +135,23 @@ void callback_fillBuffer(Uint8 *data, size_t numBytes) {
 		sent += n;
 		needed -= n;
 
-		//printf("producer: added %zu bytes, available=%zu\n", n, available);
+		#ifdef DEBUG
+			printf("producer: added %zu bytes, available=%zu\n", n, available);
+		#endif
 
 		if(needed == 0) {
 			pthread_cond_signal(&avail);
 			if(sent < numBytes) {
-				//printf("producer: waiting until data is needed (2)\n");
+				#ifdef DEBUG
+					printf("producer: waiting until data is needed (2)\n");
+				#endif
 				pthread_cond_wait(&need, &m);
 
 				// Interrupted from 'callback_unblock' ?
 				if(needed == 0) {
-					//printf("producer: interrupted (2)\n");
+					#ifdef DEBUG
+						printf("producer: interrupted (2)\n");
+					#endif
 					break;
 				}
 			}
