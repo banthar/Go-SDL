@@ -19,7 +19,6 @@ clean:
 	gomake -C sdl/audio clean
 	gomake -C ttf clean
 	gomake -C mixer clean
-	gomake -C 4s clean
 	gomake -C test clean
 	gomake -C gfx clean
 	gomake -C doc clean
