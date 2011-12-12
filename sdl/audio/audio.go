@@ -7,6 +7,7 @@
 
 package audio
 
+// #cgo pkg-config: sdl
 // #include <SDL/SDL_audio.h>
 // #include "callback.h"
 import "C"

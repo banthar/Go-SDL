@@ -3,13 +3,12 @@ include $(GOROOT)/src/Make.inc
 TARG=atom/sdl/audio
 
 CGOFILES=audio.go
-CGO_CFLAGS=`pkg-config --cflags sdl`
 CGO_OFILES=callback.o
 
 ifeq ($(GOOS),windows)
-CGO_LDFLAGS=`pkg-config --libs sdl` -lpthread
+CGO_LDFLAGS=-lpthread
 else
-CGO_LDFLAGS=`pkg-config --libs sdl` -lrt
+CGO_LDFLAGS=-lrt
 endif
 
 include $(GOROOT)/src/Make.pkg

@@ -8,7 +8,6 @@ TARG=atom/sdl/mixer
 
 GOFILES:=constants.go
 CGOFILES:=mixer.go
-CGO_LDFLAGS:=-lSDL_mixer
 
 CLEANFILES+=mixer
 

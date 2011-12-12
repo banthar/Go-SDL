@@ -7,19 +7,26 @@ include $(GOROOT)/src/Make.inc
 all: install
 
 install:
-	make clean
-	make -C sdl install
-	make -C sdl/audio install
-	make -C ttf install
-	make -C mixer install
-	make -C gfx install
+	gomake clean
+	gomake -C sdl install
+	gomake -C sdl/audio install
+	gomake -C ttf install
+	gomake -C mixer install
+	gomake -C gfx install
 
 clean:
-	make -C sdl clean
-	make -C sdl/audio clean
-	make -C ttf clean
-	make -C mixer clean
-	make -C 4s clean
-	make -C test clean
-	make -C gfx clean
-	make -C doc clean
+	gomake -C sdl clean
+	gomake -C sdl/audio clean
+	gomake -C ttf clean
+	gomake -C mixer clean
+	gomake -C 4s clean
+	gomake -C test clean
+	gomake -C gfx clean
+	gomake -C doc clean
+
+nuke:
+	gomake -C sdl nuke
+	gomake -C sdl/audio nuke
+	gomake -C ttf nuke
+	gomake -C mixer nuke
+	gomake -C gfx nuke
