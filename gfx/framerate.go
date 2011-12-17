@@ -1,4 +1,4 @@
-/* 
+/*
 A pure Go version of SDL_framerate
 */
 
