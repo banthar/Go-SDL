@@ -51,7 +51,7 @@ func (c *Chunk) PlayChannel(channel, loops int) int {
 	return c.PlayChannelTimed(channel, loops, -1)
 }
 
-//If the sample is long enough and has enough loops then the sample will stop after ticks milliseconds. 
+//If the sample is long enough and has enough loops then the sample will stop after ticks milliseconds.
 //Otherwise this function is the same as chunk.PlayChannel()
 //Returns: the channel the sample is played on. On any errors, -1 is returned
 func (c *Chunk) PlayChannelTimed(channel, loops, ticks int) int {
