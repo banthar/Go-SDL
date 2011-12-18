@@ -1,7 +1,7 @@
 package main
 
 import (
-	"sdl"
+	"github.com/banthar/Go-SDL/sdl"
 )
 
 func loadImage(name string) *sdl.Surface {

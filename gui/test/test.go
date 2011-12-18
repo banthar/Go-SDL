@@ -1,14 +1,14 @@
 package main
 
 import (
-	"image/color"
-	"os"
-	"fmt"
-	"sdl"
-	"image"
 	"exp/gui"
-	"image/draw"
 	"exp/gui/sdl"
+	"fmt"
+	"image"
+	"image/color"
+	"image/draw"
+	"os"
+	"github.com/banthar/Go-SDL/sdl"
 )
 
 func main() {
