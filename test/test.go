@@ -1,11 +1,11 @@
 package main
 
 import (
-	"sdl"
-	"sdl/ttf"
-	"sdl/mixer"
-	"math"
 	"fmt"
+	"github.com/banthar/Go-SDL/mixer"
+	"github.com/banthar/Go-SDL/sdl"
+	"github.com/banthar/Go-SDL/ttf"
+	"math"
 )
 
 type Point struct {

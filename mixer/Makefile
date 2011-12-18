@@ -4,7 +4,7 @@
 
 include $(GOROOT)/src/Make.inc
 
-TARG=sdl/mixer
+TARG=github.com/banthar/Go-SDL/mixer
 
 GOFILES:=constants.go
 CGOFILES:=mixer.go chunks.go
