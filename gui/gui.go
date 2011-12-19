@@ -2,12 +2,12 @@ package sdlgui
 
 import (
 	"errors"
-	"sdl"
-	"time"
-	"image"
-	"runtime"
 	"exp/gui"
+	"image"
 	"image/draw"
+	"runtime"
+	"github.com/banthar/Go-SDL/sdl"
+	"time"
 )
 
 type window struct {

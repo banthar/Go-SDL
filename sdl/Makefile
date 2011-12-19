@@ -1,9 +1,9 @@
 
 include $(GOROOT)/src/Make.inc
 
-TARG=sdl
+TARG=github.com/banthar/Go-SDL/sdl
 
-GOFILES:=constants.go structs.$(O).go
+GOFILES:=constants.go structs_$(GOARCH).go
 
 CGOFILES:=sdl.go
 
