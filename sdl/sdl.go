@@ -616,6 +616,11 @@ func GetMouseState(x, y *int) uint8 {
 	return uint8(C.SDL_GetMouseState((*C.int)(cast(x)), (*C.int)(cast(y))))
 }
 
+// Warp mousej
+func WarpMouse(x, y int) {
+	C.SDL_WarpMouse(C.Uint16(x), C.Uint16(y))
+}
+
 // Retrieves the current state of the mouse relative to the last time this
 // function was called.
 func GetRelativeMouseState(x, y *int) uint8 {
