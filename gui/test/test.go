@@ -4,11 +4,11 @@ import (
 	"exp/gui"
 	"exp/gui/sdl"
 	"fmt"
+	"github.com/banthar/Go-SDL/sdl"
 	"image"
 	"image/color"
 	"image/draw"
 	"os"
-	"github.com/banthar/Go-SDL/sdl"
 )
 
 func main() {
