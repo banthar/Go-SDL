@@ -1,11 +1,13 @@
 package main
 
 import (
-	"atom/sdl"
-	"atom/sdl/ttf"
-	"atom/sdl/mixer"
-	"math"
 	"fmt"
+	"github.com/0xe2-0x9a-0x9b/Go-SDL/mixer"
+	"github.com/0xe2-0x9a-0x9b/Go-SDL/sdl"
+	"github.com/0xe2-0x9a-0x9b/Go-SDL/ttf"
+	"math"
+	"os"
+	"strings"
 	"time"
 )
 
@@ -41,6 +43,16 @@ func worm(in <-chan Point, out chan<- Point, draw chan<- Point) {
 }
 
 func main() {
+	var resourcePath string
+	{
+		gopaths := os.Getenv("GOPATH")
+		if gopaths == "" {
+			panic("No such environment variable: GOPATH")
+		}
+		gopath := strings.Split(gopaths, ":")[0]
+		resourcePath = gopath + "/src/github.com/0xe2-0x9a-0x9b/Go-SDL/sdl-test"
+	}
+
 	var joy *sdl.Joystick
 	if sdl.Init(sdl.INIT_EVERYTHING) != 0 {
 		panic(sdl.GetError())
@@ -86,7 +98,7 @@ func main() {
 
 	sdl.WM_SetCaption("Go-SDL SDL Test", "")
 
-	image := sdl.Load("test.png")
+	image := sdl.Load(resourcePath + "/test.png")
 
 	if image == nil {
 		panic(sdl.GetError())
@@ -96,7 +108,7 @@ func main() {
 
 	running := true
 
-	font := ttf.OpenFont("Fontin Sans.otf", 72)
+	font := ttf.OpenFont(resourcePath+"/Fontin Sans.otf", 72)
 
 	if font == nil {
 		panic(sdl.GetError())
@@ -105,7 +117,7 @@ func main() {
 	font.SetStyle(ttf.STYLE_UNDERLINE)
 	white := sdl.Color{255, 255, 255, 0}
 	text := ttf.RenderText_Blended(font, "Test (with music)", white)
-	music := mixer.LoadMUS("test.ogg")
+	music := mixer.LoadMUS(resourcePath + "/test.ogg")
 
 	if music == nil {
 		panic(sdl.GetError())

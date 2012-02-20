@@ -10,9 +10,12 @@ package ttf
 // #cgo pkg-config: SDL_ttf
 // #include <SDL/SDL_ttf.h>
 import "C"
-import "atom/sdl"
-import "sync"
-import "unsafe"
+
+import (
+	"github.com/0xe2-0x9a-0x9b/Go-SDL/sdl"
+	"sync"
+	"unsafe"
+)
 
 // The version of Go-SDL TTF bindings.
 // The version descriptor changes into a new unique string

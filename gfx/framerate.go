@@ -20,7 +20,7 @@ func NewFramerate() *FPSmanager {
 		framecount: 0,
 		rate:       FPS_DEFAULT,
 		rateticks:  (1000.0 / float64(FPS_DEFAULT)),
-		lastticks:  uint64(time.Nanoseconds()) / 1e6,
+		lastticks:  uint64(time.Now().UnixNano()) / 1e6,
 	}
 }
 
@@ -44,14 +44,14 @@ func (manager *FPSmanager) FramerateDelay() {
 	manager.framecount++
 
 	// get/calc ticks
-	current_ticks = uint64(time.Nanoseconds()) / 1e6
+	current_ticks = uint64(time.Now().UnixNano()) / 1e6
 	target_ticks = manager.lastticks + uint64(float64(manager.framecount)*manager.rateticks)
 
 	if current_ticks <= target_ticks {
 		the_delay = target_ticks - current_ticks
-		time.Sleep(int64(the_delay) * 1e6)
+		time.Sleep(time.Duration(the_delay * 1e6))
 	} else {
 		manager.framecount = 0
-		manager.lastticks = uint64(time.Nanoseconds()) / 1e6
+		manager.lastticks = uint64(time.Now().UnixNano()) / 1e6
 	}
 }

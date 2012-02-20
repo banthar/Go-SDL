@@ -1,12 +1,2 @@
-*~
-*.[o68]
-_obj
-*.cgo*.go
-*.cgo*.c
-*.cgo*.[68]
-*cgo*.so
-*.out
-test/test
-shoot.png
-*_cgo*
-sdl_audio_callback.so
+sdl-test/sdl-test
+sdl-template/sdl-template

@@ -1,4 +1,0 @@
-* missing functions, threads and file access are useless in Go, but there are probably some usefull functions left
-* add joystick support
-* other SDL libraries: SGE, gfx ...
-* more/better test/example apps

@@ -8,6 +8,10 @@
 package audio
 
 // #cgo pkg-config: sdl
+// #cgo darwin LDFLAGS: -lrt
+// #cgo freebsd LDFLAGS: -lrt
+// #cgo linux LDFLAGS: -lrt
+// #cgo windows LDFLAGS: -lpthread
 // #include <SDL/SDL_audio.h>
 // #include "callback.h"
 import "C"

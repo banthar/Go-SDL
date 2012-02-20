@@ -1,6 +1,6 @@
 package mixer
 
-//TODO: Autogenerate these values and add rest of constants
+//TODO: Add rest of constants from SDL include files
 const (
 	AUDIO_U8          = 0x0008
 	AUDIO_S8          = 0x8008

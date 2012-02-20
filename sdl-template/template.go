@@ -1,9 +1,9 @@
 package main
 
 import (
-	"atom/sdl"
 	"fmt"
-	"rand"
+	"github.com/0xe2-0x9a-0x9b/Go-SDL/sdl"
+	"math/rand"
 	"time"
 )
 
@@ -46,7 +46,7 @@ loop:
 		case event := <-sdl.Events:
 			fmt.Printf("%#v\n", event)
 
-			switch e := event.(type) {
+			switch event.(type) {
 			case sdl.QuitEvent:
 				break loop
 			}
