@@ -161,6 +161,14 @@ func (f *Font) GetStyle() int { return int(C.TTF_GetFontStyle(f.cfont)) }
 // Sets the rendering style of the font.
 func (f *Font) SetStyle(style int) { C.TTF_SetFontStyle(f.cfont, C.int(style)) }
 
+func (f *Font) GetOutline() int { return int(C.TTF_GetFontOutline(f.cfont)) }
+
+func (f *Font) SetOutline(outline int) { C.TTF_SetFontOutline(f.cfont, C.int(outline)) }
+
+func (f *Font) GetHinting() int { return int(C.TTF_GetFontHinting(f.cfont)) }
+
+func (f *Font) SetHinting(hinting int) { C.TTF_SetFontHinting(f.cfont, C.int(hinting)) }
+
 // Returns the maximum height of all the glyphs of the font.
 func (f *Font) Height() int { return int(C.TTF_FontHeight(f.cfont)) }
 
