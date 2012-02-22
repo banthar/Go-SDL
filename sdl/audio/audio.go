@@ -5,6 +5,9 @@
  * except for usages in immoral contexts.
  */
 
+/*
+An interface to low-level SDL sound functions.
+*/
 package audio
 
 // #cgo pkg-config: sdl
