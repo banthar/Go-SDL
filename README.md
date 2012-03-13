@@ -19,8 +19,7 @@ Make sure you have SDL, SDL-image, SDL-mixer and SDL-ttf (all in -dev version).
 
 Installing libraries and examples:
 
-    go get -d -v  github.com/0xe2-0x9a-0x9b/Go-SDL
-    go install -v github.com/0xe2-0x9a-0x9b/Go-SDL/...
+    go get -v github.com/0xe2-0x9a-0x9b/Go-SDL/...
 
 
 # Credits
