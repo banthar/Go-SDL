@@ -16,6 +16,7 @@ package sdl
 // #include <SDL/SDL.h>
 // #include <SDL/SDL_image.h>
 // static void SetError(const char* description){SDL_SetError("%s",description);}
+// static int __SDL_SaveBMP(SDL_Surface *surface, const char *file) { return SDL_SaveBMP(surface, file); }
 import "C"
 import "unsafe"
 import "sync"
@@ -518,6 +519,17 @@ func Load(file string) *Surface {
 	GlobalMutex.Unlock()
 
 	return wrap(screen)
+}
+
+// SaveBMP saves the src surface as a Windows BMP to file.
+func (src *Surface) SaveBMP(file string) int {
+	GlobalMutex.Lock()
+	cfile := C.CString(file)
+	// SDL_SaveBMP is a macro.
+	res := int(C.__SDL_SaveBMP(src.cSurface, cfile))
+	C.free(unsafe.Pointer(cfile))
+	GlobalMutex.Unlock()
+	return res
 }
 
 // Creates an empty Surface.
