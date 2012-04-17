@@ -7,7 +7,6 @@ flavor (eg. Rather than sdl.Flip(surface) it's surface.Flip() )
 */
 package sdl
 
-
 // #cgo pkg-config: sdl SDL_image
 //
 // struct private_hwdata{};
@@ -84,7 +83,6 @@ func (s *Surface) destroy() {
 	s.Pixels = nil
 }
 
-
 // =======
 // General
 // =======
@@ -146,7 +144,6 @@ func WasInit(flags uint32) int {
 	return status
 }
 
-
 // ==============
 // Error Handling
 // ==============
@@ -176,7 +173,6 @@ func ClearError() {
 	C.SDL_ClearError()
 	GlobalMutex.Unlock()
 }
-
 
 // ======
 // Video
@@ -544,7 +540,6 @@ func (s *Surface) DisplayFormat() *Surface {
 	return wrap(p)
 }
 
-
 // ========
 // Keyboard
 // ========
@@ -623,7 +618,6 @@ func GetKeyName(key Key) string {
 	return name
 }
 
-
 // ======
 // Events
 // ======
@@ -644,7 +638,6 @@ func (event *Event) poll() bool {
 
 	return ret != 0
 }
-
 
 // =====
 // Mouse
@@ -674,7 +667,6 @@ func ShowCursor(toggle int) int {
 	GlobalMutex.Unlock()
 	return state
 }
-
 
 // ========
 // Joystick
