@@ -7,7 +7,6 @@ flavor (eg. Rather than sdl.Flip(surface) it's surface.Flip() )
 */
 package sdl
 
-
 // #cgo pkg-config: sdl SDL_image
 //
 // struct private_hwdata{};
@@ -17,6 +16,7 @@ package sdl
 // #include <SDL/SDL.h>
 // #include <SDL/SDL_image.h>
 // static void SetError(const char* description){SDL_SetError("%s",description);}
+// static int __SDL_SaveBMP(SDL_Surface *surface, const char *file) { return SDL_SaveBMP(surface, file); }
 import "C"
 import "unsafe"
 import "sync"
@@ -84,7 +84,6 @@ func (s *Surface) destroy() {
 	s.Pixels = nil
 }
 
-
 // =======
 // General
 // =======
@@ -146,7 +145,6 @@ func WasInit(flags uint32) int {
 	return status
 }
 
-
 // ==============
 // Error Handling
 // ==============
@@ -176,7 +174,6 @@ func ClearError() {
 	C.SDL_ClearError()
 	GlobalMutex.Unlock()
 }
-
 
 // ======
 // Video
@@ -524,6 +521,17 @@ func Load(file string) *Surface {
 	return wrap(screen)
 }
 
+// SaveBMP saves the src surface as a Windows BMP to file.
+func (src *Surface) SaveBMP(file string) int {
+	GlobalMutex.Lock()
+	cfile := C.CString(file)
+	// SDL_SaveBMP is a macro.
+	res := int(C.__SDL_SaveBMP(src.cSurface, cfile))
+	C.free(unsafe.Pointer(cfile))
+	GlobalMutex.Unlock()
+	return res
+}
+
 // Creates an empty Surface.
 func CreateRGBSurface(flags uint32, width int, height int, bpp int, Rmask uint32, Gmask uint32, Bmask uint32, Amask uint32) *Surface {
 	GlobalMutex.Lock()
@@ -543,7 +551,6 @@ func (s *Surface) DisplayFormat() *Surface {
 	s.mutex.RUnlock()
 	return wrap(p)
 }
-
 
 // ========
 // Keyboard
@@ -623,7 +630,6 @@ func GetKeyName(key Key) string {
 	return name
 }
 
-
 // ======
 // Events
 // ======
@@ -644,7 +650,6 @@ func (event *Event) poll() bool {
 
 	return ret != 0
 }
-
 
 // =====
 // Mouse
@@ -674,7 +679,6 @@ func ShowCursor(toggle int) int {
 	GlobalMutex.Unlock()
 	return state
 }
-
 
 // ========
 // Joystick
