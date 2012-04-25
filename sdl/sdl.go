@@ -725,9 +725,19 @@ func WaitEvent() Event {
 	return goEvent((*cevent)(cast(&cev)))
 }
 
-// Push the event onto the event queue
+// Push the event onto the event queue. Note that it must be passed a
+// pointer to one of the Event structs, not a value. Thus
+//
+//	PushEvent(&UserEvent{})
+//
+// will succeed, but
+//
+//	PushEvent(UserEvent{})
+//
+// will result in a panic.
 func PushEvent(event Event) bool {
-	ret := C.SDL_PushEvent((*C.SDL_Event)(cast(cEvent(event))))
+	cev := cEvent(event)
+	ret := C.SDL_PushEvent((*C.SDL_Event)(cast(cev)))
 
 	return ret != 0
 }
@@ -778,7 +788,11 @@ func goEvent(cev *cevent) Event {
 
 func cEvent(ev Event) *cevent {
 	evv := reflect.ValueOf(ev)
-	return (*cevent)(cast(evv.UnsafeAddr()))
+	if k := evv.Kind(); k != reflect.Ptr {
+		panic("Can't handle kind: " + k.String())
+	}
+
+	return (*cevent)(cast(evv.Elem().UnsafeAddr()))
 }
 
 // Time
