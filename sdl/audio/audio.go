@@ -11,7 +11,6 @@ An interface to low-level SDL sound functions.
 package audio
 
 // #cgo pkg-config: sdl
-// #cgo darwin LDFLAGS: -lrt
 // #cgo freebsd LDFLAGS: -lrt
 // #cgo linux LDFLAGS: -lrt
 // #cgo windows LDFLAGS: -lpthread
@@ -173,7 +172,6 @@ func LockAudio() {
 func UnlockAudio() {
 	C.SDL_UnlockAudio()
 }
-
 
 // Send samples to the audio device (AUDIO_S16SYS format).
 // This function blocks until all the samples are consumed by the SDL audio thread.
