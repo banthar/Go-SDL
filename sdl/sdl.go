@@ -7,7 +7,8 @@ flavor (eg. Rather than sdl.Flip(surface) it's surface.Flip() )
 */
 package sdl
 
-// #cgo pkg-config: sdl SDL_image
+// #cgo pkg-config: sdl
+// #cgo LDFLAGS: -lSDL_image
 //
 // struct private_hwdata{};
 // struct SDL_BlitMap{};
