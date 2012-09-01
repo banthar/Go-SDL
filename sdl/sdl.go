@@ -19,8 +19,12 @@ package sdl
 // static void SetError(const char* description){SDL_SetError("%s",description);}
 // static int __SDL_SaveBMP(SDL_Surface *surface, const char *file) { return SDL_SaveBMP(surface, file); }
 import "C"
-import "unsafe"
-import "sync"
+
+import (
+	"runtime"
+	"sync"
+	"unsafe"
+)
 
 type cast unsafe.Pointer
 
@@ -366,13 +370,17 @@ func WM_ToggleFullScreen(surface *Surface) int {
 // Swaps OpenGL framebuffers/Update Display.
 func GL_SwapBuffers() {
 	GlobalMutex.Lock()
+	runtime.LockOSThread()
 	C.SDL_GL_SwapBuffers()
+	runtime.UnlockOSThread()
 	GlobalMutex.Unlock()
 }
 
 func GL_SetAttribute(attr int, value int) int {
 	GlobalMutex.Lock()
+	runtime.LockOSThread()
 	status := int(C.SDL_GL_SetAttribute(C.SDL_GLattr(attr), C.int(value)))
+	runtime.UnlockOSThread()
 	GlobalMutex.Unlock()
 	return status
 }
