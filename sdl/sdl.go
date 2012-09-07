@@ -21,7 +21,6 @@ package sdl
 import "C"
 
 import (
-	"runtime"
 	"sync"
 	"unsafe"
 )
@@ -370,17 +369,13 @@ func WM_ToggleFullScreen(surface *Surface) int {
 // Swaps OpenGL framebuffers/Update Display.
 func GL_SwapBuffers() {
 	GlobalMutex.Lock()
-	runtime.LockOSThread()
 	C.SDL_GL_SwapBuffers()
-	runtime.UnlockOSThread()
 	GlobalMutex.Unlock()
 }
 
 func GL_SetAttribute(attr int, value int) int {
 	GlobalMutex.Lock()
-	runtime.LockOSThread()
 	status := int(C.SDL_GL_SetAttribute(C.SDL_GLattr(attr), C.int(value)))
-	runtime.UnlockOSThread()
 	GlobalMutex.Unlock()
 	return status
 }
