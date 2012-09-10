@@ -556,6 +556,14 @@ func (s *Surface) DisplayFormat() *Surface {
 	return wrap(p)
 }
 
+// Converts a surface to the display format with alpha
+func (s *Surface) DisplayFormatAlpha() *Surface {
+	s.mutex.RLock()
+	p := C.SDL_DisplayFormatAlpha(s.cSurface)
+	s.mutex.RUnlock()
+	return wrap(p)
+}
+
 // ========
 // Keyboard
 // ========
