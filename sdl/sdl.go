@@ -21,6 +21,8 @@ package sdl
 import "C"
 
 import (
+	"os"
+	"runtime"
 	"sync"
 	"unsafe"
 )
@@ -108,6 +110,15 @@ func GoSdlVersion() string {
 func Init(flags uint32) int {
 	GlobalMutex.Lock()
 	status := int(C.SDL_Init(C.Uint32(flags)))
+	if (status != 0) && (runtime.GOOS == "darwin") && (flags&INIT_VIDEO != 0) {
+		if os.Getenv("SDL_VIDEODRIVER") == "" {
+			os.Setenv("SDL_VIDEODRIVER", "x11")
+			status = int(C.SDL_Init(C.Uint32(flags)))
+			if status != 0 {
+				os.Setenv("SDL_VIDEODRIVER", "")
+			}
+		}
+	}
 	GlobalMutex.Unlock()
 	return status
 }
@@ -130,6 +141,15 @@ func Quit() {
 func InitSubSystem(flags uint32) int {
 	GlobalMutex.Lock()
 	status := int(C.SDL_InitSubSystem(C.Uint32(flags)))
+	if (status != 0) && (runtime.GOOS == "darwin") && (flags&INIT_VIDEO != 0) {
+		if os.Getenv("SDL_VIDEODRIVER") == "" {
+			os.Setenv("SDL_VIDEODRIVER", "x11")
+			status = int(C.SDL_InitSubSystem(C.Uint32(flags)))
+			if status != 0 {
+				os.Setenv("SDL_VIDEODRIVER", "")
+			}
+		}
+	}
 	GlobalMutex.Unlock()
 	return status
 }
