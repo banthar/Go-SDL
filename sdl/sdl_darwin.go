@@ -1,7 +1,7 @@
 package sdl
 
 import (
-	"os"
+	//"os"
 )
 
 func init() {
