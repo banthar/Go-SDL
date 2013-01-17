@@ -5,7 +5,7 @@
  * except for usages in immoral contexts.
  */
 
-#include <SDL/SDL_audio.h>
+#include <SDL_audio.h>
 
 typedef void (SDLCALL *callback_t)(void *userdata, Uint8 *stream, int len);
 

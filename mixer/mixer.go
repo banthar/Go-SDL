@@ -9,7 +9,7 @@ package mixer
 
 // #cgo pkg-config: sdl
 // #cgo LDFLAGS: -lSDL_mixer
-// #include <SDL/SDL_mixer.h>
+// #include <SDL_mixer.h>
 import "C"
 import "unsafe"
 

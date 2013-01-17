@@ -9,7 +9,7 @@ package ttf
 
 // #cgo pkg-config: sdl
 // #cgo LDFLAGS: -lSDL_ttf
-// #include <SDL/SDL_ttf.h>
+// #include <SDL_ttf.h>
 import "C"
 
 import (

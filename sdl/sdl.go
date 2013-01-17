@@ -14,8 +14,8 @@ package sdl
 // struct SDL_BlitMap{};
 // #define map _map
 //
-// #include <SDL/SDL.h>
-// #include <SDL/SDL_image.h>
+// #include <SDL.h>
+// #include <SDL_image.h>
 // static void SetError(const char* description){SDL_SetError("%s",description);}
 // static int __SDL_SaveBMP(SDL_Surface *surface, const char *file) { return SDL_SaveBMP(surface, file); }
 import "C"
