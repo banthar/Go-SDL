@@ -23,6 +23,7 @@ import (
 	"os"
 	"runtime"
 	"sync"
+	"time"
 	"unsafe"
 )
 
@@ -845,4 +846,13 @@ func (joystick *Joystick) GetBall(ball int, dx, dy *int) int {
 // to 32767.
 func (joystick *Joystick) GetAxis(axis int) int16 {
 	return int16(C.SDL_JoystickGetAxis(joystick.cJoystick, C.int(axis)))
+}
+
+// ========
+// Time
+// ========
+
+// Waits a specified number of milliseconds before returning.
+func Delay(ms uint32) {
+	time.Sleep(time.Duration(ms) * time.Millisecond)
 }
