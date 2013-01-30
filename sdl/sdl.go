@@ -119,6 +119,7 @@ func Init(flags uint32) int {
 			}
 		}
 	}
+
 	GlobalMutex.Unlock()
 	return status
 }
@@ -848,9 +849,17 @@ func (joystick *Joystick) GetAxis(axis int) int16 {
 	return int16(C.SDL_JoystickGetAxis(joystick.cJoystick, C.int(axis)))
 }
 
-// ========
+// ====
 // Time
-// ========
+// ====
+
+// Gets the number of milliseconds since the SDL library initialization.
+func GetTicks() uint32 {
+	GlobalMutex.Lock()
+	t := uint32(C.SDL_GetTicks())
+	GlobalMutex.Unlock()
+	return t
+}
 
 // Waits a specified number of milliseconds before returning.
 func Delay(ms uint32) {
