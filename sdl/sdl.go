@@ -21,6 +21,7 @@ import "C"
 
 import (
 	"os"
+	"reflect"
 	"runtime"
 	"sync"
 	"time"
@@ -50,6 +51,8 @@ type Surface struct {
 	Pitch  uint16
 	Pixels unsafe.Pointer
 	Offset int32
+
+	gcPixels interface{} // Prevents garbage collection of pixels passed to func CreateRGBSurfaceFrom
 }
 
 func wrap(cSurface *C.SDL_Surface) *Surface {
@@ -88,6 +91,7 @@ func (s *Surface) destroy() {
 	s.cSurface = nil
 	s.Format = nil
 	s.Pixels = nil
+	s.gcPixels = nil
 }
 
 // =======
@@ -567,6 +571,26 @@ func CreateRGBSurface(flags uint32, width int, height int, bpp int, Rmask uint32
 	GlobalMutex.Unlock()
 
 	return wrap(p)
+}
+
+// Creates a Surface from existing pixel data. It expects pixels to be a slice, pointer or unsafe.Pointer.
+func CreateRGBSurfaceFrom(pixels interface{}, width, height, bpp, pitch int, Rmask, Gmask, Bmask, Amask uint32) *Surface {
+	var ptr unsafe.Pointer
+	switch v := reflect.ValueOf(pixels); v.Kind() {
+	case reflect.Ptr, reflect.UnsafePointer, reflect.Slice:
+		ptr = unsafe.Pointer(v.Pointer())
+	default:
+		panic("Don't know how to handle type: " + v.Kind().String())
+	}
+
+	GlobalMutex.Lock()
+	p := C.SDL_CreateRGBSurfaceFrom(ptr, C.int(width), C.int(height), C.int(bpp), C.int(pitch),
+		C.Uint32(Rmask), C.Uint32(Gmask), C.Uint32(Bmask), C.Uint32(Amask))
+	GlobalMutex.Unlock()
+
+	s := wrap(p)
+	s.gcPixels = pixels
+	return s
 }
 
 // Converts a surface to the display format
