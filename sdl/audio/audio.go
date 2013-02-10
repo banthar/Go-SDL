@@ -42,7 +42,7 @@ var userDefinedCallback func(unsafe.Pointer, int)
 //export streamCallback
 func streamCallback(arg unsafe.Pointer) {
 	ctx := (*C.context)(arg)
-	
+
 	// call the actual Go callback defined by user
 	//NOTE: here buffer truncation possible with large NumBytes
 	userDefinedCallback(ctx.Stream, int(ctx.NumBytes))
@@ -67,16 +67,16 @@ const (
 )
 
 type AudioSpec struct {
-	Freq        int
-	Format      uint16 // If in doubt, use AUDIO_S16SYS
-	Channels    uint8  // 1 or 2
-	Out_Silence uint8
-	Samples     uint16 // A power of 2, preferrably 2^11 (2048) or more
-	Out_Size    uint32
+	Freq                int
+	Format              uint16 // If in doubt, use AUDIO_S16SYS
+	Channels            uint8  // 1 or 2
+	Out_Silence         uint8
+	Samples             uint16 // A power of 2, preferrably 2^11 (2048) or more
+	Out_Size            uint32
 	UserDefinedCallback func(unsafe.Pointer, int)
 }
 
-var alreadyOpened	bool
+var alreadyOpened bool
 
 const (
 	// play concatenating samples
@@ -87,8 +87,8 @@ const (
 )
 
 type AudioEvent struct {
-	Event		int
-	Buffer		[]int16
+	Event  int
+	Buffer []int16
 }
 
 // Audio status
@@ -98,7 +98,7 @@ const (
 	SDL_AUDIO_PAUSED  = C.SDL_AUDIO_PAUSED
 )
 
-var PlayLoop	chan	AudioEvent
+var PlayLoop chan AudioEvent
 var PlayQueueSize int
 var TailBuffer []int16
 
@@ -146,18 +146,18 @@ func DownstreamPlayback16(buffer unsafe.Pointer, bufferSize int) {
 		}
 
 		ae := <-PlayLoop
-		
+
 		switch ae.Event {
-			case AE_UNPAUSE:
-				{
-					PauseAudio(false)
-					continue
+		case AE_UNPAUSE:
+			{
+				PauseAudio(false)
+				continue
 			}
-				case AE_PAUSE:
-				{
-					PauseAudio(true)
-					continue
-				}
+		case AE_PAUSE:
+			{
+				PauseAudio(true)
+				continue
+			}
 		}
 
 		// prepare eventual tail buffer
@@ -171,28 +171,28 @@ func DownstreamPlayback16(buffer unsafe.Pointer, bufferSize int) {
 		if overflowingSamples > 0 {
 			copy(TailBuffer, ae.Buffer[toBeCopied:])
 		}
-	
-				
+
 		// we have "eaten" a sound object from the queue
 		PlayQueueSize--
-		
-		
+
 		// this sound object fully satisfied the buffer
 		if overflowingSamples > 0 {
-			return }
-			
+			return
+		}
+
 		// in case of perfect boundary match
-		if streamLen == dstOffset + toBeCopied {
-		return }
-			
+		if streamLen == dstOffset+toBeCopied {
+			return
+		}
+
 		// loop again, pick another sound
 	}
 }
 
 func OpenAudio(desired, obtained_orNil *AudioSpec) int {
-		if alreadyOpened {
-			panic("more than 1 audio stream currently not supported")
-		}
+	if alreadyOpened {
+		panic("more than 1 audio stream currently not supported")
+	}
 
 	C.setCallbackFunc(callback.Func)
 	// copy handle to user-defined callback function, if defined
@@ -200,14 +200,14 @@ func OpenAudio(desired, obtained_orNil *AudioSpec) int {
 	// in that case you will use default SendAudio semantics
 	// note that if you specify a callback and use SendAudio, a hangup will instead happen
 	// when calling SendAudio	
-	
+
 	if nil != desired.UserDefinedCallback {
 		userDefinedCallback = desired.UserDefinedCallback
 	} else {
 		userDefinedCallback = DownstreamPlayback16
 		PlayLoop = make(chan AudioEvent)
 	}
-	
+
 	var C_desired, C_obtained *C.SDL_AudioSpec
 
 	C_desired = new(C.SDL_AudioSpec)
@@ -246,9 +246,9 @@ func OpenAudio(desired, obtained_orNil *AudioSpec) int {
 }
 
 func CloseAudio() {
-		if !alreadyOpened {
-			panic("SDL audio not opened")
-		}
+	if !alreadyOpened {
+		panic("SDL audio not opened")
+	}
 
 	PauseAudio(true)
 
@@ -261,11 +261,11 @@ func GetAudioStatus() int {
 
 // Pause or unpause the audio.
 func PauseAudio(pause_on bool) {
-		if pause_on {
-			C.SDL_PauseAudio(1)
-		} else {
-			C.SDL_PauseAudio(0)
-		}
+	if pause_on {
+		C.SDL_PauseAudio(1)
+	} else {
+		C.SDL_PauseAudio(0)
+	}
 }
 
 // pause or unpause the audio synchronously
@@ -273,19 +273,18 @@ func PauseAudioSync(pause_on bool) {
 	if nil == PlayLoop {
 		panic("Cannot use PauseAudioSync with custom callback")
 	}
-		if pause_on {
-			PlayLoop <- AudioEvent{Event:AE_PAUSE}
-		} else {
-			PlayLoop <- AudioEvent{Event:AE_UNPAUSE}
-		}
+	if pause_on {
+		PlayLoop <- AudioEvent{Event: AE_PAUSE}
+	} else {
+		PlayLoop <- AudioEvent{Event: AE_UNPAUSE}
+	}
 }
-
 
 // Send samples to the audio device (AUDIO_S16SYS format).
 // This function blocks until all the samples are consumed by the SDL audio thread.
 func SendAudio_int16(data []int16) {
 	PlayQueueSize++
-	PlayLoop <- AudioEvent{Event:AE_PLAY_CONCAT, Buffer: data}
+	PlayLoop <- AudioEvent{Event: AE_PLAY_CONCAT, Buffer: data}
 }
 
 // Send samples to the audio device (AUDIO_U16SYS format).
