@@ -87,10 +87,10 @@ const (
 )
 
 type AudioEvent struct {
-	Event  		int
-	Buffer		[]int16
-	
-	AudioType 	int
+	Event  int
+	Buffer []int16
+
+	AudioType int
 }
 
 // Audio status

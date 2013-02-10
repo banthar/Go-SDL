@@ -34,10 +34,10 @@ func Beep(freq, duration int) {
 func Init() bool {
 
 	desiredSpec := audio.AudioSpec{
-		Freq:                FREQUENCY,
-		Format:              audio.AUDIO_S16SYS,
-		Channels:            1,
-		Samples:             AUDIO_SAMPLES,
+		Freq:     FREQUENCY,
+		Format:   audio.AUDIO_S16SYS,
+		Channels: 1,
+		Samples:  AUDIO_SAMPLES,
 	}
 	var obtainedSpec audio.AudioSpec
 
@@ -45,25 +45,25 @@ func Init() bool {
 		return false
 	}
 
-		Play = make(chan BeepObject)
+	Play = make(chan BeepObject)
 
-			// start the playback queue processor
-			go func() {
-				for {
-					// pick next beep object
-					bo := <-Play
+	// start the playback queue processor
+	go func() {
+		for {
+			// pick next beep object
+			bo := <-Play
 
-					stream := make([]int16, bo.SamplesLeft)
+			stream := make([]int16, bo.SamplesLeft)
 
-					v := float64(0)
-					for i := 0; i < bo.SamplesLeft; i++ {
-						stream[i] = int16(AMPLITUDE * math.Sin(v*2*math.Pi/FREQUENCY))
-						v += bo.Freq
-					}
+			v := float64(0)
+			for i := 0; i < bo.SamplesLeft; i++ {
+				stream[i] = int16(AMPLITUDE * math.Sin(v*2*math.Pi/FREQUENCY))
+				v += bo.Freq
+			}
 
-					audio.SendAudio_int16(stream)
-				}
-			}() 
+			audio.SendAudio_int16(stream)
+		}
+	}()
 
 	return true
 }
@@ -128,7 +128,7 @@ func PlaySong3() {
 	time.Sleep(time.Millisecond * 200)
 	Beep(698, 200)
 	Beep(784, 800)
-	
+
 }
 
 func main() {
@@ -141,9 +141,9 @@ func main() {
 	audio.PauseAudio(false)
 
 	PlaySong1()
-	
+
 	// it's a silence :)
 	Beep(0, 400)
-	
+
 	PlaySong3()
 }
