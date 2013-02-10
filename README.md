@@ -7,6 +7,11 @@ The improvements/differences are:
 * audio callback support using excellent [Roger Peppe's callback package](http://code.google.com/p/rog-go/)
 * downstreaming support (written by neagix)
 
+# Known issues
+
+The re-designed audio system supports only signed 16bit samples, but writing the others is as easy as a copy/paste.
+
+
 # Installation
 
 Make sure you have SDL, SDL-image, SDL-mixer and SDL-ttf (all in -dev version).
