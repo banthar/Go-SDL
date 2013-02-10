@@ -87,8 +87,10 @@ const (
 )
 
 type AudioEvent struct {
-	Event  int
-	Buffer []int16
+	Event  		int
+	Buffer		[]int16
+	
+	AudioType 	int
 }
 
 // Audio status
@@ -100,15 +102,15 @@ const (
 
 var PlayLoop chan AudioEvent
 var PlayQueueSize int
-var TailBuffer []int16
+var TailBufferS16 []int16
 
 //NOTE: we assume this is not going to be called concurrently :)
-func DownstreamPlayback16(buffer unsafe.Pointer, bufferSize int) {
+func DownstreamPlaybackS16(buffer unsafe.Pointer, bufferSize int) {
 
 	// hack to convert C void* pointer to proper Go slice
 	var stream []int16
 	streamLen := bufferSize / 2
-	tailBufferLen := len(TailBuffer)
+	tailBufferLen := len(TailBufferS16)
 	sliceHeader := (*reflect.SliceHeader)((unsafe.Pointer(&stream)))
 	sliceHeader.Cap = streamLen
 	sliceHeader.Len = streamLen
@@ -119,22 +121,22 @@ func DownstreamPlayback16(buffer unsafe.Pointer, bufferSize int) {
 
 	// first thing, pick any eventual remnants buffer to copy over
 	dstOffset := 0
-	if nil != TailBuffer && tailBufferLen > 0 {
-		for i := range TailBuffer {
-			stream[dstOffset] = TailBuffer[i]
+	if nil != TailBufferS16 && tailBufferLen > 0 {
+		for i := range TailBufferS16 {
+			stream[dstOffset] = TailBufferS16[i]
 			dstOffset++
 
 			// we have copied enough
 			if dstOffset == streamLen {
-				newTailBuffer := make([]int16, tailBufferLen-dstOffset)
-				copy(newTailBuffer, TailBuffer[dstOffset:])
-				TailBuffer = newTailBuffer
+				newTailBufferS16 := make([]int16, tailBufferLen-dstOffset)
+				copy(newTailBufferS16, TailBufferS16[dstOffset:])
+				TailBufferS16 = newTailBufferS16
 				return
 			}
 		}
 
-		// we have consumed the whole TailBuffer, reset it
-		TailBuffer = nil
+		// we have consumed the whole TailBufferS16, reset it
+		TailBufferS16 = nil
 	}
 
 	// pick next beep object
@@ -164,12 +166,12 @@ func DownstreamPlayback16(buffer unsafe.Pointer, bufferSize int) {
 		toBeCopied := streamLen - dstOffset
 		overflowingSamples := len(ae.Buffer) - toBeCopied
 		if overflowingSamples > 0 {
-			TailBuffer = make([]int16, overflowingSamples)
+			TailBufferS16 = make([]int16, overflowingSamples)
 		}
 
 		copy(stream[dstOffset:], ae.Buffer)
 		if overflowingSamples > 0 {
-			copy(TailBuffer, ae.Buffer[toBeCopied:])
+			copy(TailBufferS16, ae.Buffer[toBeCopied:])
 		}
 
 		// we have "eaten" a sound object from the queue
@@ -204,7 +206,7 @@ func OpenAudio(desired, obtained_orNil *AudioSpec) int {
 	if nil != desired.UserDefinedCallback {
 		userDefinedCallback = desired.UserDefinedCallback
 	} else {
-		userDefinedCallback = DownstreamPlayback16
+		userDefinedCallback = DownstreamPlaybackS16
 		PlayLoop = make(chan AudioEvent)
 	}
 
@@ -284,7 +286,7 @@ func PauseAudioSync(pause_on bool) {
 // This function blocks until all the samples are consumed by the SDL audio thread.
 func SendAudio_int16(data []int16) {
 	PlayQueueSize++
-	PlayLoop <- AudioEvent{Event: AE_PLAY_CONCAT, Buffer: data}
+	PlayLoop <- AudioEvent{Event: AE_PLAY_CONCAT, Buffer: data, AudioType: AUDIO_S16}
 }
 
 // Send samples to the audio device (AUDIO_U16SYS format).
