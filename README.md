@@ -1,16 +1,18 @@
 # Introduction
 
-This is an improved version of 0xe2-0x9a-0x9b's [Go-SDL](https://github.com/0xe2-0x9a-0x9b/Go-SDL).
+This is an improved version of 0xe2-0x9a-0x9b's [Go-SDL](https://github.com/0xe2-0x9a-0x9b/Go-SDL)
+currently mantained by neagix.
 
 The improvements/differences are:
 
-* audio callback support using excellent [Roger Peppe's callback package](http://code.google.com/p/rog-go/)
-* downstreaming support (written by neagix)
+* audio callback support
+* downstreaming support
+
+There is a nice and fully working PC speaker buzzer example in examples/callback.
 
 # Known issues
 
 The re-designed audio system supports only signed 16bit samples, but writing the others is as easy as a copy/paste.
-
 
 # Installation
 

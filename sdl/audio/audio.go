@@ -23,7 +23,6 @@ package audio
 import "C"
 import "unsafe"
 import "reflect"
-import "code.google.com/p/rog-go/exp/callback"
 
 // The version of Go-SDL audio bindings.
 // The version descriptor changes into a new unique string
@@ -34,11 +33,13 @@ import "code.google.com/p/rog-go/exp/callback"
 //
 // If Go adds some kind of support for package versioning, this function will go away.
 func GoSdlAudioVersion() string {
-	return "Go-SDL audio 1.1"
+	return "Go-SDL audio 1.2"
 }
 
 var userDefinedCallback func(unsafe.Pointer, int)
 
+// this is the callback called from the C code
+// without any special glue since the CGO threads insanity has been fixed =)
 //export streamCallback
 func streamCallback(arg unsafe.Pointer) {
 	ctx := (*C.context)(arg)
@@ -196,7 +197,6 @@ func OpenAudio(desired, obtained_orNil *AudioSpec) int {
 		panic("more than 1 audio stream currently not supported")
 	}
 
-	C.setCallbackFunc(callback.Func)
 	// copy handle to user-defined callback function, if defined
 	// it is perfectly supported to not specify the callback function
 	// in that case you will use default SendAudio semantics
@@ -206,6 +206,7 @@ func OpenAudio(desired, obtained_orNil *AudioSpec) int {
 	if nil != desired.UserDefinedCallback {
 		userDefinedCallback = desired.UserDefinedCallback
 	} else {
+		// default playback (16-bit signed)
 		userDefinedCallback = DownstreamPlaybackS16
 		PlayLoop = make(chan AudioEvent)
 	}
@@ -217,6 +218,8 @@ func OpenAudio(desired, obtained_orNil *AudioSpec) int {
 	C_desired.format = C.Uint16(desired.Format)
 	C_desired.channels = C.Uint8(desired.Channels)
 	C_desired.samples = C.Uint16(desired.Samples)
+	// there is an unique C callback acting as proxy to the different Go callbacks
+	// see streamContext()
 	C_desired.callback = C.callback_getCallback()
 
 	if obtained_orNil != nil {
