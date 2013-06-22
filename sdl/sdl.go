@@ -550,6 +550,17 @@ func Load(file string) *Surface {
 	return wrap(screen)
 }
 
+// Loads Surface from file (using IMG_Load).
+func Load_RW(rwOps *RWops) *Surface {
+	GlobalMutex.Lock()
+
+	var screen = C.IMG_Load_RW((*C.SDL_RWops)(cast(rwOps.cRWops)), 0)
+
+	GlobalMutex.Unlock()
+
+	return wrap(screen)
+}
+
 // SaveBMP saves the src surface as a Windows BMP to file.
 func (src *Surface) SaveBMP(file string) int {
 	GlobalMutex.Lock()
