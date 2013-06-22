@@ -550,7 +550,7 @@ func Load(file string) *Surface {
 	return wrap(screen)
 }
 
-// Loads Surface from file (using IMG_Load).
+// Loads Surface from RWops (using IMG_Load_RW).
 func Load_RW(rwOps *RWops) *Surface {
 	GlobalMutex.Lock()
 
