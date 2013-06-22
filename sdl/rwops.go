@@ -1,7 +1,6 @@
 package sdl
 
 import (
-	"log"
 	"unsafe"
 )
 
