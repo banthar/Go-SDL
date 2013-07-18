@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/0xe2-0x9a-0x9b/Go-SDL/mixer"
-	"github.com/0xe2-0x9a-0x9b/Go-SDL/sdl"
-	"github.com/0xe2-0x9a-0x9b/Go-SDL/ttf"
+	"github.com/neagix/Go-SDL/mixer"
+	"github.com/neagix/Go-SDL/sdl"
+	"github.com/neagix/Go-SDL/ttf"
 	"log"
 	"math"
 	"os"
@@ -53,7 +53,7 @@ func main() {
 			log.Fatal("No such environment variable: GOPATH")
 		}
 		for _, gopath := range strings.Split(GOPATH, ":") {
-			a := gopath + "/src/github.com/0xe2-0x9a-0x9b/Go-SDL/sdl-test"
+			a := gopath + "/src/github.com/neagix/Go-SDL/examples/completeTest"
 			_, err := os.Stat(a)
 			if err == nil {
 				resourcePath = a
