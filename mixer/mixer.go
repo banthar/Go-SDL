@@ -24,6 +24,18 @@ func OpenAudio(frequency int, format uint16, channels, chunksize int) int {
 		C.int(channels), C.int(chunksize)))
 }
 
+// Queries the mixer format. Returns (0,0,0) if audio has not been
+// opened, and (frequency, format, channels) otherwise
+func QuerySpec() (int, uint16, int) {
+	var frequency C.int
+	var format C.Uint16
+	var channels C.int
+	if C.Mix_QuerySpec(&frequency, &format, &channels) == 0 {
+		return 0, 0, 0
+	}
+	return int(frequency), uint16(format), int(channels)
+}
+
 // Shuts down SDL_mixer.
 func CloseAudio() { C.Mix_CloseAudio() }
 
