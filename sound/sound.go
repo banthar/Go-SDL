@@ -15,7 +15,9 @@ package sound
 import "C"
 import "unsafe"
 
+import "errors"
 import "sync"
+import "fmt"
 import "github.com/neagix/Go-SDL/sdl/audio"
 
 type AudioInfo struct {
@@ -37,12 +39,14 @@ type Sample struct {
 	Decoder *DecoderInfo
 	Desired *AudioInfo
 	Actual  *AudioInfo
+
+	nbytes uint32 // number of bytes read in last Decode()
 }
 
-func GetError() string {
-	err := C.GoString(C.Sound_GetError())
+func GetError() error {
+	errstr := C.GoString(C.Sound_GetError())
 	C.Sound_ClearError()
-	return err
+	return errors.New(errstr)
 }
 
 func Init() int {
@@ -108,15 +112,18 @@ func cAudioInfo(info *AudioInfo) *C.Sound_AudioInfo {
 	return cinfo
 }
 
-func NewSampleFromFile(filename string, desired *AudioInfo, size uint) *Sample {
+func NewSampleFromFile(filename string, desired *AudioInfo, size uint) (*Sample, error) {
 	sample := new(Sample)
 	cfile := C.CString(filename)
 	defer C.free(unsafe.Pointer(cfile))
 	sample.csample = C.Sound_NewSampleFromFile(cfile, cAudioInfo(desired), C.Uint32(size))
+	if sample.csample == nil {
+		return nil, GetError()
+	}
 	sample.Decoder = fromCDecoderInfo(sample.csample.decoder)
 	sample.Desired = fromCAudioInfo(&sample.csample.desired)
 	sample.Actual = fromCAudioInfo(&sample.csample.actual)
-	return sample
+	return sample, nil
 }
 
 func FreeSample(sample Sample) {
@@ -128,18 +135,20 @@ func (sample *Sample) SetBufferSize(size uint32) int {
 	return int(ret)
 }
 
+/* Decodes as many samples as will fit in the buffer.
+ * Returns the number of BYTES read (zero at EOF). */
 func (sample *Sample) Decode() uint32 {
 	sample.Lock()
 	defer sample.Unlock()
-	nbytes := C.Sound_Decode(sample.csample)
-	return uint32(nbytes)
+	sample.nbytes = uint32(C.Sound_Decode(sample.csample))
+	return sample.nbytes
 }
 
 func (sample *Sample) DecodeAll() uint32 {
 	sample.Lock()
 	defer sample.Unlock()
-	nbytes := C.Sound_DecodeAll(sample.csample)
-	return uint32(nbytes)
+	sample.nbytes = uint32(C.Sound_DecodeAll(sample.csample))
+	return sample.nbytes
 }
 
 func (sample *Sample) Rewind() int {
@@ -160,10 +169,10 @@ func (sample *Sample) Buffer_int16() []int16 {
 	sample.Lock()
 	defer sample.Unlock()
 	if sample.Desired.Format != audio.AUDIO_S16SYS {
-		panic("wrong format requested")
+		panic(fmt.Sprintf("wrong format requested %d", sample.Desired.Format))
 	}
 
-	buf := make([]int16, int(sample.csample.buffer_size)/2)
+	buf := make([]int16, int(sample.nbytes)/2)
 	for i := 0; i < len(buf); i++ {
 		buf[i] = int16(*((*C.int16_t)(unsafe.Pointer((uintptr(sample.csample.buffer) + uintptr(i*2))))))
 	}
