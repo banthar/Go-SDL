@@ -17,17 +17,17 @@ Installation
 
 To install all of the relevant libraries, use the following:
 
-    goinstall github.com/banthar/Go-SDL/sdl
-    goinstall github.com/banthar/Go-SDL/ttf
-    goinstall github.com/banthar/Go-SDL/gfx
-    goinstall github.com/banthar/Go-SDL/mixer
+    go get github.com/banthar/Go-SDL/sdl
+    go get github.com/banthar/Go-SDL/ttf
+    go get github.com/banthar/Go-SDL/gfx
+    go get github.com/banthar/Go-SDL/mixer
 
 If you don't have write permission for GOPATH/GOROOT, you may need to run the previous command as root. If you get errors while trying to run it using sudo, it's possible that the GOROOT/GOOS/GOARCH/GOBIN variables are not available to the make command. You can try using '-E' to preserve the environment:
 
-    sudo -E goinstall github.com/banthar/Go-SDL/sdl
-    sudo -E goinstall github.com/banthar/Go-SDL/ttf
-    sudo -E goinstall github.com/banthar/Go-SDL/gfx
-    sudo -E goinstall github.com/banthar/Go-SDL/mixer
+    sudo -E go get github.com/banthar/Go-SDL/sdl
+    sudo -E go get github.com/banthar/Go-SDL/ttf
+    sudo -E go get github.com/banthar/Go-SDL/gfx
+    sudo -E go get github.com/banthar/Go-SDL/mixer
 
 It's also possible to install just using make:
 
